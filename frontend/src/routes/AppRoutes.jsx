@@ -7,7 +7,7 @@ import ResetPassword from '../pages/ResetPassword';
 import ResetSuccess from '../pages/ResetSuccess';
 
 /**
- * AppRoutes - Configures all authentication routes for CollabBoard.
+ * AppRoutes - Configures all authentication routes for Fizz Connect.
  */
 export default function AppRoutes() {
   return (

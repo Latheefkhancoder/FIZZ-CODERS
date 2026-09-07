@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * AuthInput - Modern, accessible input with left icon support and retro-pixel red glow on focus.
+ * AuthInput - Modern, accessible input with left icon support and aqua glow on focus.
  */
 export default function AuthInput({
   id,
@@ -54,7 +54,7 @@ export default function AuthInput({
         .auth-field-label {
           font-family: var(--font-sans);
           font-size: 13px;
-          font-weight: 500;
+          font-weight: 700;
           color: var(--text-light);
           letter-spacing: 0.2px;
         }
@@ -71,16 +71,16 @@ export default function AuthInput({
         }
 
         .auth-input-wrapper:hover {
-          border-color: rgba(255, 45, 61, 0.45);
+          border-color: rgba(22, 198, 210, 0.45);
         }
 
         .auth-input-wrapper:focus-within {
-          border-color: var(--red-primary);
-          box-shadow: 0 0 0 3px rgba(255, 45, 61, 0.18), 0 0 15px rgba(255, 45, 61, 0.25);
+          border-color: var(--input-border-focus);
+          box-shadow: 0 0 0 3px rgba(22, 198, 210, 0.18), 0 0 15px rgba(22, 198, 210, 0.15);
         }
 
         .auth-input-wrapper.has-error {
-          border-color: #ff3344;
+          border-color: #28D3D6;
           box-shadow: 0 0 0 2px rgba(255, 51, 68, 0.25);
         }
 
@@ -116,7 +116,7 @@ export default function AuthInput({
 
         .auth-field-error {
           font-size: 11.5px;
-          color: var(--red-light);
+          color: #28D3D6;
           font-family: var(--font-sans);
           padding-left: 2px;
           display: flex;

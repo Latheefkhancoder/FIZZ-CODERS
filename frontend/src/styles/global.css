@@ -1,37 +1,38 @@
 /* =========================================================
-   CollabBoard - Retro-Futuristic Pixel SaaS Design System
+   FIZZ-CONNECT - Modern SaaS Design System
    ========================================================= */
 
 :root {
   /* Color Palette */
-  --bg-deep: #050505;
-  --bg-dark: #0A0000;
-  --bg-crimson: #140000;
+  --bg-deep: #FFFDF7;
+  --bg-dark: #FFFDF7;
+  --bg-crimson: #FFFDF7;
 
-  --red-darkest: #200002;
-  --red-dark: #300000;
-  --red-mid: #520000;
-  --red-primary: #FF2D3D;
-  --red-light: #FF4B55;
-  --red-accent: #FF6B74;
-  --red-glow: rgba(255, 45, 61, 0.45);
-  --red-glow-subtle: rgba(255, 45, 61, 0.16);
+  --red-darkest: #102A43;
+  --red-dark: #087F88;
+  --red-mid: #19C7D1;
+  --red-primary: #19C7D1;
+  --red-light: #28D3D6;
+  --red-accent: #28D3D6;
+  --red-glow: rgba(25, 199, 209, 0.45);
+  --red-glow-subtle: rgba(25, 199, 209, 0.16);
 
   /* Neutrals */
-  --text-white: #FFFFFF;
-  --text-light: #E5E5E5;
-  --text-muted: #9A9A9A;
-  --text-dim: #6B6B6B;
+  --text-white: #102A43; 
+  --text-light: #102A43;
+  --text-muted: #60758A;
+  --text-dim: #8AA0B2;
+  --pure-white: #FFFFFF;
 
   /* Card & Surface Tokens */
-  --card-bg: rgba(16, 2, 4, 0.82);
-  --card-border: rgba(255, 45, 61, 0.32);
-  --card-border-glow: rgba(255, 45, 61, 0.7);
+  --card-bg: #FFFFFF;
+  --card-border: #E8FAF8;
+  --card-border-glow: rgba(25, 199, 209, 0.4);
   --card-radius: 16px;
 
-  --input-bg: rgba(8, 1, 2, 0.9);
-  --input-border: rgba(255, 45, 61, 0.24);
-  --input-border-focus: #FF2D3D;
+  --input-bg: #FAF9F2;
+  --input-border: #E8FAF8;
+  --input-border-focus: #19C7D1;
   --input-radius: 10px;
 
   /* Typography */
@@ -40,21 +41,24 @@
   --font-pixel-accent: 'Press Start 2P', monospace;
 
   /* Shadows */
-  --shadow-card: 0 10px 40px -10px rgba(0, 0, 0, 0.9), 0 0 35px -5px rgba(255, 45, 61, 0.2);
-  --shadow-card-hover: 0 15px 50px -10px rgba(0, 0, 0, 0.95), 0 0 50px -2px rgba(255, 45, 61, 0.35);
-  --shadow-btn: 0 4px 20px rgba(255, 45, 61, 0.45);
-  --shadow-btn-hover: 0 6px 30px rgba(255, 45, 61, 0.7);
-  --shadow-node: 0 0 15px rgba(255, 45, 61, 0.3);
+  --shadow-card: 0 10px 40px -10px rgba(0, 0, 0, 0.05), 0 0 35px -5px rgba(25, 199, 209, 0.15);
+  --shadow-card-hover: 0 15px 50px -10px rgba(0, 0, 0, 0.08), 0 0 50px -2px rgba(25, 199, 209, 0.25);
+  --shadow-btn: 0 4px 20px rgba(25, 199, 209, 0.35);
+  --shadow-btn-hover: 0 6px 30px rgba(25, 199, 209, 0.5);
+  --shadow-node: 0 0 15px rgba(25, 199, 209, 0.3);
 }
 
 /* CSS Reset & Defaults */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-html, body {
+html,
+body {
   width: 100%;
   min-height: 100%;
   background-color: var(--bg-deep);
@@ -74,11 +78,11 @@ html, body {
   pointer-events: none;
   z-index: 0;
   background-color: var(--bg-deep);
-  background-image: 
-    radial-gradient(circle at 18% 22%, rgba(82, 0, 0, 0.45) 0%, transparent 48%),
-    radial-gradient(circle at 82% 75%, rgba(48, 0, 0, 0.5) 0%, transparent 45%),
-    linear-gradient(to right, rgba(255, 45, 61, 0.035) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 45, 61, 0.035) 1px, transparent 1px);
+  background-image:
+    radial-gradient(circle at 18% 22%, rgba(25, 199, 209, 0.08) 0%, transparent 48%),
+    radial-gradient(circle at 82% 75%, rgba(37, 208, 211, 0.08) 0%, transparent 45%),
+    linear-gradient(to right, rgba(25, 199, 209, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(25, 199, 209, 0.08) 1px, transparent 1px);
   background-size: 100% 100%, 100% 100%, 28px 28px, 28px 28px;
 }
 
@@ -87,13 +91,11 @@ html, body {
   content: '';
   position: absolute;
   inset: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    rgba(0, 0, 0, 0.15),
-    rgba(0, 0, 0, 0.15) 1px,
-    transparent 1px,
-    transparent 2px
-  );
+  background: repeating-linear-gradient(0deg,
+      rgba(25, 199, 209, 0.02),
+      rgba(25, 199, 209, 0.02) 1px,
+      transparent 1px,
+      transparent 2px);
   pointer-events: none;
   opacity: 0.5;
 }
@@ -129,6 +131,7 @@ input {
     opacity: 0;
     transform: translateY(18px) scale(0.98);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -136,46 +139,83 @@ input {
 }
 
 @keyframes pixelBob {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-8px);
   }
 }
 
 @keyframes pixelBobDelayed {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-12px);
   }
 }
 
 @keyframes pulseRedGlow {
-  0%, 100% {
-    box-shadow: 0 0 15px rgba(255, 45, 61, 0.25);
+
+  0%,
+  100% {
+    box-shadow: 0 0 15px rgba(25, 199, 209, 0.15);
   }
+
   50% {
-    box-shadow: 0 0 30px rgba(255, 45, 61, 0.55);
+    box-shadow: 0 0 30px rgba(25, 199, 209, 0.35);
   }
 }
 
 @keyframes pixelCrossBlink {
-  0%, 100% { opacity: 0.35; transform: scale(1); }
-  50% { opacity: 0.9; transform: scale(1.15); }
+
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.9;
+    transform: scale(1.15);
+  }
 }
 
 @keyframes pulseText {
-  0%, 100% { opacity: 0.7; }
-  50% { opacity: 1; text-shadow: 0 0 8px rgba(255, 45, 61, 0.6); }
+
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+
+  50% {
+    opacity: 1;
+    text-shadow: 0 0 8px rgba(25, 199, 209, 0.6);
+  }
 }
 
 @keyframes checkmarkPop {
-  0% { transform: scale(0.6); opacity: 0; }
-  70% { transform: scale(1.1); opacity: 1; }
-  100% { transform: scale(1); opacity: 1; }
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+
+  70% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 /* Utility Pixel Classes */
@@ -205,13 +245,16 @@ input {
   width: 6px;
   height: 6px;
 }
+
 ::-webkit-scrollbar-track {
   background: var(--bg-deep);
 }
+
 ::-webkit-scrollbar-thumb {
   background: var(--red-dark);
   border-radius: 3px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: var(--red-primary);
 }

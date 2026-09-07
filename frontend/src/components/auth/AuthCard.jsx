@@ -1,8 +1,8 @@
 import React from 'react';
 
 /**
- * AuthCard - Dark semi-transparent card container with thin red border,
- * glowing red ambient shadow, and responsive layout.
+ * AuthCard - White card container with thin aqua border,
+ * subtle aqua ambient shadow, and responsive layout.
  */
 export default function AuthCard({
   title,

@@ -2,17 +2,16 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 /**
- * AuthLayout - Master retro-futuristic layout shell for all CollabBoard auth views.
- * Handles split-screen desktop, responsive mobile stacking, pixel grid background,
+ * AuthLayout - Master modern layout shell for all FIZZ-CONNECT auth views.
+ * Handles split-screen desktop, responsive mobile stacking, background,
  * branding header with navigation links, and bottom retro status tags.
  */
 export default function AuthLayout({
   headline,
   highlightWord,
   subtext,
-  topQuote = 'SAME IDEAS. BIGGER POSSIBILITIES.',
-  bottomLeftTag = 'IDEAS CONNECT PEOPLE.',
-  bottomRightTag = 'COLLABORATE · INNOVATE · BUILD · GROW',
+  bottomLeftTag,
+  bottomRightTag,
   visualSlot,
   children,
   centeredLayout = false,
@@ -22,43 +21,32 @@ export default function AuthLayout({
       {/* Background Pixel Grid & Atmospheric Ambient Radiance */}
       <div className="pixel-grid-bg" />
 
-      {/* Floating ambient corner red glow */}
+      {/* Floating ambient corner aqua glow */}
       <div className="ambient-glow glow-top-left" />
       <div className="ambient-glow glow-bottom-right" />
 
       {/* Top Header Navbar */}
       <header className="auth-header">
         <Link to="/login" className="brand-logo-link">
-          {/* Pixel Gem / Cog Icon */}
+          {/* Pixel Gem / Cog Icon in Aqua theme */}
           <span className="pixel-brand-icon">
             <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="10" y="2" width="8" height="4" fill="#FF2D3D" />
-              <rect x="10" y="22" width="8" height="4" fill="#FF2D3D" />
-              <rect x="2" y="10" width="4" height="8" fill="#FF2D3D" />
-              <rect x="22" y="10" width="4" height="8" fill="#FF2D3D" />
-              <rect x="6" y="6" width="16" height="16" fill="#750009" stroke="#FF2D3D" strokeWidth="2" />
+              <rect x="10" y="2" width="8" height="4" fill="#39D9D5" />
+              <rect x="10" y="22" width="8" height="4" fill="#39D9D5" />
+              <rect x="2" y="10" width="4" height="8" fill="#39D9D5" />
+              <rect x="22" y="10" width="4" height="8" fill="#39D9D5" />
+              <rect x="6" y="6" width="16" height="16" fill="#16C6D2" stroke="#39D9D5" strokeWidth="2" />
               <rect x="11" y="11" width="6" height="6" fill="#FFFFFF" />
             </svg>
           </span>
 
           <div className="brand-text-block">
             <h1 className="brand-title">
-              <span className="brand-collab">Collab</span>
-              <span className="brand-board">Board</span>
+              <span className="brand-fizz">FIZZ-</span><span className="brand-connect">CONNECT</span>
             </h1>
-            <span className="brand-tagline">Plan · Collaborate · Build</span>
+            <span className="brand-tagline">PLAN · COLLABORATE · BUILD</span>
           </div>
         </Link>
-
-        <div className="header-right-meta">
-          <div className="top-pixel-quote font-pixel">"{topQuote}"</div>
-          <nav className="header-nav" aria-label="Main Navigation">
-            <span className="nav-item">Ideas</span>
-            <span className="nav-item">People</span>
-            <span className="nav-item">Projects</span>
-            <span className="nav-item">About</span>
-          </nav>
-        </div>
       </header>
 
       {/* Main Content Area */}
@@ -96,11 +84,13 @@ export default function AuthLayout({
         )}
       </main>
 
-      {/* Bottom Retro Status Tags matching reference image */}
-      <footer className="auth-footer-bar">
-        <span className="footer-tag-left font-pixel">{bottomLeftTag}</span>
-        <span className="footer-tag-right font-pixel">{bottomRightTag}</span>
-      </footer>
+      {/* Bottom Retro Status Tags - kept if passed, though mostly removed */}
+      {(bottomLeftTag || bottomRightTag) && (
+        <footer className="auth-footer-bar">
+          <span className="footer-tag-left font-pixel">{bottomLeftTag}</span>
+          <span className="footer-tag-right font-pixel">{bottomRightTag}</span>
+        </footer>
+      )}
 
       {/* Layout Styles */}
       <style>{`
@@ -129,13 +119,13 @@ export default function AuthLayout({
         .glow-top-left {
           top: -100px;
           left: -100px;
-          background: #520000;
+          background: #DDF8F6;
         }
 
         .glow-bottom-right {
           bottom: -100px;
           right: -100px;
-          background: #380002;
+          background: #EFFCFB;
         }
 
         /* Header */
@@ -159,7 +149,7 @@ export default function AuthLayout({
         .pixel-brand-icon {
           display: flex;
           align-items: center;
-          filter: drop-shadow(0 0 10px rgba(255, 45, 61, 0.6));
+          filter: drop-shadow(0 0 10px rgba(22, 198, 210, 0.4));
           transition: transform 0.2s ease;
         }
 
@@ -181,12 +171,12 @@ export default function AuthLayout({
           line-height: 1;
         }
 
-        .brand-collab {
-          color: var(--text-white);
+        .brand-fizz {
+          color: var(--text-white); /* Dark Navy */
         }
 
-        .brand-board {
-          color: var(--red-primary);
+        .brand-connect {
+          color: var(--red-primary); /* Aqua */
         }
 
         .brand-tagline {
@@ -195,41 +185,6 @@ export default function AuthLayout({
           color: var(--text-muted);
           letter-spacing: 0.5px;
           text-transform: uppercase;
-        }
-
-        .header-right-meta {
-          display: flex;
-          flex-direction: column;
-          align-items: flex-end;
-          gap: 8px;
-        }
-
-        .top-pixel-quote {
-          font-size: 10px;
-          color: var(--text-muted);
-          letter-spacing: 1px;
-          text-transform: uppercase;
-          opacity: 0.85;
-        }
-
-        .header-nav {
-          display: flex;
-          align-items: center;
-          gap: 24px;
-        }
-
-        .nav-item {
-          font-family: var(--font-sans);
-          font-size: 13px;
-          font-weight: 500;
-          color: var(--text-light);
-          cursor: pointer;
-          transition: color 0.2s ease;
-        }
-
-        .nav-item:hover {
-          color: var(--red-primary);
-          text-shadow: 0 0 8px var(--red-glow);
         }
 
         /* Main Container */
@@ -349,12 +304,6 @@ export default function AuthLayout({
           .editorial-subtext {
             margin: 0 auto;
           }
-          .top-pixel-quote {
-            display: none;
-          }
-          .header-nav {
-            gap: 16px;
-          }
         }
 
         @media (max-width: 580px) {
@@ -365,9 +314,6 @@ export default function AuthLayout({
             flex-direction: column;
             align-items: flex-start;
             gap: 16px;
-          }
-          .header-right-meta {
-            align-items: flex-start;
           }
           .editorial-headline {
             font-size: 30px;

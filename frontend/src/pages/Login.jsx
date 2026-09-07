@@ -72,7 +72,7 @@ export default function Login() {
     >
       <AuthCard
         title="Welcome Back!"
-        subtitle="Log in to continue building great things on CollabBoard."
+        subtitle="Log in to continue building great things on FIZZ-CONNECT."
       >
         <form onSubmit={handleSubmit} className="auth-form-inner" noValidate>
           {/* Email Address */}

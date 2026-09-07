@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * AuthButton - Primary retro-futuristic red pill button with subtle glow and hover elevation.
+ * AuthButton - Primary SaaS pill button with subtle aqua glow and hover elevation.
  */
 export default function AuthButton({
   children,
@@ -33,10 +33,10 @@ export default function AuthButton({
           position: relative;
           width: 100%;
           padding: 13px 24px;
-          background: linear-gradient(135deg, #FF2D3D 0%, #D81F2E 100%);
-          border: 1px solid rgba(255, 255, 255, 0.2);
+          background: linear-gradient(135deg, #16C6D2 0%, #42D8D2 100%);
+          border: 1px solid rgba(255, 255, 255, 0.4);
           border-radius: 9999px; /* Pill style matching reference */
-          color: var(--text-white);
+          color: var(--pure-white);
           font-family: var(--font-sans);
           font-size: 14.5px;
           font-weight: 600;
@@ -52,13 +52,13 @@ export default function AuthButton({
 
         .auth-btn-primary:hover:not(:disabled) {
           transform: translateY(-2px);
-          background: linear-gradient(135deg, #FF4B55 0%, #FF2D3D 100%);
+          background: linear-gradient(135deg, #39D9D5 0%, #16C6D2 100%);
           box-shadow: var(--shadow-btn-hover);
         }
 
         .auth-btn-primary:active:not(:disabled) {
           transform: translateY(0);
-          box-shadow: 0 2px 10px rgba(255, 45, 61, 0.5);
+          box-shadow: 0 2px 10px rgba(22, 198, 210, 0.5);
         }
 
         .auth-btn-primary:disabled {
