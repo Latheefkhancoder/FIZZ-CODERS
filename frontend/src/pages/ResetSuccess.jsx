@@ -30,30 +30,30 @@ export default function ResetSuccess() {
               xmlns="http://www.w3.org/2000/svg"
             >
               {/* Outer Pixelated Red Ring */}
-              <rect x="18" y="2" width="12" height="4" fill="#FF2D3D" />
-              <rect x="18" y="42" width="12" height="4" fill="#FF2D3D" />
-              <rect x="2" y="18" width="4" height="12" fill="#FF2D3D" />
-              <rect x="42" y="18" width="4" height="12" fill="#FF2D3D" />
+              <rect x="18" y="2" width="12" height="4" fill="#19C7D1" />
+              <rect x="18" y="42" width="12" height="4" fill="#19C7D1" />
+              <rect x="2" y="18" width="4" height="12" fill="#19C7D1" />
+              <rect x="42" y="18" width="4" height="12" fill="#19C7D1" />
 
-              <rect x="8" y="6" width="10" height="4" fill="#FF2D3D" />
-              <rect x="30" y="6" width="10" height="4" fill="#FF2D3D" />
-              <rect x="8" y="38" width="10" height="4" fill="#FF2D3D" />
-              <rect x="30" y="38" width="10" height="4" fill="#FF2D3D" />
+              <rect x="8" y="6" width="10" height="4" fill="#19C7D1" />
+              <rect x="30" y="6" width="10" height="4" fill="#19C7D1" />
+              <rect x="8" y="38" width="10" height="4" fill="#19C7D1" />
+              <rect x="30" y="38" width="10" height="4" fill="#19C7D1" />
 
-              <rect x="6" y="10" width="4" height="8" fill="#FF2D3D" />
-              <rect x="38" y="10" width="4" height="8" fill="#FF2D3D" />
-              <rect x="6" y="30" width="4" height="8" fill="#FF2D3D" />
-              <rect x="38" y="30" width="4" height="8" fill="#FF2D3D" />
+              <rect x="6" y="10" width="4" height="8" fill="#19C7D1" />
+              <rect x="38" y="10" width="4" height="8" fill="#19C7D1" />
+              <rect x="6" y="30" width="4" height="8" fill="#19C7D1" />
+              <rect x="38" y="30" width="4" height="8" fill="#19C7D1" />
 
               {/* Inner Circle Fill */}
-              <rect x="10" y="10" width="28" height="28" fill="#1c0104" />
+              <rect x="10" y="10" width="28" height="28" fill="#FFFFFF" />
 
               {/* Pixel Checkmark */}
-              <rect x="14" y="24" width="4" height="4" fill="#FF2D3D" />
-              <rect x="18" y="28" width="4" height="4" fill="#FF2D3D" />
-              <rect x="22" y="32" width="4" height="4" fill="#FF4B55" />
-              <rect x="26" y="28" width="4" height="4" fill="#FF4B55" />
-              <rect x="30" y="24" width="4" height="4" fill="#FF4B55" />
+              <rect x="14" y="24" width="4" height="4" fill="#19C7D1" />
+              <rect x="18" y="28" width="4" height="4" fill="#19C7D1" />
+              <rect x="22" y="32" width="4" height="4" fill="#28D3D6" />
+              <rect x="26" y="28" width="4" height="4" fill="#28D3D6" />
+              <rect x="30" y="24" width="4" height="4" fill="#28D3D6" />
               <rect x="34" y="20" width="4" height="4" fill="#FFFFFF" />
             </svg>
           </div>
@@ -87,7 +87,7 @@ export default function ResetSuccess() {
         }
 
         .pixel-success-svg {
-          filter: drop-shadow(0 0 20px rgba(255, 45, 61, 0.7));
+          filter: drop-shadow(0 0 20px rgba(25, 199, 209, 0.25));
           transition: transform 0.3s ease;
         }
 

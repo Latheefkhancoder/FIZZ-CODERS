@@ -73,7 +73,7 @@ export default function CreateAccount() {
     <AuthLayout
       headline={['More', 'Creators', 'Brighter']}
       highlightWord="Tomorrow."
-      subtext="Join CollabBoard and be part of a community that turns ideas into reality."
+      subtext="Join FIZZ-CONNECT and be part of a community that turns ideas into reality."
       topQuote="MORE CREATORS. BRIGHTER TOMORROW."
       bottomLeftTag="IDEAS TODAY IMPACT TOMORROW."
       bottomRightTag="BUILD · SHARE · LEARN · GROW"
@@ -81,7 +81,7 @@ export default function CreateAccount() {
     >
       <AuthCard
         title="Create Your Account"
-        subtitle="Join CollabBoard and start building something amazing."
+        subtitle="Join FIZZ-CONNECT and start building something amazing."
       >
         <form onSubmit={handleSubmit} className="auth-form-inner" noValidate>
           {/* Full Name */}
