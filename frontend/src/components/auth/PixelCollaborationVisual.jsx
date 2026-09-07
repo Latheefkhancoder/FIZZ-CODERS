@@ -649,7 +649,8 @@ export default function PixelCollaborationVisual({ variant = 'login' }) {
         .pixel-hero-visual-root {
           position: relative;
           width: 100%;
-          min-height: 480px;
+          height: 100%;
+          min-height: 0;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -666,8 +667,10 @@ export default function PixelCollaborationVisual({ variant = 'login' }) {
 
         .pixel-hero-svg {
           width: 100%;
+          height: 100%;
           max-width: 760px;
-          height: auto;
+          max-height: 100%;
+          object-fit: contain;
           filter: drop-shadow(0 0 25px rgba(255, 45, 61, 0.22));
           transition: transform 0.3s ease;
         }
@@ -805,7 +808,7 @@ export default function PixelCollaborationVisual({ variant = 'login' }) {
 
         @media (max-width: 900px) {
           .pixel-hero-visual-root {
-            min-height: 380px;
+            min-height: unset;
           }
           .pixel-hero-svg {
             max-width: 520px;
@@ -816,9 +819,6 @@ export default function PixelCollaborationVisual({ variant = 'login' }) {
         }
 
         @media (max-width: 600px) {
-          .pixel-hero-visual-root {
-            min-height: 300px;
-          }
           .pixel-hero-svg {
             max-width: 100%;
           }

@@ -76,11 +76,37 @@ export default function AuthCard({
 
         @media (max-width: 480px) {
           .auth-card-container {
-            padding: 28px 22px;
+            padding: 24px 18px;
             border-radius: 16px;
           }
           .auth-card-title {
             font-size: 22px;
+          }
+        }
+
+        @media (max-height: 700px) and (min-width: 901px) {
+          .auth-card-container {
+            padding: 24px 28px;
+          }
+          .auth-card-title {
+            font-size: 22px;
+            margin-bottom: 6px;
+          }
+          .auth-card-subtitle {
+            font-size: 12.5px;
+            margin-bottom: 20px;
+          }
+          .auth-card-body {
+            gap: 14px;
+          }
+        }
+
+        @media (max-height: 600px) and (min-width: 901px) {
+          .auth-card-container {
+            padding: 18px 24px;
+          }
+          .auth-card-body {
+            gap: 10px;
           }
         }
       `}</style>

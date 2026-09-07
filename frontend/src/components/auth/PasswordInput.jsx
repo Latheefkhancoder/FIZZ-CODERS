@@ -166,6 +166,19 @@ export default function PasswordInput({
           font-family: var(--font-sans);
           padding-left: 2px;
         }
+
+        @media (max-height: 700px) and (min-width: 901px) {
+          .auth-input-element {
+            padding: 9px 0;
+          }
+        }
+
+        @media (max-height: 600px) and (min-width: 901px) {
+          .auth-input-element {
+            padding: 7px 0;
+            font-size: 13px;
+          }
+        }
       `}</style>
     </div>
   );

@@ -54,17 +54,31 @@
   padding: 0;
 }
 
-html, body {
+html {
   width: 100%;
-  min-height: 100%;
+  height: 100%;
+  background-color: var(--bg-deep);
+  font-size: 15px;
+}
+
+body {
+  width: 100%;
+  height: 100%;
   background-color: var(--bg-deep);
   color: var(--text-light);
   font-family: var(--font-sans);
-  font-size: 15px;
   line-height: 1.5;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior: none;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Pixel Grid Background */

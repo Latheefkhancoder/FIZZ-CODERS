@@ -106,13 +106,14 @@ export default function AuthLayout({
       <style>{`
         .auth-master-wrapper {
           position: relative;
-          min-height: 100vh;
+          height: 100vh;
+          min-height: 0;
           display: flex;
           flex-direction: column;
-          justify-content: space-between;
-          padding: 24px 44px;
+          padding: 20px 44px;
           box-sizing: border-box;
           z-index: 1;
+          overflow: hidden;
         }
 
         .ambient-glow {
@@ -146,7 +147,8 @@ export default function AuthLayout({
           width: 100%;
           position: relative;
           z-index: 10;
-          padding-bottom: 20px;
+          flex-shrink: 0;
+          padding-bottom: 12px;
         }
 
         .brand-logo-link {
@@ -235,14 +237,16 @@ export default function AuthLayout({
         /* Main Container */
         .auth-main-container {
           flex: 1;
+          min-height: 0;
           display: flex;
-          align-items: center;
+          align-items: stretch;
           width: 100%;
           max-width: 1440px;
           margin: 0 auto;
           position: relative;
           z-index: 5;
-          padding: 16px 0;
+          padding: 8px 0;
+          overflow: hidden;
         }
 
         .layout-split {
@@ -250,6 +254,8 @@ export default function AuthLayout({
           grid-template-columns: 1.3fr 0.82fr;
           gap: 42px;
           align-items: center;
+          width: 100%;
+          min-height: 0;
         }
 
         .layout-centered {
@@ -264,13 +270,20 @@ export default function AuthLayout({
         .auth-left-section {
           display: flex;
           flex-direction: column;
-          gap: 20px;
+          gap: 16px;
           position: relative;
+          height: 100%;
+          min-height: 0;
+          overflow: hidden;
+        }
+
+        .editorial-text-group {
+          flex-shrink: 0;
         }
 
         .editorial-headline {
           font-family: var(--font-sans);
-          font-size: clamp(34px, 4.2vw, 54px);
+          font-size: clamp(28px, 3.5vw, 54px);
           font-weight: 900;
           color: var(--text-white);
           line-height: 1.08;
@@ -279,7 +292,7 @@ export default function AuthLayout({
 
         .editorial-subtext {
           font-family: var(--font-sans);
-          font-size: 15px;
+          font-size: 14px;
           color: var(--text-muted);
           max-width: 440px;
           line-height: 1.6;
@@ -288,14 +301,28 @@ export default function AuthLayout({
 
         .visual-wrapper {
           position: relative;
-          width: 100%;
+          flex: 1;
+          min-height: 0;
+          overflow: hidden;
+          display: flex;
+          align-items: center;
         }
 
         /* Right Side */
         .auth-right-section {
           display: flex;
           justify-content: center;
+          align-items: center;
           width: 100%;
+          height: 100%;
+          min-height: 0;
+          overflow-y: auto;
+          overflow-x: hidden;
+          padding: 8px 0;
+        }
+
+        .auth-right-section::-webkit-scrollbar {
+          width: 4px;
         }
 
         .center-card-wrapper {
@@ -318,31 +345,54 @@ export default function AuthLayout({
           align-items: center;
           justify-content: space-between;
           width: 100%;
-          padding-top: 20px;
-          font-size: 10.5px;
+          padding-top: 10px;
+          font-size: 10px;
           color: var(--text-muted);
           letter-spacing: 1px;
-          opacity: 0.75;
+          opacity: 0.65;
           user-select: none;
+          flex-shrink: 0;
         }
 
-        /* Responsive Breakpoints */
+        /* ── Responsive Breakpoints ── */
+
+        /* Large desktop */
+        @media (max-width: 1200px) {
+          .auth-master-wrapper {
+            padding: 18px 36px;
+          }
+          .layout-split {
+            grid-template-columns: 1.2fr 0.9fr;
+            gap: 32px;
+          }
+        }
+
+        /* Tablet landscape / small desktop */
         @media (max-width: 1080px) {
           .layout-split {
             grid-template-columns: 1fr 1fr;
-            gap: 30px;
+            gap: 28px;
           }
         }
 
+        /* Tablet portrait */
         @media (max-width: 900px) {
           .auth-master-wrapper {
-            padding: 20px 24px;
+            padding: 16px 24px;
+            height: auto;
+            min-height: 100vh;
+            overflow-y: auto;
+          }
+          .auth-main-container {
+            overflow: visible;
           }
           .layout-split {
             grid-template-columns: 1fr;
-            gap: 40px;
+            gap: 24px;
           }
           .auth-left-section {
+            overflow: visible;
+            height: auto;
             text-align: center;
             align-items: center;
           }
@@ -355,27 +405,98 @@ export default function AuthLayout({
           .header-nav {
             gap: 16px;
           }
+          .visual-wrapper {
+            max-height: 320px;
+          }
+          .auth-right-section {
+            height: auto;
+            overflow: visible;
+          }
         }
 
-        @media (max-width: 580px) {
+        /* Mobile large */
+        @media (max-width: 640px) {
           .auth-master-wrapper {
-            padding: 16px;
+            padding: 14px 16px;
           }
           .auth-header {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 16px;
+            flex-direction: row;
+            flex-wrap: wrap;
+            gap: 10px;
           }
           .header-right-meta {
-            align-items: flex-start;
+            align-items: flex-end;
+          }
+          .header-nav {
+            gap: 12px;
+          }
+          .nav-item {
+            font-size: 12px;
           }
           .editorial-headline {
-            font-size: 30px;
+            font-size: clamp(24px, 7vw, 34px);
+          }
+          .visual-wrapper {
+            max-height: 240px;
           }
           .auth-footer-bar {
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
             text-align: center;
+          }
+        }
+
+        /* Mobile small */
+        @media (max-width: 420px) {
+          .auth-master-wrapper {
+            padding: 12px 14px;
+          }
+          .visual-wrapper {
+            max-height: 180px;
+          }
+          .brand-title {
+            font-size: 20px;
+          }
+          .header-nav {
+            display: none;
+          }
+        }
+
+        /* Height-constrained screens (short viewports / laptops) */
+        @media (max-height: 700px) and (min-width: 901px) {
+          .auth-master-wrapper {
+            padding: 10px 44px;
+          }
+          .editorial-headline {
+            font-size: clamp(22px, 2.8vw, 40px);
+          }
+          .editorial-subtext {
+            font-size: 13px;
+          }
+          .visual-wrapper {
+            max-height: 240px;
+          }
+          .auth-footer-bar {
+            padding-top: 6px;
+            font-size: 9px;
+          }
+          .auth-header {
+            padding-bottom: 6px;
+          }
+        }
+
+        @media (max-height: 600px) and (min-width: 901px) {
+          .auth-master-wrapper {
+            padding: 8px 40px;
+          }
+          .visual-wrapper {
+            max-height: 180px;
+          }
+          .editorial-headline {
+            font-size: clamp(20px, 2.5vw, 32px);
+          }
+          .editorial-subtext {
+            display: none;
           }
         }
       `}</style>
