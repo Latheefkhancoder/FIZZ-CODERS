@@ -3,21 +3,29 @@
  */
 
 const successResponse = (res, message, data = null, statusCode = 200) => {
-  return res.status(statusCode).json({
+  const responseBody = {
     success: true,
     message,
-    data,
-    timestamp: new Date().toISOString(),
-  });
+  };
+
+  if (data !== null && data !== undefined) {
+    responseBody.data = data;
+  }
+
+  return res.status(statusCode).json(responseBody);
 };
 
 const errorResponse = (res, message, error = null, statusCode = 500) => {
-  return res.status(statusCode).json({
+  const responseBody = {
     success: false,
     message,
-    error,
-    timestamp: new Date().toISOString(),
-  });
+  };
+
+  if (error !== null && error !== undefined) {
+    responseBody.error = error;
+  }
+
+  return res.status(statusCode).json(responseBody);
 };
 
 module.exports = {
