@@ -1,9 +1,15 @@
-name: CollabBoard CI
+name: FIZZ-CONNECT CI
 
 on:
   pull_request:
     branches:
       - main
+
+  push:
+    branches:
+      - mirac
+
+  workflow_dispatch:
 
 jobs:
 
