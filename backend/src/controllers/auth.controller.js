@@ -1,53 +1,70 @@
 const { authService } = require("../services");
+const { successResponse } = require("../utils/response");
 
+/**
+ * Register a new user account
+ * @route POST /api/auth/register
+ */
 const register = async (req, res, next) => {
   try {
-    const { name, email, password } = req.body;
-
-    if (!name || !email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "Name, email and password are required",
-      });
-    }
-
-    const user = await authService.registerUser({
-      name: name.trim(),
-      email: email.trim().toLowerCase(),
-      password,
-    });
-
-    return res.status(201).json({
-      success: true,
-      message: "Account created successfully",
-      user,
-    });
+    const { fullName, email, password } = req.body;
+    const result = await authService.registerUser({ fullName, email, password });
+    return successResponse(res, "Registration successful", result, 201);
   } catch (error) {
     next(error);
   }
 };
 
+/**
+ * Login user
+ * @route POST /api/auth/login
+ */
 const login = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, rememberMe } = req.body;
+    const result = await authService.loginUser({ email, password, rememberMe });
+    return successResponse(res, "Login successful", result, 200);
+  } catch (error) {
+    next(error);
+  }
+};
 
-    if (!email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "Email and password are required",
-      });
-    }
+/**
+ * Request password reset
+ * @route POST /api/auth/forgot-password
+ */
+const forgotPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    const result = await authService.requestPasswordReset(email);
+    return successResponse(res, result.message, null, 200);
+  } catch (error) {
+    next(error);
+  }
+};
 
-    const user = await authService.loginUser({
-      email: email.trim().toLowerCase(),
-      password,
-    });
+/**
+ * Reset password using token
+ * @route POST /api/auth/reset-password
+ */
+const resetPassword = async (req, res, next) => {
+  try {
+    const { token, newPassword } = req.body;
+    await authService.resetPassword({ token, newPassword });
+    return successResponse(res, "Password has been successfully reset", null, 200);
+  } catch (error) {
+    next(error);
+  }
+};
 
-    return res.status(200).json({
-      success: true,
-      message: "Login successful",
-      user,
-    });
+/**
+ * Get authenticated user profile
+ * @route GET /api/auth/me
+ */
+const getMe = async (req, res, next) => {
+  try {
+    const user = await authService.getCurrentUser(req.user.id);
+    return successResponse(res, "User profile retrieved", { user }, 200);
   } catch (error) {
     next(error);
   }
@@ -56,4 +73,7 @@ const login = async (req, res, next) => {
 module.exports = {
   register,
   login,
+  forgotPassword,
+  resetPassword,
+  getMe,
 };
