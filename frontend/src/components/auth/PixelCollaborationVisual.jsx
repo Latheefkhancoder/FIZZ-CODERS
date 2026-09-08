@@ -17,10 +17,7 @@ export default function PixelCollaborationVisual({ variant = 'login' }) {
       <div className="pixel-star pstar-6">+</div>
       <div className="pixel-star pstar-7">+</div>
 
-      {/* Floating Pixel Clouds & Celestial Sphere */}
-      <div className="pixel-celestial-moon" />
-      <div className="pixel-cloud-layer cloud-layer-1" />
-      <div className="pixel-cloud-layer cloud-layer-2" />
+      {/* Environmental Pixel Stars / Crosses */}
 
       {/* ─── VARIANT 1: LOGIN (Main Collaboration Studio) ─── */}
       {variant === 'login' && (
@@ -633,44 +630,6 @@ export default function PixelCollaborationVisual({ variant = 'login' }) {
           object-fit: contain;
           filter: drop-shadow(0 0 25px rgba(22, 198, 210, 0.22));
           transition: transform 0.3s ease;
-        }
-
-        /* Celestial Moon with atmospheric crater texture */
-        .pixel-celestial-moon {
-          position: absolute;
-          top: 8%;
-          right: 18%;
-          width: 170px;
-          height: 170px;
-          border-radius: 50%;
-          background: radial-gradient(circle at 35% 35%, #EFFCFB 0%, #FFFFFF 65%, transparent 100%);
-          border: 1.5px dashed rgba(22, 198, 210, 0.45);
-          opacity: 0.65;
-          pointer-events: none;
-          animation: pulseRedGlow 7s ease-in-out infinite alternate;
-        }
-
-        /* Layered Pixel Clouds */
-        .pixel-cloud-layer {
-          position: absolute;
-          background: #FFFFFF;
-          border: 1px solid rgba(22, 198, 210, 0.3);
-          pointer-events: none;
-          opacity: 0.55;
-        }
-        .cloud-layer-1 {
-          top: 18%;
-          right: 8%;
-          width: 150px;
-          height: 30px;
-          box-shadow: -25px 14px 0 0 #FFFFFF, 20px -14px 0 0 #FFFFFF;
-        }
-        .cloud-layer-2 {
-          bottom: 15%;
-          left: 4%;
-          width: 180px;
-          height: 34px;
-          box-shadow: 30px -16px 0 0 #FFFFFF, -20px 14px 0 0 #FFFFFF;
         }
 
         /* Twinkling Pixel Stars */

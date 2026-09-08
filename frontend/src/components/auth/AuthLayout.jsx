@@ -19,19 +19,15 @@ export default function AuthLayout({
 }) {
   return (
     <div className="auth-master-wrapper">
-      {/* Background Pixel Grid & Atmospheric Ambient Radiance */}
+      {/* Background Pixel Grid */}
       <div className="pixel-grid-bg" />
-
-      {/* Floating ambient corner aqua glow */}
-      <div className="ambient-glow glow-top-left" />
-      <div className="ambient-glow glow-bottom-right" />
 
       {/* Top Header Navbar */}
       <header className="auth-header">
         <Link to="/login" className="brand-logo-link">
           {/* Logo Icon */}
           <span className="pixel-brand-icon">
-            <img src={logo} alt="FIZZ-CONNECT Logo" width="28" height="28" style={{ objectFit: 'contain' }} />
+            <img src={logo} alt="FIZZ-CONNECT Logo" width="42" height="42" style={{ objectFit: 'contain' }} />
           </span>
 
           <div className="brand-text-block">
@@ -148,11 +144,6 @@ export default function AuthLayout({
           display: flex;
           align-items: center;
           filter: drop-shadow(0 0 10px rgba(22, 198, 210, 0.4));
-          transition: transform 0.2s ease;
-        }
-
-        .brand-logo-link:hover .pixel-brand-icon {
-          transform: scale(1.08) rotate(5deg);
         }
 
         .brand-text-block {
