@@ -1,0 +1,271 @@
+/* =========================================================
+   FIZZ-CONNECT - Modern SaaS Design System
+   ========================================================= */
+
+:root {
+  /* Color Palette */
+  --bg-deep: #FFFDF7;
+  --bg-dark: #FFFDF7;
+  --bg-crimson: #FFFDF7;
+
+  --red-darkest: #102A43;
+  --red-dark: #087F88;
+  --red-mid: #19C7D1;
+  --red-primary: #19C7D1;
+  --red-light: #28D3D6;
+  --red-accent: #28D3D6;
+  --red-glow: rgba(25, 199, 209, 0.45);
+  --red-glow-subtle: rgba(25, 199, 209, 0.16);
+
+  /* Neutrals */
+  --text-white: #102A43; 
+  --text-light: #102A43;
+  --text-muted: #60758A;
+  --text-dim: #8AA0B2;
+  --pure-white: #FFFFFF;
+
+  /* Card & Surface Tokens */
+  --card-bg: #FFFFFF;
+  --card-border: #E8FAF8;
+  --card-border-glow: rgba(25, 199, 209, 0.4);
+  --card-radius: 16px;
+
+  --input-bg: #FAF9F2;
+  --input-border: #E8FAF8;
+  --input-border-focus: #19C7D1;
+  --input-radius: 10px;
+
+  /* Typography */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-pixel: 'Silkscreen', monospace;
+  --font-pixel-accent: 'Press Start 2P', monospace;
+
+  /* Shadows */
+  --shadow-card: 0 10px 40px -10px rgba(0, 0, 0, 0.05), 0 0 35px -5px rgba(25, 199, 209, 0.15);
+  --shadow-card-hover: 0 15px 50px -10px rgba(0, 0, 0, 0.08), 0 0 50px -2px rgba(25, 199, 209, 0.25);
+  --shadow-btn: 0 4px 20px rgba(25, 199, 209, 0.35);
+  --shadow-btn-hover: 0 6px 30px rgba(25, 199, 209, 0.5);
+  --shadow-node: 0 0 15px rgba(25, 199, 209, 0.3);
+}
+
+/* CSS Reset & Defaults */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg-deep);
+  font-size: 15px;
+}
+
+body {
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg-deep);
+  color: var(--text-light);
+  font-family: var(--font-sans);
+  line-height: 1.5;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior: none;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Pixel Grid Background */
+.pixel-grid-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-color: var(--bg-deep);
+  background-image:
+    linear-gradient(to right, rgba(25, 199, 209, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(25, 199, 209, 0.08) 1px, transparent 1px);
+  background-size: 28px 28px, 28px 28px;
+}
+
+/* Scanline / Pixel Texture overlay */
+.pixel-grid-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg,
+      rgba(25, 199, 209, 0.02),
+      rgba(25, 199, 209, 0.02) 1px,
+      transparent 1px,
+      transparent 2px);
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+/* Links */
+a {
+  color: var(--red-primary);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+a:hover {
+  color: var(--red-light);
+  text-shadow: 0 0 10px var(--red-glow);
+}
+
+/* Buttons */
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+input {
+  font-family: inherit;
+  outline: none;
+}
+
+/* Animations */
+@keyframes cardFloatIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes pixelBob {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes pixelBobDelayed {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+@keyframes pulseRedGlow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 15px rgba(25, 199, 209, 0.15);
+  }
+
+  50% {
+    box-shadow: 0 0 30px rgba(25, 199, 209, 0.35);
+  }
+}
+
+@keyframes pixelCrossBlink {
+
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.9;
+    transform: scale(1.15);
+  }
+}
+
+@keyframes pulseText {
+
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+
+  50% {
+    opacity: 1;
+    text-shadow: 0 0 8px rgba(25, 199, 209, 0.6);
+  }
+}
+
+@keyframes checkmarkPop {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+
+  70% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Utility Pixel Classes */
+.font-pixel {
+  font-family: var(--font-pixel);
+  letter-spacing: 0.5px;
+}
+
+.font-pixel-accent {
+  font-family: var(--font-pixel-accent);
+}
+
+.text-red {
+  color: var(--red-primary) !important;
+}
+
+.text-white {
+  color: var(--text-white) !important;
+}
+
+.text-muted {
+  color: var(--text-muted) !important;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-deep);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--red-dark);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--red-primary);
+}
