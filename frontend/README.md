@@ -1,6 +1,6 @@
-# CollabBoard — Frontend
+# Fizz Connect — Frontend
 
-A **production-level React + Vite** frontend for the CollabBoard collaborative workspace platform.
+A **production-level React + Vite** frontend for the Fizz Connect collaborative workspace platform.
 
 ---
 
@@ -105,7 +105,7 @@ All API calls are routed through `src/services/apiClient.js` which is a pre-conf
 | Variable | Description | Default |
 |---|---|---|
 | `VITE_API_BASE_URL` | Backend REST API base URL | `http://localhost:5000/api` |
-| `VITE_APP_NAME` | Application display name | `CollabBoard` |
+| `VITE_APP_NAME` | Application display name | `Fizz Connect` |
 
 > **Note:** All Vite env variables must be prefixed with `VITE_` to be accessible in the browser via `import.meta.env`.
 

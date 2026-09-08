@@ -1,0 +1,90 @@
+.auth-form-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.auth-options-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  margin-top: 2px;
+  margin-bottom: 4px;
+}
+
+.remember-me-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox-input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkbox-custom {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.checkbox-input:checked ~ .checkbox-custom {
+  background: var(--red-primary);
+  border-color: var(--red-primary);
+  box-shadow: 0 0 8px var(--red-glow);
+}
+
+.checkbox-input:checked ~ .checkbox-custom::after {
+  content: '✓';
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.checkbox-label {
+  color: var(--text-light);
+  font-size: 12.5px;
+}
+
+.forgot-password-link {
+  color: var(--red-primary);
+  font-size: 12.5px;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.forgot-password-link:hover {
+  color: var(--red-light);
+  text-shadow: 0 0 6px var(--red-glow);
+}
+
+.auth-switch-text {
+  font-size: 13px;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: 8px;
+}
+
+.auth-switch-link {
+  color: var(--red-primary);
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+.auth-switch-link:hover {
+  color: var(--red-light);
+  text-shadow: 0 0 8px var(--red-glow);
+}
