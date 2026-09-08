@@ -36,12 +36,6 @@ export default function ForgotPassword() {
 
   return (
     <AuthLayout
-      headline={['Ideas', 'Never']}
-      highlightWord="Get Lost."
-      subtext="Enter your email address and we'll send you a link to reset your access."
-      topQuote="IDEAS NEVER GET LOST."
-      bottomLeftTag="IDEAS NEVER GET LOST."
-      bottomRightTag="GET BACK TO BUILDING SOON."
       visualSlot={<PixelCollaborationVisual variant="forgot-password" />}
     >
       <AuthCard

@@ -71,12 +71,6 @@ export default function CreateAccount() {
 
   return (
     <AuthLayout
-      headline={['More', 'Creators', 'Brighter']}
-      highlightWord="Tomorrow."
-      subtext="Join FIZZ-CONNECT and be part of a community that turns ideas into reality."
-      topQuote="MORE CREATORS. BRIGHTER TOMORROW."
-      bottomLeftTag="IDEAS TODAY IMPACT TOMORROW."
-      bottomRightTag="BUILD · SHARE · LEARN · GROW"
       visualSlot={<PixelCollaborationVisual variant="create-account" />}
     >
       <AuthCard
