@@ -1,15 +1,16 @@
+const { Pool } = require("pg");
 const env = require("./env");
 
-/**
- * Database Configuration Placeholder
- * 
- * PostgreSQL client / pool connection configuration will be initialized here.
- * Ready for future integration with pg / knex / prisma / sequelize.
- */
-
-const dbConfig = {
+const pool = new Pool({
   connectionString: env.DATABASE_URL,
-  ssl: env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
-};
+  ssl:
+    env.NODE_ENV === "production"
+      ? { rejectUnauthorized: false }
+      : false,
+});
 
-module.exports = dbConfig;
+pool.on("error", (error) => {
+  console.error("Unexpected PostgreSQL pool error:", error);
+});
+
+module.exports = pool;
