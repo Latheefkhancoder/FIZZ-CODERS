@@ -1,7 +1,7 @@
-/**
- * Database Models & Data Access Layer
- * 
- * PostgreSQL models / query repositories will be defined here in upcoming iterations.
- */
+const userModel = require("./user.model");
+const passwordResetTokenModel = require("./passwordResetToken.model");
 
-module.exports = {};
+module.exports = {
+  userModel,
+  passwordResetTokenModel,
+};

@@ -1,8 +1,5 @@
-/**
- * Request Validators
- * 
- * Schema definitions and validation middleware (e.g. Joi, Zod, express-validator)
- * will be defined here in upcoming iterations.
- */
+const authValidator = require("./auth.validator");
 
-module.exports = {};
+module.exports = {
+  ...authValidator,
+};
