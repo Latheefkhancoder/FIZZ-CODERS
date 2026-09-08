@@ -175,7 +175,7 @@ export default function ForgotPassword() {
           display: block;
           width: 100%;
           padding: 12px 20px;
-          background: rgba(255, 45, 61, 0.12);
+          background: var(--red-glow-subtle);
           border: 1px solid var(--red-primary);
           border-radius: 9999px;
           color: var(--text-white);
