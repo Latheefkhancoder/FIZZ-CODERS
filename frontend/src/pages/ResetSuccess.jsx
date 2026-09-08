@@ -4,6 +4,7 @@ import AuthLayout from '../components/auth/AuthLayout';
 import AuthCard from '../components/auth/AuthCard';
 import AuthButton from '../components/auth/AuthButton';
 import PixelCollaborationVisual from '../components/auth/PixelCollaborationVisual';
+import './ResetSuccess.css';
 
 export default function ResetSuccess() {
   const navigate = useNavigate();
@@ -66,7 +67,16 @@ export default function ResetSuccess() {
             type="button"
             onClick={() => navigate('/login')}
             icon={
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <line x1="5" y1="12" x2="19" y2="12" />
                 <polyline points="12 5 19 12 12 19" />
               </svg>
@@ -76,29 +86,6 @@ export default function ResetSuccess() {
           </AuthButton>
         </div>
       </AuthCard>
-
-      <style>{`
-        .pixel-success-badge-container {
-          position: relative;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          animation: checkmarkPop 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
-        .pixel-success-svg {
-          filter: drop-shadow(0 0 20px rgba(25, 199, 209, 0.25));
-          transition: transform 0.3s ease;
-        }
-
-        .pixel-success-svg:hover {
-          transform: scale(1.05) rotate(2deg);
-        }
-
-        .success-action-wrap {
-          margin-top: 10px;
-        }
-      `}</style>
     </AuthLayout>
   );
 }

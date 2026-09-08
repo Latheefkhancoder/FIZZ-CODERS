@@ -5,6 +5,7 @@ import AuthCard from '../components/auth/AuthCard';
 import PasswordInput from '../components/auth/PasswordInput';
 import AuthButton from '../components/auth/AuthButton';
 import PixelCollaborationVisual from '../components/auth/PixelCollaborationVisual';
+import './ResetPassword.css';
 
 export default function ResetPassword() {
   const navigate = useNavigate();
@@ -38,20 +39,27 @@ export default function ResetPassword() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
+
     if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: null }));
+      setErrors((prev) => ({
+        ...prev,
+        [name]: null,
+      }));
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
     if (!validateForm()) return;
 
     setIsSubmitting(true);
+
     // On successful validation and submission, navigate to /reset-success
     setTimeout(() => {
       setIsSubmitting(false);
@@ -73,7 +81,11 @@ export default function ResetPassword() {
         title="Reset Your Password"
         subtitle="Enter your new password below."
       >
-        <form onSubmit={handleSubmit} className="auth-form-inner" noValidate>
+        <form
+          onSubmit={handleSubmit}
+          className="auth-form-inner"
+          noValidate
+        >
           {/* New Password */}
           <PasswordInput
             id="reset-new-password"
@@ -105,7 +117,16 @@ export default function ResetPassword() {
             type="submit"
             loading={isSubmitting}
             icon={
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <polyline points="23 4 23 10 17 10" />
                 <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
               </svg>
@@ -116,37 +137,15 @@ export default function ResetPassword() {
 
           {/* Back to Login */}
           <div className="auth-footer-link-wrap">
-            <Link to="/login" className="back-login-link">
+            <Link
+              to="/login"
+              className="back-login-link"
+            >
               ← Back to Login
             </Link>
           </div>
         </form>
       </AuthCard>
-
-      <style>{`
-        .auth-form-inner {
-          display: flex;
-          flex-direction: column;
-          gap: 20px;
-        }
-
-        .auth-footer-link-wrap {
-          text-align: center;
-          margin-top: 4px;
-        }
-
-        .back-login-link {
-          color: var(--text-muted);
-          font-size: 13px;
-          font-weight: 500;
-          transition: color 0.2s ease;
-          display: inline-block;
-        }
-
-        .back-login-link:hover {
-          color: var(--text-white);
-        }
-      `}</style>
     </AuthLayout>
   );
 }

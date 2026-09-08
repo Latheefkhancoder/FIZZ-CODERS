@@ -1,0 +1,20 @@
+.pixel-success-badge-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: checkmarkPop 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.pixel-success-svg {
+  filter: drop-shadow(0 0 20px rgba(25, 199, 209, 0.25));
+  transition: transform 0.3s ease;
+}
+
+.pixel-success-svg:hover {
+  transform: scale(1.05) rotate(2deg);
+}
+
+.success-action-wrap {
+  margin-top: 10px;
+}

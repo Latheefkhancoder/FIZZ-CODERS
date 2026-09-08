@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+
 import AuthLayout from '../components/auth/AuthLayout';
 import AuthCard from '../components/auth/AuthCard';
 import AuthInput from '../components/auth/AuthInput';
 import PasswordInput from '../components/auth/PasswordInput';
 import AuthButton from '../components/auth/AuthButton';
 import PixelCollaborationVisual from '../components/auth/PixelCollaborationVisual';
+
+import './CreateAccount.css';
 
 export default function CreateAccount() {
   const [formData, setFormData] = useState({
@@ -27,7 +30,9 @@ export default function CreateAccount() {
 
     if (!formData.email.trim()) {
       nextErrors.email = 'Email address is required.';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
+    } else if (
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())
+    ) {
       nextErrors.email = 'Please enter a valid email address.';
     }
 
@@ -44,25 +49,33 @@ export default function CreateAccount() {
     }
 
     setErrors(nextErrors);
+
     return Object.keys(nextErrors).length === 0;
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
+
     if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: null }));
+      setErrors((prev) => ({
+        ...prev,
+        [name]: null,
+      }));
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
     if (!validateForm()) return;
 
     setIsSubmitting(true);
+
     // Frontend-only submission simulation
     setTimeout(() => {
       setIsSubmitting(false);
@@ -83,7 +96,11 @@ export default function CreateAccount() {
         title="Create Your Account"
         subtitle="Join FIZZ-CONNECT and start building something amazing."
       >
-        <form onSubmit={handleSubmit} className="auth-form-inner" noValidate>
+        <form
+          onSubmit={handleSubmit}
+          className="auth-form-inner"
+          noValidate
+        >
           {/* Full Name */}
           <AuthInput
             id="register-fullname"
@@ -97,7 +114,16 @@ export default function CreateAccount() {
             required
             autoComplete="name"
             icon={
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                 <circle cx="12" cy="7" r="4" />
               </svg>
@@ -117,7 +143,16 @@ export default function CreateAccount() {
             required
             autoComplete="email"
             icon={
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
                 <polyline points="22,6 12,13 2,6" />
               </svg>
@@ -155,7 +190,16 @@ export default function CreateAccount() {
             type="submit"
             loading={isSubmitting}
             icon={
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                 <circle cx="8.5" cy="7" r="4" />
                 <line x1="20" y1="8" x2="20" y2="14" />
@@ -169,38 +213,13 @@ export default function CreateAccount() {
           {/* Bottom Link to Login */}
           <div className="auth-switch-text">
             <span>Already have an account? </span>
+
             <Link to="/login" className="auth-switch-link">
               Log in →
             </Link>
           </div>
         </form>
       </AuthCard>
-
-      <style>{`
-        .auth-form-inner {
-          display: flex;
-          flex-direction: column;
-          gap: 16px;
-        }
-
-        .auth-switch-text {
-          font-size: 13px;
-          color: var(--text-muted);
-          text-align: center;
-          margin-top: 6px;
-        }
-
-        .auth-switch-link {
-          color: var(--red-primary);
-          font-weight: 600;
-          margin-left: 4px;
-        }
-
-        .auth-switch-link:hover {
-          color: var(--red-light);
-          text-shadow: 0 0 8px var(--red-glow);
-        }
-      `}</style>
     </AuthLayout>
   );
 }
