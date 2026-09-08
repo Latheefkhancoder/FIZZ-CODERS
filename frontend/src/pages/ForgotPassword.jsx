@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-
 import AuthLayout from '../components/auth/AuthLayout';
 import AuthCard from '../components/auth/AuthCard';
 import AuthInput from '../components/auth/AuthInput';
 import AuthButton from '../components/auth/AuthButton';
 import PixelCollaborationVisual from '../components/auth/PixelCollaborationVisual';
-
 import './ForgotPassword.css';
 
 export default function ForgotPassword() {
@@ -40,12 +38,6 @@ export default function ForgotPassword() {
 
   return (
     <AuthLayout
-      headline={['Ideas', 'Never']}
-      highlightWord="Get Lost."
-      subtext="Enter your email address and we'll send you a link to reset your access."
-      topQuote="IDEAS NEVER GET LOST."
-      bottomLeftTag="IDEAS NEVER GET LOST."
-      bottomRightTag="GET BACK TO BUILDING SOON."
       visualSlot={<PixelCollaborationVisual variant="forgot-password" />}
     >
       <AuthCard
@@ -116,7 +108,7 @@ export default function ForgotPassword() {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 >
-                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2-2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
                   <polyline points="22,6 12,13 2,6" />
                 </svg>
               }

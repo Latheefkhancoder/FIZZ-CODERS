@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import logo from '../../assets/logo.png';
 import './AuthLayout.css';
 
 /**
@@ -19,40 +20,21 @@ export default function AuthLayout({
 }) {
   return (
     <div className="auth-master-wrapper">
-      {/* Background Pixel Grid & Atmospheric Ambient Radiance */}
+      {/* Background Pixel Grid */}
       <div className="pixel-grid-bg" />
-
-      {/* Floating ambient corner aqua glow */}
-      <div className="ambient-glow glow-top-left" />
-      <div className="ambient-glow glow-bottom-right" />
 
       {/* Top Header Navbar */}
       <header className="auth-header">
         <Link to="/login" className="brand-logo-link">
-          {/* Pixel Gem / Cog Icon in Aqua theme */}
+          {/* Logo Icon */}
           <span className="pixel-brand-icon">
-            <svg
-              width="28"
-              height="28"
-              viewBox="0 0 28 28"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <rect x="10" y="2" width="8" height="4" fill="#39D9D5" />
-              <rect x="10" y="22" width="8" height="4" fill="#39D9D5" />
-              <rect x="2" y="10" width="4" height="8" fill="#39D9D5" />
-              <rect x="22" y="10" width="4" height="8" fill="#39D9D5" />
-              <rect
-                x="6"
-                y="6"
-                width="16"
-                height="16"
-                fill="#16C6D2"
-                stroke="#39D9D5"
-                strokeWidth="2"
-              />
-              <rect x="11" y="11" width="6" height="6" fill="#FFFFFF" />
-            </svg>
+            <img
+              src={logo}
+              alt="FIZZ-CONNECT Logo"
+              width="42"
+              height="42"
+              style={{ objectFit: 'contain' }}
+            />
           </span>
 
           <div className="brand-text-block">
@@ -78,24 +60,26 @@ export default function AuthLayout({
           <>
             {/* Left Side: Editorial Typography & Pixel Collaboration Visual */}
             <section className="auth-left-section">
-              <div className="editorial-text-group">
-                <h2 className="editorial-headline">
-                  {headline.map((line, idx) => (
-                    <React.Fragment key={idx}>
-                      {line}
-                      <br />
-                    </React.Fragment>
-                  ))}
+              {headline && headline.length > 0 && (
+                <div className="editorial-text-group">
+                  <h2 className="editorial-headline">
+                    {headline.map((line, idx) => (
+                      <React.Fragment key={idx}>
+                        {line}
+                        <br />
+                      </React.Fragment>
+                    ))}
 
-                  {highlightWord && (
-                    <span className="text-red">{highlightWord}</span>
+                    {highlightWord && (
+                      <span className="text-red">{highlightWord}</span>
+                    )}
+                  </h2>
+
+                  {subtext && (
+                    <p className="editorial-subtext">{subtext}</p>
                   )}
-                </h2>
-
-                {subtext && (
-                  <p className="editorial-subtext">{subtext}</p>
-                )}
-              </div>
+                </div>
+              )}
 
               {/* Pixel Visual Area */}
               <div className="visual-wrapper">{visualSlot}</div>

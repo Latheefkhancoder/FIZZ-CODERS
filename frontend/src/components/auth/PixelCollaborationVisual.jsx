@@ -17,10 +17,7 @@ export default function PixelCollaborationVisual({ variant = 'login' }) {
       <div className="pixel-star pstar-6">+</div>
       <div className="pixel-star pstar-7">+</div>
 
-      {/* Floating Pixel Clouds & Celestial Sphere */}
-      <div className="pixel-celestial-moon" />
-      <div className="pixel-cloud-layer cloud-layer-1" />
-      <div className="pixel-cloud-layer cloud-layer-2" />
+      {/* Environmental Pixel Stars / Crosses */}
 
       {/* ─── VARIANT 1: LOGIN (Main Collaboration Studio) ─── */}
       {variant === 'login' && (
@@ -270,9 +267,9 @@ export default function PixelCollaborationVisual({ variant = 'login' }) {
                 <text x="50" y="15" fill="#60758A" fontSize="7" fontFamily="Silkscreen" letterSpacing="0.5">COLLAB.OS // V1.0</text>
 
                 {/* Card Main Headline */}
-                <text x="14" y="44" fill="#102A43" fontSize="10.5" fontFamily="Silkscreen" fontWeight="700">GOOD IDEAS</text>
-                <text x="14" y="58" fill="#28D3D6" fontSize="10.5" fontFamily="Silkscreen" fontWeight="700">BRING PEOPLE</text>
-                <text x="14" y="72" fill="#60758A" fontSize="9" fontFamily="Silkscreen">TOGETHER.</text>
+                <text x="14" y="46" fill="#102A43" fontSize="11" fontFamily="Silkscreen" fontWeight="700">PROJECT DASHBOARD</text>
+                <text x="14" y="66" fill="#28D3D6" fontSize="9" fontFamily="Silkscreen">SYSTEM ONLINE</text>
+
 
                 {/* Sprint Progress Bar */}
                 <g transform="translate(14, 82)">
@@ -442,24 +439,24 @@ export default function PixelCollaborationVisual({ variant = 'login' }) {
               </g>
             </g>
 
-            {/* Card 1: "IDEAS + PEOPLE + ACTION" */}
+            {/* Card 1: "PLAN · COLLABORATE · BUILD" */}
             <g transform="translate(460, 150)">
               <g className="anim-float-card">
                 <rect x="0" y="0" width="180" height="85" rx="10" fill="#102A43" stroke="#19C7D1" strokeWidth="2" />
                 <rect x="0" y="0" width="180" height="18" rx="10" fill="#EAF5F5" />
                 <text x="14" y="13" fill="#102A43" fontSize="6.5" fontFamily="Silkscreen">COLLAB PLATFORM</text>
-                <text x="16" y="38" fill="#102A43" fontSize="10" fontFamily="Silkscreen">IDEAS</text>
-                <text x="16" y="52" fill="#28D3D6" fontSize="10" fontFamily="Silkscreen">+ PEOPLE</text>
-                <text x="16" y="68" fill="#102A43" fontSize="10" fontFamily="Silkscreen">+ ACTION</text>
+                <text x="16" y="38" fill="#102A43" fontSize="10" fontFamily="Silkscreen">PLAN</text>
+                <text x="16" y="52" fill="#28D3D6" fontSize="10" fontFamily="Silkscreen">COLLABORATE</text>
+                <text x="16" y="68" fill="#102A43" fontSize="10" fontFamily="Silkscreen">BUILD</text>
               </g>
             </g>
 
-            {/* Card 2: "A BRIGHTER TOMORROW" */}
+            {/* Card 2: "WORKSPACE ONLINE" */}
             <g transform="translate(460, 310)">
               <g className="anim-float-card">
                 <rect x="0" y="0" width="180" height="65" rx="10" fill="#102A43" stroke="#19C7D1" strokeWidth="1.8" />
-                <text x="16" y="28" fill="#60758A" fontSize="8.5" fontFamily="Silkscreen">A BRIGHTER</text>
-                <text x="16" y="46" fill="#19C7D1" fontSize="10.5" fontFamily="Silkscreen" fontWeight="700">TOMORROW</text>
+                <text x="16" y="28" fill="#60758A" fontSize="8.5" fontFamily="Silkscreen">WORKSPACE</text>
+                <text x="16" y="46" fill="#19C7D1" fontSize="10.5" fontFamily="Silkscreen" fontWeight="700">ONLINE</text>
               </g>
             </g>
           </svg>
@@ -510,16 +507,15 @@ export default function PixelCollaborationVisual({ variant = 'login' }) {
               className="anim-data-wire" opacity="0.6"
             />
 
-            {/* Large Card: "FORGOT PASSWORD? NO WORRIES, WE'VE GOT YOU." */}
+            {/* Large Card: "ACCOUNT RECOVERY SYSTEM" */}
             <g transform="translate(350, 160)">
               <g className="anim-float-card">
-                <rect x="0" y="0" width="260" height="115" rx="12" fill="#102A43" stroke="#19C7D1" strokeWidth="2" />
+                <rect x="0" y="0" width="260" height="100" rx="12" fill="#102A43" stroke="#19C7D1" strokeWidth="2" />
                 <rect x="0" y="0" width="260" height="24" rx="12" fill="#EAF5F5" />
                 <circle cx="16" cy="12" r="3" fill="#19C7D1" />
                 <text x="30" y="15" fill="#60758A" fontSize="7" fontFamily="Silkscreen">ACCOUNT SECURITY RECOVERY</text>
-                <text x="20" y="50" fill="#28D3D6" fontSize="11" fontFamily="Silkscreen">FORGOT PASSWORD?</text>
-                <text x="20" y="70" fill="#102A43" fontSize="9.5" fontFamily="Silkscreen">NO WORRIES,</text>
-                <text x="20" y="90" fill="#90A4AE" fontSize="8.5" fontFamily="Silkscreen">WE'VE GOT YOU COVERED.</text>
+                <text x="20" y="54" fill="#28D3D6" fontSize="11" fontFamily="Silkscreen">RECOVERY MODE</text>
+                <text x="20" y="76" fill="#60758A" fontSize="9" fontFamily="Silkscreen">RESET LINK SERVICE</text>
               </g>
             </g>
 
@@ -584,8 +580,8 @@ export default function PixelCollaborationVisual({ variant = 'login' }) {
             <g transform="translate(360, 330)">
               <g className="anim-float-node-1">
                 <rect x="0" y="0" width="180" height="60" rx="8" fill="#102A43" stroke="#19C7D1" strokeWidth="1.8" />
-                <text x="20" y="26" fill="#102A43" fontSize="8" fontFamily="Silkscreen">STRONGER</text>
-                <text x="20" y="44" fill="#28D3D6" fontSize="10" fontFamily="Silkscreen">IDEAS AHEAD.</text>
+                <text x="20" y="26" fill="#102A43" fontSize="8" fontFamily="Silkscreen">SECURITY PROTOCOL</text>
+                <text x="20" y="44" fill="#28D3D6" fontSize="10" fontFamily="Silkscreen">ENCRYPTED 256-BIT</text>
               </g>
             </g>
           </svg>
@@ -634,44 +630,6 @@ export default function PixelCollaborationVisual({ variant = 'login' }) {
           object-fit: contain;
           filter: drop-shadow(0 0 25px rgba(22, 198, 210, 0.22));
           transition: transform 0.3s ease;
-        }
-
-        /* Celestial Moon with atmospheric crater texture */
-        .pixel-celestial-moon {
-          position: absolute;
-          top: 8%;
-          right: 18%;
-          width: 170px;
-          height: 170px;
-          border-radius: 50%;
-          background: radial-gradient(circle at 35% 35%, #EFFCFB 0%, #FFFFFF 65%, transparent 100%);
-          border: 1.5px dashed rgba(22, 198, 210, 0.45);
-          opacity: 0.65;
-          pointer-events: none;
-          animation: pulseRedGlow 7s ease-in-out infinite alternate;
-        }
-
-        /* Layered Pixel Clouds */
-        .pixel-cloud-layer {
-          position: absolute;
-          background: #FFFFFF;
-          border: 1px solid rgba(22, 198, 210, 0.3);
-          pointer-events: none;
-          opacity: 0.55;
-        }
-        .cloud-layer-1 {
-          top: 18%;
-          right: 8%;
-          width: 150px;
-          height: 30px;
-          box-shadow: -25px 14px 0 0 #FFFFFF, 20px -14px 0 0 #FFFFFF;
-        }
-        .cloud-layer-2 {
-          bottom: 15%;
-          left: 4%;
-          width: 180px;
-          height: 34px;
-          box-shadow: 30px -16px 0 0 #FFFFFF, -20px 14px 0 0 #FFFFFF;
         }
 
         /* Twinkling Pixel Stars */

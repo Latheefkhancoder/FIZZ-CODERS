@@ -69,12 +69,6 @@ export default function ResetPassword() {
 
   return (
     <AuthLayout
-      headline={['New', 'Password', 'New']}
-      highlightWord="Possibilities."
-      subtext="Create a strong password to protect your collaborative ideas and projects."
-      topQuote="NEW PASSWORD. NEW POSSIBILITIES."
-      bottomLeftTag="SECURE TODAY."
-      bottomRightTag="GREATER TOMORROW."
       visualSlot={<PixelCollaborationVisual variant="reset-password" />}
     >
       <AuthCard

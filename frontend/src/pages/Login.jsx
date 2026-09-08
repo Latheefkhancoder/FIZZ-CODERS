@@ -74,12 +74,6 @@ export default function Login() {
 
   return (
     <AuthLayout
-      headline={['Better', 'Ideas']}
-      highlightWord="Together."
-      subtext="A collaborative space to plan, create, share and build — together."
-      topQuote="SAME IDEAS. BIGGER POSSIBILITIES."
-      bottomLeftTag="IDEAS CONNECT PEOPLE."
-      bottomRightTag="COLLABORATE · INNOVATE · BUILD · GROW"
       visualSlot={<PixelCollaborationVisual variant="login" />}
     >
       <AuthCard

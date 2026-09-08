@@ -92,11 +92,9 @@ body {
   z-index: 0;
   background-color: var(--bg-deep);
   background-image:
-    radial-gradient(circle at 18% 22%, rgba(25, 199, 209, 0.08) 0%, transparent 48%),
-    radial-gradient(circle at 82% 75%, rgba(37, 208, 211, 0.08) 0%, transparent 45%),
     linear-gradient(to right, rgba(25, 199, 209, 0.08) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(25, 199, 209, 0.08) 1px, transparent 1px);
-  background-size: 100% 100%, 100% 100%, 28px 28px, 28px 28px;
+  background-size: 28px 28px, 28px 28px;
 }
 
 /* Scanline / Pixel Texture overlay */

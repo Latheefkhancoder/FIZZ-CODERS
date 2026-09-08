@@ -12,9 +12,6 @@ export default function ResetSuccess() {
   return (
     <AuthLayout
       centeredLayout={true}
-      topQuote="SAME IDEAS. NEW BEGINNINGS."
-      bottomLeftTag="WELCOME BACK TO BIGGER IDEAS."
-      bottomRightTag="BUILD · COLLABORATE · GROW"
       visualSlot={<PixelCollaborationVisual variant="reset-success" />}
     >
       <AuthCard
