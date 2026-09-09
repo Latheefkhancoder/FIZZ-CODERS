@@ -43,6 +43,17 @@ const hashToken = (token) => {
 };
 
 /**
+ * Generate a cryptographically secure random N-digit numeric OTP
+ * @param {number} length - Number of digits (default 6)
+ * @returns {string} Numeric string
+ */
+const generateOtp = (length = 6) => {
+  const min = Math.pow(10, length - 1);
+  const max = Math.pow(10, length) - 1;
+  return crypto.randomInt(min, max + 1).toString();
+};
+
+/**
  * Generate a JWT token for an authenticated user
  * @param {object} payload - User identification payload (e.g. { id, email, name })
  * @param {boolean} rememberMe - Whether extended expiration applies
@@ -66,7 +77,9 @@ module.exports = {
   hashPassword,
   comparePassword,
   generateRandomToken,
+  generateOtp,
   hashToken,
   generateJwt,
   verifyJwt,
 };
+

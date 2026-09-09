@@ -15,7 +15,7 @@ const handleResponse = async (response) => {
 };
 
 /**
- * Register a new user
+ * Register a new user (triggers verification OTP)
  * @param {object} payload - { fullName, email, password, confirmPassword }
  */
 export const registerUser = async (payload) => {
@@ -26,6 +26,33 @@ export const registerUser = async (payload) => {
   });
   return handleResponse(response);
 };
+
+/**
+ * Verify email using OTP
+ * @param {object} payload - { email, otp }
+ */
+export const verifyEmail = async (payload) => {
+  const response = await fetch(`${API_BASE_URL}/auth/verify-email`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  return handleResponse(response);
+};
+
+/**
+ * Resend email verification OTP
+ * @param {string} email
+ */
+export const resendVerification = async (email) => {
+  const response = await fetch(`${API_BASE_URL}/auth/resend-verification`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  });
+  return handleResponse(response);
+};
+
 
 /**
  * Login user

@@ -3,6 +3,8 @@ const { authController } = require("../controllers");
 const { authenticate, validate } = require("../middleware");
 const {
   validateRegister,
+  validateVerifyEmail,
+  validateResendVerification,
   validateLogin,
   validateForgotPassword,
   validateResetPassword,
@@ -12,10 +14,24 @@ const router = express.Router();
 
 /**
  * @route POST /api/auth/register
- * @desc Register a new user account
+ * @desc Register a new user account (sends verification OTP)
  * @access Public
  */
 router.post("/register", validate(validateRegister), authController.register);
+
+/**
+ * @route POST /api/auth/verify-email
+ * @desc Verify user email using OTP
+ * @access Public
+ */
+router.post("/verify-email", validate(validateVerifyEmail), authController.verifyEmail);
+
+/**
+ * @route POST /api/auth/resend-verification
+ * @desc Resend email verification OTP
+ * @access Public
+ */
+router.post("/resend-verification", validate(validateResendVerification), authController.resendVerification);
 
 /**
  * @route POST /api/auth/login
@@ -23,6 +39,7 @@ router.post("/register", validate(validateRegister), authController.register);
  * @access Public
  */
 router.post("/login", validate(validateLogin), authController.login);
+
 
 /**
  * @route POST /api/auth/forgot-password

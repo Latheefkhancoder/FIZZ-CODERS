@@ -13,7 +13,6 @@ export default function ForgotPassword() {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [sentNotice, setSentNotice] = useState(false);
-  const [resetToken, setResetToken] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -32,21 +31,14 @@ export default function ForgotPassword() {
     setIsSubmitting(true);
 
     try {
-      const res = await forgotPassword(email.trim());
+      await forgotPassword(email.trim());
       setIsSubmitting(false);
       setSentNotice(true);
-      if (res.data?.resetToken) {
-        setResetToken(res.data.resetToken);
-      }
     } catch (err) {
       setIsSubmitting(false);
       setError(err.message || 'Failed to process request. Please try again.');
     }
   };
-
-  const resetTargetUrl = resetToken
-    ? `/reset-password?token=${encodeURIComponent(resetToken)}`
-    : '/reset-password';
 
   return (
     <AuthLayout
@@ -65,19 +57,12 @@ export default function ForgotPassword() {
             </h3>
 
             <p className="sent-desc">
-              We've dispatched password reset instructions to{' '}
-              <strong className="text-white">{email}</strong>.
-              Please check your inbox.
+              If an account exists for{' '}
+              <strong className="text-white">{email}</strong>, password reset instructions have been sent.
+              Please check your email inbox and click the link to reset your password.
             </p>
 
             <div className="sent-actions">
-              <Link
-                to={resetTargetUrl}
-                className="continue-reset-link"
-              >
-                Proceed to Reset Password →
-              </Link>
-
               <Link
                 to="/login"
                 className="back-login-link"
@@ -87,6 +72,7 @@ export default function ForgotPassword() {
             </div>
           </div>
         ) : (
+
           <form
             onSubmit={handleSubmit}
             className="auth-form-inner"

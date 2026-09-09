@@ -1,5 +1,7 @@
 const {
   validateRegister,
+  validateVerifyEmail,
+  validateResendVerification,
   validateLogin,
   validateForgotPassword,
   validateResetPassword,
@@ -59,6 +61,56 @@ describe("Auth Validators Unit Tests", () => {
       });
       expect(result.isValid).toBe(false);
       expect(result.errors).toContain("Passwords do not match");
+    });
+  });
+
+  describe("validateVerifyEmail", () => {
+    it("should pass for valid email and 6-digit OTP", () => {
+      const result = validateVerifyEmail({
+        email: "john@example.com",
+        otp: "123456",
+      });
+      expect(result.isValid).toBe(true);
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it("should fail when email is missing or invalid", () => {
+      const result = validateVerifyEmail({
+        email: "invalid-email",
+        otp: "123456",
+      });
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("Invalid email format");
+    });
+
+    it("should fail when OTP is not 6 digits", () => {
+      const result1 = validateVerifyEmail({
+        email: "john@example.com",
+        otp: "123",
+      });
+      expect(result1.isValid).toBe(false);
+      expect(result1.errors).toContain("Verification code must be a 6-digit number");
+
+      const result2 = validateVerifyEmail({
+        email: "john@example.com",
+        otp: "abcdef",
+      });
+      expect(result2.isValid).toBe(false);
+      expect(result2.errors).toContain("Verification code must be a 6-digit number");
+    });
+  });
+
+  describe("validateResendVerification", () => {
+    it("should pass for valid email", () => {
+      const result = validateResendVerification({ email: "john@example.com" });
+      expect(result.isValid).toBe(true);
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it("should fail for missing or invalid email", () => {
+      const result = validateResendVerification({ email: "" });
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("Email is required");
     });
   });
 
@@ -122,3 +174,4 @@ describe("Auth Validators Unit Tests", () => {
     });
   });
 });
+

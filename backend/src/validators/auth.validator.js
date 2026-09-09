@@ -120,9 +120,60 @@ const validateResetPassword = (body) => {
   };
 };
 
+/**
+ * Validate verify email OTP request body
+ * @param {object} body
+ * @returns {{ isValid: boolean, errors: string[] }}
+ */
+const validateVerifyEmail = (body) => {
+  const errors = [];
+  const { email, otp } = body || {};
+
+  if (!email || typeof email !== "string" || email.trim().length === 0) {
+    errors.push("Email is required");
+  } else if (!EMAIL_REGEX.test(email.trim())) {
+    errors.push("Invalid email format");
+  }
+
+  if (!otp || typeof otp !== "string" || otp.trim().length === 0) {
+    errors.push("Verification code is required");
+  } else if (!/^\d{6}$/.test(otp.trim())) {
+    errors.push("Verification code must be a 6-digit number");
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+  };
+};
+
+/**
+ * Validate resend verification OTP request body
+ * @param {object} body
+ * @returns {{ isValid: boolean, errors: string[] }}
+ */
+const validateResendVerification = (body) => {
+  const errors = [];
+  const { email } = body || {};
+
+  if (!email || typeof email !== "string" || email.trim().length === 0) {
+    errors.push("Email is required");
+  } else if (!EMAIL_REGEX.test(email.trim())) {
+    errors.push("Invalid email format");
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+  };
+};
+
 module.exports = {
   validateRegister,
+  validateVerifyEmail,
+  validateResendVerification,
   validateLogin,
   validateForgotPassword,
   validateResetPassword,
 };
+

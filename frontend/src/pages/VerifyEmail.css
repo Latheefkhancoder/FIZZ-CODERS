@@ -1,0 +1,84 @@
+.verify-email-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.verify-email-info {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 13.5px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.verify-email-info strong {
+  color: var(--text-white);
+  word-break: break-all;
+}
+
+.otp-input-field {
+  letter-spacing: 6px;
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.resend-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+
+.resend-btn {
+  background: none;
+  border: none;
+  color: var(--red-primary, #ff2d3d);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.resend-btn:hover:not(:disabled) {
+  text-decoration: underline;
+  opacity: 0.9;
+}
+
+.resend-btn:disabled {
+  color: var(--text-muted);
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.verify-success-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+  padding: 10px 0;
+}
+
+.verify-success-icon {
+  font-size: 36px;
+  color: #10b981;
+}
+
+.verify-success-title {
+  font-family: var(--font-sans);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-white);
+}
+
+.verify-success-desc {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}

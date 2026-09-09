@@ -2,21 +2,49 @@ const { authService } = require("../services");
 const { successResponse } = require("../utils/response");
 
 /**
- * Register a new user account
+ * Register a new user account (sends verification OTP)
  * @route POST /api/auth/register
  */
 const register = async (req, res, next) => {
   try {
     const { fullName, email, password } = req.body;
     const result = await authService.registerUser({ fullName, email, password });
-    return successResponse(res, "Registration successful", result, 201);
+    return successResponse(res, result.message, { email: result.email }, 201);
   } catch (error) {
     next(error);
   }
 };
 
 /**
- * Login user
+ * Verify email using OTP code
+ * @route POST /api/auth/verify-email
+ */
+const verifyEmail = async (req, res, next) => {
+  try {
+    const { email, otp } = req.body;
+    const result = await authService.verifyEmail({ email, otp });
+    return successResponse(res, result.message, { email: result.email, verified: true }, 200);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Resend verification OTP code
+ * @route POST /api/auth/resend-verification
+ */
+const resendVerification = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    const result = await authService.resendVerification(email);
+    return successResponse(res, result.message, null, 200);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Login user (requires verified email)
  * @route POST /api/auth/login
  */
 const login = async (req, res, next) => {
@@ -37,8 +65,7 @@ const forgotPassword = async (req, res, next) => {
   try {
     const { email } = req.body;
     const result = await authService.requestPasswordReset(email);
-    const responseData = result.resetLink ? { resetLink: result.resetLink, resetToken: result.resetToken } : null;
-    return successResponse(res, result.message, responseData, 200);
+    return successResponse(res, result.message, null, 200);
   } catch (error) {
     next(error);
   }
@@ -92,9 +119,12 @@ const getMe = async (req, res, next) => {
 
 module.exports = {
   register,
+  verifyEmail,
+  resendVerification,
   login,
   forgotPassword,
   verifyResetToken,
   resetPassword,
   getMe,
 };
+
