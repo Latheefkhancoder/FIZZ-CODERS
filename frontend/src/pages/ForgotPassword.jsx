@@ -5,6 +5,7 @@ import AuthCard from '../components/auth/AuthCard';
 import AuthInput from '../components/auth/AuthInput';
 import AuthButton from '../components/auth/AuthButton';
 import PixelCollaborationVisual from '../components/auth/PixelCollaborationVisual';
+import { forgotPassword } from '../services/auth.service';
 import './ForgotPassword.css';
 
 export default function ForgotPassword() {
@@ -12,8 +13,9 @@ export default function ForgotPassword() {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [sentNotice, setSentNotice] = useState(false);
+  const [resetToken, setResetToken] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!email.trim()) {
@@ -29,12 +31,22 @@ export default function ForgotPassword() {
     setError('');
     setIsSubmitting(true);
 
-    // Provide friendly UI response
-    setTimeout(() => {
+    try {
+      const res = await forgotPassword(email.trim());
       setIsSubmitting(false);
       setSentNotice(true);
-    }, 600);
+      if (res.data?.resetToken) {
+        setResetToken(res.data.resetToken);
+      }
+    } catch (err) {
+      setIsSubmitting(false);
+      setError(err.message || 'Failed to process request. Please try again.');
+    }
   };
+
+  const resetTargetUrl = resetToken
+    ? `/reset-password?token=${encodeURIComponent(resetToken)}`
+    : '/reset-password';
 
   return (
     <AuthLayout
@@ -60,7 +72,7 @@ export default function ForgotPassword() {
 
             <div className="sent-actions">
               <Link
-                to="/reset-password"
+                to={resetTargetUrl}
                 className="continue-reset-link"
               >
                 Proceed to Reset Password →

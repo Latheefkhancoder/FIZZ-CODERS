@@ -37,7 +37,27 @@ const forgotPassword = async (req, res, next) => {
   try {
     const { email } = req.body;
     const result = await authService.requestPasswordReset(email);
-    return successResponse(res, result.message, null, 200);
+    const responseData = result.resetLink ? { resetLink: result.resetLink, resetToken: result.resetToken } : null;
+    return successResponse(res, result.message, responseData, 200);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Verify reset token validity
+ * @route GET /api/auth/verify-reset-token
+ */
+const verifyResetToken = async (req, res, next) => {
+  try {
+    const { token } = req.query;
+    const result = await authService.verifyResetToken(token);
+    return successResponse(
+      res,
+      result.valid ? "Token is valid" : "Token is invalid or expired",
+      result,
+      200
+    );
   } catch (error) {
     next(error);
   }
@@ -74,6 +94,7 @@ module.exports = {
   register,
   login,
   forgotPassword,
+  verifyResetToken,
   resetPassword,
   getMe,
 };

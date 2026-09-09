@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
+    "migrate": "node src/scripts/migrate.js",
     "test": "jest",
     "lint": "eslint ."
   },
@@ -25,7 +26,8 @@
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.3",
     "nodemailer": "^10.0.1",
-    "pg": "^8.23.0"
+    "pg": "^8.23.0",
+    "pg-mem": "^3.0.14"
   },
   "devDependencies": {
     "@eslint/js": "^9.20.0",
