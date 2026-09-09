@@ -1,20 +1,28 @@
-const { userModel, passwordResetTokenModel } = require("../models");
+const {
+  userModel,
+  passwordResetTokenModel,
+  emailVerificationModel,
+} = require("../models");
 const {
   hashPassword,
   comparePassword,
   generateRandomToken,
+  generateOtp,
   hashToken,
   generateJwt,
 } = require("../utils/crypto");
 const emailService = require("./email.service");
 
+const OTP_EXPIRATION_MS = 10 * 60 * 1000; // 10 minutes
+const MAX_OTP_ATTEMPTS = 5;
+
 /**
- * Register a new user
+ * Register a new user and generate/send verification OTP
  * @param {object} params
  * @param {string} params.fullName
  * @param {string} params.email
  * @param {string} params.password
- * @returns {Promise<{ user: object, token: string }>}
+ * @returns {Promise<{ email: string, message: string }>}
  */
 const registerUser = async ({ fullName, email, password }) => {
   const normalizedEmail = email.toLowerCase().trim();
@@ -22,38 +30,174 @@ const registerUser = async ({ fullName, email, password }) => {
   // Check if user already exists
   const existingUser = await userModel.findByEmail(normalizedEmail);
   if (existingUser) {
-    const error = new Error("An account with this email already exists");
-    error.statusCode = 409;
-    throw error;
+    const isVerified = await emailVerificationModel.isEmailVerified(normalizedEmail);
+    if (isVerified) {
+      const error = new Error("An account with this email already exists");
+      error.statusCode = 409;
+      throw error;
+    }
+
+    // If existing user is unverified, update password and name
+    const passwordHash = await hashPassword(password);
+    await userModel.updatePassword(existingUser.id, passwordHash);
+  } else {
+    // Hash password & create user record
+    const passwordHash = await hashPassword(password);
+    await userModel.createUser({
+      name: fullName.trim(),
+      email: normalizedEmail,
+      passwordHash,
+    });
   }
 
-  // Hash password
-  const passwordHash = await hashPassword(password);
+  // Invalidate any previous active verification codes
+  await emailVerificationModel.invalidateActiveCodes(normalizedEmail);
 
-  // Create user record
-  const newUser = await userModel.createUser({
-    name: fullName.trim(),
+  // Generate secure 6-digit OTP
+  const otp = generateOtp(6);
+  const otpHash = hashToken(otp);
+  const expiresAt = new Date(Date.now() + OTP_EXPIRATION_MS);
+
+  // Store hashed OTP in database
+  await emailVerificationModel.createCode({
     email: normalizedEmail,
-    passwordHash,
+    otpHash,
+    expiresAt,
   });
 
-  const safeUser = {
-    id: newUser.id,
-    name: newUser.name,
-    email: newUser.email,
-  };
+  // Send verification email with raw OTP
+  await emailService.sendEmailVerificationOtp(normalizedEmail, otp);
 
-  // Generate session token
-  const token = generateJwt(safeUser);
-
+  // Return success response WITHOUT authentication token
   return {
-    user: safeUser,
-    token,
+    email: normalizedEmail,
+    message: "Registration successful. A verification code has been sent to your email.",
   };
 };
 
 /**
- * Authenticate user login
+ * Verify email using submitted 6-digit OTP
+ * @param {object} params
+ * @param {string} params.email
+ * @param {string} params.otp
+ * @returns {Promise<{ verified: boolean, email: string, message: string }>}
+ */
+const verifyEmail = async ({ email, otp }) => {
+  const normalizedEmail = email.toLowerCase().trim();
+
+  // Verify user exists
+  const user = await userModel.findByEmail(normalizedEmail);
+  if (!user) {
+    const error = new Error("Invalid email or verification code");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  // Check if already verified
+  const alreadyVerified = await emailVerificationModel.isEmailVerified(normalizedEmail);
+  if (alreadyVerified) {
+    return {
+      verified: true,
+      email: normalizedEmail,
+      message: "Email has already been verified.",
+    };
+  }
+
+  // Find latest active code
+  const codeRecord = await emailVerificationModel.findLatestActiveCode(normalizedEmail);
+  if (!codeRecord) {
+    const error = new Error("Invalid or expired verification code. Please request a new one.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  // Check expiration
+  if (new Date(codeRecord.expires_at) < new Date()) {
+    const error = new Error("Verification code has expired. Please request a new one.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  // Check attempt limit
+  if (codeRecord.attempts >= MAX_OTP_ATTEMPTS) {
+    const error = new Error("Too many failed attempts. Please request a new verification code.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  // Validate OTP hash
+  const incomingHash = hashToken(otp.trim());
+  if (incomingHash !== codeRecord.otp_hash) {
+    await emailVerificationModel.incrementAttempts(codeRecord.id);
+    const remaining = MAX_OTP_ATTEMPTS - (codeRecord.attempts + 1);
+    const error = new Error(
+      remaining > 0
+        ? `Invalid verification code. ${remaining} attempt(s) remaining.`
+        : "Invalid verification code. Maximum attempts exceeded. Please request a new code."
+    );
+    error.statusCode = 400;
+    throw error;
+  }
+
+  // Mark as verified
+  await emailVerificationModel.markVerified(codeRecord.id);
+
+  // Invalidate any remaining codes for this email
+  await emailVerificationModel.invalidateActiveCodes(normalizedEmail);
+
+  return {
+    verified: true,
+    email: normalizedEmail,
+    message: "Email verified successfully.",
+  };
+};
+
+/**
+ * Resend verification OTP code
+ * @param {string} email
+ * @returns {Promise<{ message: string }>}
+ */
+const resendVerification = async (email) => {
+  const normalizedEmail = email.toLowerCase().trim();
+
+  const user = await userModel.findByEmail(normalizedEmail);
+  if (!user) {
+    // Generic response to avoid email enumeration
+    return {
+      message: "If an account exists for this email, a verification code has been sent.",
+    };
+  }
+
+  const isVerified = await emailVerificationModel.isEmailVerified(normalizedEmail);
+  if (isVerified) {
+    const error = new Error("This email has already been verified.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  // Invalidate previous active codes
+  await emailVerificationModel.invalidateActiveCodes(normalizedEmail);
+
+  // Generate new 6-digit OTP
+  const otp = generateOtp(6);
+  const otpHash = hashToken(otp);
+  const expiresAt = new Date(Date.now() + OTP_EXPIRATION_MS);
+
+  await emailVerificationModel.createCode({
+    email: normalizedEmail,
+    otpHash,
+    expiresAt,
+  });
+
+  await emailService.sendEmailVerificationOtp(normalizedEmail, otp);
+
+  return {
+    message: "A new verification code has been sent to your email.",
+  };
+};
+
+/**
+ * Authenticate user login (requires verified email)
  * @param {object} params
  * @param {string} params.email
  * @param {string} params.password
@@ -76,6 +220,16 @@ const loginUser = async ({ email, password, rememberMe = false }) => {
   if (!isMatch) {
     const error = new Error("Invalid email or password");
     error.statusCode = 401;
+    throw error;
+  }
+
+  // Verify email verification status in email_verification_codes
+  const isVerified = await emailVerificationModel.isEmailVerified(normalizedEmail);
+  if (!isVerified) {
+    const error = new Error("Email verification required. Please verify your email before logging in.");
+    error.statusCode = 403;
+    error.requiresVerification = true;
+    error.email = normalizedEmail;
     throw error;
   }
 
@@ -122,15 +276,10 @@ const requestPasswordReset = async (email) => {
     });
 
     // Send reset email containing the raw token
-    const emailResult = await emailService.sendPasswordResetEmail(user.email, rawToken);
-    return {
-      message: "If an account exists for this email, a password reset link has been sent.",
-      resetLink: emailResult?.link,
-      resetToken: rawToken,
-    };
+    await emailService.sendPasswordResetEmail(user.email, rawToken);
   }
 
-  // Always return identical generic message to prevent account enumeration
+  // Always return identical generic message without resetToken or link to prevent account enumeration
   return {
     message: "If an account exists for this email, a password reset link has been sent.",
   };
@@ -207,9 +356,12 @@ const getCurrentUser = async (userId) => {
 
 module.exports = {
   registerUser,
+  verifyEmail,
+  resendVerification,
   loginUser,
   requestPasswordReset,
   verifyResetToken,
   resetPassword,
   getCurrentUser,
 };
+

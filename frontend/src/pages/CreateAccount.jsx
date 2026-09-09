@@ -85,25 +85,26 @@ export default function CreateAccount() {
     setServerError('');
 
     try {
-      const res = await registerUser({
+      const targetEmail = formData.email.trim();
+      await registerUser({
         fullName: formData.fullName.trim(),
-        email: formData.email.trim(),
+        email: targetEmail,
         password: formData.password,
         confirmPassword: formData.confirmPassword,
       });
 
       setIsSubmitting(false);
 
-      if (res.data?.token) {
-        localStorage.setItem('auth_token', res.data.token);
-      }
-
-      navigate('/login');
+      // Navigate to OTP verification step with email in state
+      navigate('/verify-email', {
+        state: { email: targetEmail },
+      });
     } catch (err) {
       setIsSubmitting(false);
       setServerError(err.message || 'Registration failed. Please try again.');
     }
   };
+
 
   return (
     <AuthLayout

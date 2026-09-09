@@ -1,10 +1,15 @@
 const { authService } = require("../../src/services");
-const { userModel, passwordResetTokenModel } = require("../../src/models");
+const {
+  userModel,
+  passwordResetTokenModel,
+  emailVerificationModel,
+} = require("../../src/models");
 const emailService = require("../../src/services/email.service");
-const { hashPassword } = require("../../src/utils/crypto");
+const { hashPassword, hashToken } = require("../../src/utils/crypto");
 
 jest.mock("../../src/models/user.model");
 jest.mock("../../src/models/passwordResetToken.model");
+jest.mock("../../src/models/emailVerification.model");
 jest.mock("../../src/services/email.service");
 
 describe("Auth Service Unit Tests", () => {
@@ -13,13 +18,16 @@ describe("Auth Service Unit Tests", () => {
   });
 
   describe("registerUser", () => {
-    it("should successfully register a new user", async () => {
+    it("should successfully register a new user and send OTP without returning token", async () => {
       userModel.findByEmail.mockResolvedValue(null);
       userModel.createUser.mockResolvedValue({
         id: 1,
         name: "John Doe",
         email: "john@example.com",
       });
+      emailVerificationModel.invalidateActiveCodes.mockResolvedValue(0);
+      emailVerificationModel.createCode.mockResolvedValue({ id: 1 });
+      emailService.sendEmailVerificationOtp.mockResolvedValue({ delivered: true });
 
       const result = await authService.registerUser({
         fullName: "John Doe",
@@ -29,13 +37,18 @@ describe("Auth Service Unit Tests", () => {
 
       expect(userModel.findByEmail).toHaveBeenCalledWith("john@example.com");
       expect(userModel.createUser).toHaveBeenCalled();
-      expect(result).toHaveProperty("user");
-      expect(result.user.email).toBe("john@example.com");
-      expect(result).toHaveProperty("token");
+      expect(emailVerificationModel.createCode).toHaveBeenCalled();
+      expect(emailService.sendEmailVerificationOtp).toHaveBeenCalledWith(
+        "john@example.com",
+        expect.any(String)
+      );
+      expect(result.email).toBe("john@example.com");
+      expect(result).not.toHaveProperty("token");
     });
 
-    it("should throw 409 conflict if email already exists", async () => {
+    it("should throw 409 conflict if email already exists and is verified", async () => {
       userModel.findByEmail.mockResolvedValue({ id: 1, email: "john@example.com" });
+      emailVerificationModel.isEmailVerified.mockResolvedValue(true);
 
       await expect(
         authService.registerUser({
@@ -50,8 +63,118 @@ describe("Auth Service Unit Tests", () => {
     });
   });
 
+  describe("verifyEmail", () => {
+    it("should successfully verify email with valid OTP", async () => {
+      userModel.findByEmail.mockResolvedValue({ id: 1, email: "john@example.com" });
+      emailVerificationModel.isEmailVerified.mockResolvedValue(false);
+      emailVerificationModel.findLatestActiveCode.mockResolvedValue({
+        id: 10,
+        email: "john@example.com",
+        otp_hash: hashToken("123456"),
+        expires_at: new Date(Date.now() + 600000),
+        attempts: 0,
+      });
+      emailVerificationModel.markVerified.mockResolvedValue({ id: 10 });
+      emailVerificationModel.invalidateActiveCodes.mockResolvedValue(0);
+
+      const result = await authService.verifyEmail({
+        email: "john@example.com",
+        otp: "123456",
+      });
+
+      expect(emailVerificationModel.markVerified).toHaveBeenCalledWith(10);
+      expect(result.verified).toBe(true);
+      expect(result.email).toBe("john@example.com");
+    });
+
+    it("should reject invalid OTP and increment attempts", async () => {
+      userModel.findByEmail.mockResolvedValue({ id: 1, email: "john@example.com" });
+      emailVerificationModel.isEmailVerified.mockResolvedValue(false);
+      emailVerificationModel.findLatestActiveCode.mockResolvedValue({
+        id: 10,
+        email: "john@example.com",
+        otp_hash: hashToken("123456"),
+        expires_at: new Date(Date.now() + 600000),
+        attempts: 1,
+      });
+      emailVerificationModel.incrementAttempts.mockResolvedValue({ id: 10, attempts: 2 });
+
+      await expect(
+        authService.verifyEmail({
+          email: "john@example.com",
+          otp: "999999",
+        })
+      ).rejects.toMatchObject({
+        statusCode: 400,
+      });
+
+      expect(emailVerificationModel.incrementAttempts).toHaveBeenCalledWith(10);
+    });
+
+    it("should reject expired OTP", async () => {
+      userModel.findByEmail.mockResolvedValue({ id: 1, email: "john@example.com" });
+      emailVerificationModel.isEmailVerified.mockResolvedValue(false);
+      emailVerificationModel.findLatestActiveCode.mockResolvedValue({
+        id: 10,
+        email: "john@example.com",
+        otp_hash: hashToken("123456"),
+        expires_at: new Date(Date.now() - 1000), // Expired
+        attempts: 0,
+      });
+
+      await expect(
+        authService.verifyEmail({
+          email: "john@example.com",
+          otp: "123456",
+        })
+      ).rejects.toMatchObject({
+        statusCode: 400,
+        message: expect.stringContaining("expired"),
+      });
+    });
+
+    it("should reject when maximum attempts exceeded", async () => {
+      userModel.findByEmail.mockResolvedValue({ id: 1, email: "john@example.com" });
+      emailVerificationModel.isEmailVerified.mockResolvedValue(false);
+      emailVerificationModel.findLatestActiveCode.mockResolvedValue({
+        id: 10,
+        email: "john@example.com",
+        otp_hash: hashToken("123456"),
+        expires_at: new Date(Date.now() + 600000),
+        attempts: 5,
+      });
+
+      await expect(
+        authService.verifyEmail({
+          email: "john@example.com",
+          otp: "123456",
+        })
+      ).rejects.toMatchObject({
+        statusCode: 400,
+        message: expect.stringContaining("attempts"),
+      });
+    });
+  });
+
+  describe("resendVerification", () => {
+    it("should invalidate old codes and generate new OTP", async () => {
+      userModel.findByEmail.mockResolvedValue({ id: 1, email: "john@example.com" });
+      emailVerificationModel.isEmailVerified.mockResolvedValue(false);
+      emailVerificationModel.invalidateActiveCodes.mockResolvedValue(1);
+      emailVerificationModel.createCode.mockResolvedValue({ id: 11 });
+      emailService.sendEmailVerificationOtp.mockResolvedValue({ delivered: true });
+
+      const result = await authService.resendVerification("john@example.com");
+
+      expect(emailVerificationModel.invalidateActiveCodes).toHaveBeenCalledWith("john@example.com");
+      expect(emailVerificationModel.createCode).toHaveBeenCalled();
+      expect(emailService.sendEmailVerificationOtp).toHaveBeenCalled();
+      expect(result.message).toContain("verification code has been sent");
+    });
+  });
+
   describe("loginUser", () => {
-    it("should successfully log in user with correct credentials", async () => {
+    it("should successfully log in verified user with correct credentials", async () => {
       const passwordHash = await hashPassword("password123");
       userModel.findByEmail.mockResolvedValue({
         id: 1,
@@ -59,6 +182,7 @@ describe("Auth Service Unit Tests", () => {
         email: "john@example.com",
         password_hash: passwordHash,
       });
+      emailVerificationModel.isEmailVerified.mockResolvedValue(true);
 
       const result = await authService.loginUser({
         email: "john@example.com",
@@ -68,6 +192,27 @@ describe("Auth Service Unit Tests", () => {
       expect(result).toHaveProperty("user");
       expect(result.user.name).toBe("John Doe");
       expect(result).toHaveProperty("token");
+    });
+
+    it("should reject login when user email is not verified", async () => {
+      const passwordHash = await hashPassword("password123");
+      userModel.findByEmail.mockResolvedValue({
+        id: 1,
+        name: "John Doe",
+        email: "john@example.com",
+        password_hash: passwordHash,
+      });
+      emailVerificationModel.isEmailVerified.mockResolvedValue(false);
+
+      await expect(
+        authService.loginUser({
+          email: "john@example.com",
+          password: "password123",
+        })
+      ).rejects.toMatchObject({
+        statusCode: 403,
+        message: expect.stringContaining("verification required"),
+      });
     });
 
     it("should reject login when user is not found", async () => {
@@ -104,6 +249,7 @@ describe("Auth Service Unit Tests", () => {
       });
     });
   });
+
 
   describe("requestPasswordReset", () => {
     it("should generate reset token and send email if user exists", async () => {

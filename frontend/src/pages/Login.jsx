@@ -24,6 +24,8 @@ export default function Login() {
   const [userProfile, setUserProfile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [unverifiedEmail, setUnverifiedEmail] = useState('');
+
   const validateForm = () => {
     const nextErrors = {};
 
@@ -62,6 +64,7 @@ export default function Login() {
     }
     if (serverError) {
       setServerError('');
+      setUnverifiedEmail('');
     }
   };
 
@@ -72,6 +75,7 @@ export default function Login() {
 
     setIsSubmitting(true);
     setServerError('');
+    setUnverifiedEmail('');
 
     try {
       const res = await loginUser({
@@ -93,7 +97,11 @@ export default function Login() {
       }
     } catch (err) {
       setIsSubmitting(false);
-      setServerError(err.message || 'Login failed. Please check your credentials.');
+      const msg = err.message || 'Login failed. Please check your credentials.';
+      setServerError(msg);
+      if (err.status === 403 || msg.toLowerCase().includes('verification')) {
+        setUnverifiedEmail(formData.email.trim());
+      }
     }
   };
 
@@ -139,11 +147,29 @@ export default function Login() {
                   color: '#f87171',
                   fontSize: '0.875rem',
                   marginBottom: '1rem',
+                  lineHeight: '1.4',
                 }}
               >
-                {serverError}
+                <div>{serverError}</div>
+                {unverifiedEmail && (
+                  <div style={{ marginTop: '8px' }}>
+                    <Link
+                      to="/verify-email"
+                      state={{ email: unverifiedEmail }}
+                      style={{
+                        color: '#38bdf8',
+                        fontWeight: '600',
+                        textDecoration: 'underline',
+                        fontSize: '0.825rem',
+                      }}
+                    >
+                      Click here to verify your email now →
+                    </Link>
+                  </div>
+                )}
               </div>
             )}
+
 
             {/* Email Address */}
             <AuthInput
