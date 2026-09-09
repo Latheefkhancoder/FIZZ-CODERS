@@ -86,8 +86,6 @@ export default function Login() {
       });
 
       setIsSubmitting(false);
-<<<<<<< HEAD
-      
       // Route integration: If email contains "member" or is Priya, go to member dashboard.
       // Otherwise default to admin dashboard.
       const email = formData.email.toLowerCase();
@@ -98,10 +96,6 @@ export default function Login() {
         sessionStorage.setItem('fizz_role', 'admin');
         navigate('/admin');
       }
-    }, 600);
-=======
-      setLoginSuccess(true);
-      setUserProfile(res.data?.user);
 
       if (res.data?.token) {
         if (formData.rememberMe) {
@@ -118,7 +112,6 @@ export default function Login() {
         setUnverifiedEmail(formData.email.trim());
       }
     }
->>>>>>> main
   };
 
   return (

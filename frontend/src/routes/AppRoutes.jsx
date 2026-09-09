@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from '../pages/Login';
 import CreateAccount from '../pages/CreateAccount';
 import VerifyEmail from '../pages/VerifyEmail';
@@ -32,8 +32,11 @@ import MemberProfilePage      from '../pages/member/MemberProfilePage';
  */
 const ProtectedRoute = ({ children, allowedRole }) => {
   const role = sessionStorage.getItem('fizz_role');
-  if (role !== allowedRole) {
+  if (!role) {
     return <Navigate to="/login" replace />;
+  }
+  if (allowedRole && role !== allowedRole && role !== 'admin') {
+    return <Navigate to={role === 'member' ? '/member' : '/login'} replace />;
   }
   return children;
 };
@@ -44,13 +47,13 @@ export default function AppRoutes() {
       {/* Root redirect to /login */}
       <Route path="/" element={<Navigate to="/login" replace />} />
 
-<<<<<<< HEAD
-      {/* Authentication Pages — UNCHANGED */}
-      <Route path="/login"            element={<Login />} />
-      <Route path="/create-account"   element={<CreateAccount />} />
-      <Route path="/forgot-password"  element={<ForgotPassword />} />
-      <Route path="/reset-password"   element={<ResetPassword />} />
-      <Route path="/reset-success"    element={<ResetSuccess />} />
+      {/* Authentication Pages */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/create-account" element={<CreateAccount />} />
+      <Route path="/verify-email" element={<VerifyEmail />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/reset-success" element={<ResetSuccess />} />
 
       {/* Admin Dashboard */}
       <Route
@@ -92,15 +95,6 @@ export default function AppRoutes() {
         <Route path="chatbot"        element={<MemberTeamChatbotPage />} />
         <Route path="profile"        element={<MemberProfilePage />} />
       </Route>
-=======
-      {/* Authentication Pages */}
-      <Route path="/login" element={<Login />} />
-      <Route path="/create-account" element={<CreateAccount />} />
-      <Route path="/verify-email" element={<VerifyEmail />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/reset-password" element={<ResetPassword />} />
-      <Route path="/reset-success" element={<ResetSuccess />} />
->>>>>>> main
 
 
       {/* Fallback redirect */}

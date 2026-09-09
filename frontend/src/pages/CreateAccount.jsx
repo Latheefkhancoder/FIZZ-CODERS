@@ -47,7 +47,7 @@ export default function CreateAccount() {
     }
 
     if (!formData.confirmPassword) {
-      nextErrors.confirmPassword = 'Please confirm your password.';
+      nextErrors.confirmPassword = 'Confirm your password.';
     } else if (formData.password !== formData.confirmPassword) {
       nextErrors.confirmPassword = 'Passwords do not match.';
     }
@@ -94,7 +94,6 @@ export default function CreateAccount() {
       });
 
       setIsSubmitting(false);
-
       // Navigate to OTP verification step with email in state
       navigate('/verify-email', {
         state: { email: targetEmail },

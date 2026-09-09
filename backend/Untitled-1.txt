@@ -1,0 +1,3 @@
+# 
+
+{"success":true,"message":"FIZZ-CONNECT API is running","data":{"status":"ok","service":"FIZZ-CONNECT Backend API","uptime":268.6124594,"timestamp":"2026-09-08T15:45:44.471Z"}}
