@@ -1,7 +1,7 @@
 .auth-form-inner {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 13px;
 }
 
 .auth-switch-text {

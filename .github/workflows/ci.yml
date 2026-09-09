@@ -5,10 +5,6 @@ on:
     branches:
       - main
 
-  push:
-    branches:
-      - mirac
-
   workflow_dispatch:
 
 jobs:
@@ -69,3 +65,38 @@ jobs:
 
       - name: Run tests
         run: npm test
+
+  database:
+    name: Database CI
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: fizz_connect_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d fizz_connect_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PostgreSQL client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+      - name: Run database migrations
+        env:
+          PGPASSWORD: postgres
+        run: |
+          for file in database/migrations/*.sql; do
+            echo "Running $file"
+            psql -h localhost -U postgres -d fizz_connect_test -v ON_ERROR_STOP=1 -f "$file"
+          done

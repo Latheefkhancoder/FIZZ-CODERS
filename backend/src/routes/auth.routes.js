@@ -1,0 +1,72 @@
+const express = require("express");
+const { authController } = require("../controllers");
+const { authenticate, validate } = require("../middleware");
+const {
+  validateRegister,
+  validateVerifyEmail,
+  validateResendVerification,
+  validateLogin,
+  validateForgotPassword,
+  validateResetPassword,
+} = require("../validators");
+
+const router = express.Router();
+
+/**
+ * @route POST /api/auth/register
+ * @desc Register a new user account (sends verification OTP)
+ * @access Public
+ */
+router.post("/register", validate(validateRegister), authController.register);
+
+/**
+ * @route POST /api/auth/verify-email
+ * @desc Verify user email using OTP
+ * @access Public
+ */
+router.post("/verify-email", validate(validateVerifyEmail), authController.verifyEmail);
+
+/**
+ * @route POST /api/auth/resend-verification
+ * @desc Resend email verification OTP
+ * @access Public
+ */
+router.post("/resend-verification", validate(validateResendVerification), authController.resendVerification);
+
+/**
+ * @route POST /api/auth/login
+ * @desc Authenticate user and get JWT
+ * @access Public
+ */
+router.post("/login", validate(validateLogin), authController.login);
+
+
+/**
+ * @route POST /api/auth/forgot-password
+ * @desc Request password reset email
+ * @access Public
+ */
+router.post("/forgot-password", validate(validateForgotPassword), authController.forgotPassword);
+
+/**
+ * @route GET /api/auth/verify-reset-token
+ * @desc Verify reset token validity
+ * @access Public
+ */
+router.get("/verify-reset-token", authController.verifyResetToken);
+
+/**
+ * @route POST /api/auth/reset-password
+ * @desc Reset password using token
+ * @access Public
+ */
+router.post("/reset-password", validate(validateResetPassword), authController.resetPassword);
+
+/**
+ * @route GET /api/auth/me
+ * @desc Get current authenticated user profile
+ * @access Private (Requires Bearer token)
+ */
+router.get("/me", authenticate, authController.getMe);
+
+module.exports = router;

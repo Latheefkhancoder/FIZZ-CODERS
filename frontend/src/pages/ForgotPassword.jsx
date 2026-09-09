@@ -5,6 +5,7 @@ import AuthCard from '../components/auth/AuthCard';
 import AuthInput from '../components/auth/AuthInput';
 import AuthButton from '../components/auth/AuthButton';
 import PixelCollaborationVisual from '../components/auth/PixelCollaborationVisual';
+import { forgotPassword } from '../services/auth.service';
 import './ForgotPassword.css';
 
 export default function ForgotPassword() {
@@ -13,7 +14,7 @@ export default function ForgotPassword() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [sentNotice, setSentNotice] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!email.trim()) {
@@ -29,11 +30,14 @@ export default function ForgotPassword() {
     setError('');
     setIsSubmitting(true);
 
-    // Provide friendly UI response
-    setTimeout(() => {
+    try {
+      await forgotPassword(email.trim());
       setIsSubmitting(false);
       setSentNotice(true);
-    }, 600);
+    } catch (err) {
+      setIsSubmitting(false);
+      setError(err.message || 'Failed to process request. Please try again.');
+    }
   };
 
   return (
@@ -53,19 +57,12 @@ export default function ForgotPassword() {
             </h3>
 
             <p className="sent-desc">
-              We've dispatched password reset instructions to{' '}
-              <strong className="text-white">{email}</strong>.
-              Please check your inbox.
+              If an account exists for{' '}
+              <strong className="text-white">{email}</strong>, password reset instructions have been sent.
+              Please check your email inbox and click the link to reset your password.
             </p>
 
             <div className="sent-actions">
-              <Link
-                to="/reset-password"
-                className="continue-reset-link"
-              >
-                Proceed to Reset Password →
-              </Link>
-
               <Link
                 to="/login"
                 className="back-login-link"
@@ -75,6 +72,7 @@ export default function ForgotPassword() {
             </div>
           </div>
         ) : (
+
           <form
             onSubmit={handleSubmit}
             className="auth-form-inner"
