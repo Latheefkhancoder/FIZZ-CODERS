@@ -4,7 +4,6 @@ const authRoutes = require("./auth.routes");
 
 const router = express.Router();
 
-// Mount individual route modules
 router.use("/", healthRoutes);
 router.use("/auth", authRoutes);
 
