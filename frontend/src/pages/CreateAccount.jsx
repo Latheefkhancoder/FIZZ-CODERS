@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import AuthLayout from '../components/auth/AuthLayout';
 import AuthCard from '../components/auth/AuthCard';
@@ -11,6 +11,7 @@ import PixelCollaborationVisual from '../components/auth/PixelCollaborationVisua
 import './CreateAccount.css';
 
 export default function CreateAccount() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -43,7 +44,7 @@ export default function CreateAccount() {
     }
 
     if (!formData.confirmPassword) {
-      nextErrors.confirmPassword = 'Please confirm your password.';
+      nextErrors.confirmPassword = 'Confirm your password.';
     } else if (formData.password !== formData.confirmPassword) {
       nextErrors.confirmPassword = 'Passwords do not match.';
     }
@@ -79,6 +80,7 @@ export default function CreateAccount() {
     // Frontend-only submission simulation
     setTimeout(() => {
       setIsSubmitting(false);
+      navigate('/login');
     }, 600);
   };
 

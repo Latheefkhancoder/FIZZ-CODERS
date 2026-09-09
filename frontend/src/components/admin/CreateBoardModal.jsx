@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './CreateBoardModal.css';
 
 const IconClose = () => (
@@ -15,16 +15,18 @@ export default function CreateBoardModal({ isOpen, onClose, onSubmit }) {
   const [name, setName] = useState('');
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    if (!isOpen) { setName(''); setError(''); }
-  }, [isOpen]);
+  const handleClose = useCallback(() => {
+    setName('');
+    setError('');
+    onClose();
+  }, [onClose]);
 
   useEffect(() => {
     if (!isOpen) return;
-    const handler = (e) => { if (e.key === 'Escape') onClose(); };
+    const handler = (e) => { if (e.key === 'Escape') handleClose(); };
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
-  }, [isOpen, onClose]);
+  }, [isOpen, handleClose]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -32,13 +34,13 @@ export default function CreateBoardModal({ isOpen, onClose, onSubmit }) {
     if (!trimmed) { setError('Board name is required.'); return; }
     if (trimmed.length < 3) { setError('Board name must be at least 3 characters.'); return; }
     onSubmit(trimmed);
-    onClose();
+    handleClose();
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
+    <div className="modal-backdrop" onClick={handleClose}>
       <div
         className="modal-box"
         onClick={(e) => e.stopPropagation()}
@@ -48,7 +50,7 @@ export default function CreateBoardModal({ isOpen, onClose, onSubmit }) {
       >
         <div className="modal-header">
           <h3 id="create-board-title" className="modal-title">Create New Board</h3>
-          <button className="modal-close-btn" onClick={onClose} aria-label="Close" type="button">
+          <button className="modal-close-btn" onClick={handleClose} aria-label="Close" type="button">
             <IconClose />
           </button>
         </div>
@@ -70,7 +72,7 @@ export default function CreateBoardModal({ isOpen, onClose, onSubmit }) {
           </div>
 
           <div className="modal-actions">
-            <button type="button" className="modal-btn-cancel" onClick={onClose}>Cancel</button>
+            <button type="button" className="modal-btn-cancel" onClick={handleClose}>Cancel</button>
             <button type="submit" className="modal-btn-primary">Create Board</button>
           </div>
         </form>

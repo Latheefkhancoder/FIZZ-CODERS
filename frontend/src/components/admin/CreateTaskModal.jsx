@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAdmin } from '../../context/AdminContext';
 import './CreateBoardModal.css'; /* reuse shared modal styles */
 
@@ -28,16 +28,18 @@ export default function CreateTaskModal({ isOpen, boardId, onClose, onSubmit }) 
   const [form, setForm] = useState(EMPTY_FORM);
   const [errors, setErrors] = useState({});
 
-  useEffect(() => {
-    if (!isOpen) { setForm(EMPTY_FORM); setErrors({}); }
-  }, [isOpen]);
+  const handleClose = useCallback(() => {
+    setForm(EMPTY_FORM);
+    setErrors({});
+    onClose();
+  }, [onClose]);
 
   useEffect(() => {
     if (!isOpen) return;
-    const handler = (e) => { if (e.key === 'Escape') onClose(); };
+    const handler = (e) => { if (e.key === 'Escape') handleClose(); };
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
-  }, [isOpen, onClose]);
+  }, [isOpen, handleClose]);
 
   const setField = (field, value) => {
     setForm(prev => ({ ...prev, [field]: value }));
@@ -63,13 +65,13 @@ export default function CreateTaskModal({ isOpen, boardId, onClose, onSubmit }) 
       assignee:    form.assignee,
       dueDate:     form.dueDate,
     });
-    onClose();
+    handleClose();
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
+    <div className="modal-backdrop" onClick={handleClose}>
       <div
         className="modal-box"
         style={{ maxWidth: 480 }}
@@ -80,7 +82,7 @@ export default function CreateTaskModal({ isOpen, boardId, onClose, onSubmit }) 
       >
         <div className="modal-header">
           <h3 id="create-task-title" className="modal-title">Create New Task</h3>
-          <button className="modal-close-btn" onClick={onClose} aria-label="Close" type="button">
+          <button className="modal-close-btn" onClick={handleClose} aria-label="Close" type="button">
             <IconClose />
           </button>
         </div>
@@ -164,7 +166,7 @@ export default function CreateTaskModal({ isOpen, boardId, onClose, onSubmit }) 
           <p className="modal-hint">New tasks automatically start in <strong>TODO</strong>.</p>
 
           <div className="modal-actions">
-            <button type="button" className="modal-btn-cancel" onClick={onClose}>Cancel</button>
+            <button type="button" className="modal-btn-cancel" onClick={handleClose}>Cancel</button>
             <button type="submit" className="modal-btn-primary">Create Task</button>
           </div>
         </form>

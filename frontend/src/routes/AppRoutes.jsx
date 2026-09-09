@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from '../pages/Login';
 import CreateAccount from '../pages/CreateAccount';
 import ForgotPassword from '../pages/ForgotPassword';
@@ -31,8 +31,11 @@ import MemberProfilePage      from '../pages/member/MemberProfilePage';
  */
 const ProtectedRoute = ({ children, allowedRole }) => {
   const role = sessionStorage.getItem('fizz_role');
-  if (role !== allowedRole) {
+  if (!role) {
     return <Navigate to="/login" replace />;
+  }
+  if (allowedRole && role !== allowedRole && role !== 'admin') {
+    return <Navigate to={role === 'member' ? '/member' : '/login'} replace />;
   }
   return children;
 };

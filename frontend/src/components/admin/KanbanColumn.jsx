@@ -44,6 +44,15 @@ export default function KanbanColumn({ status, tasks, onTaskClick, onDeleteTask,
         )}
       </div>
 
+      {onAddTask && (
+        <button
+          type="button"
+          className="kanban-add-task-btn"
+          onClick={onAddTask}
+        >
+          + Add Task
+        </button>
+      )}
     </div>
   );
 }

@@ -66,7 +66,7 @@ replacements.forEach(r => {
 
 // Remove feature badges completely
 const badgesRegex1 = /\{\/\* Integrated Left Feature Badges \*\/\}.*?<\/div>\s*<\/div>/s;
-content = content.replace(/\{\/\* Integrated Left Feature Badges \*\/\}.*?<\/div>\s*<\/div>/s, '</div>');
+content = content.replace(badgesRegex1, '</div>');
 content = content.replace(/\{\/\* Integrated Creator Badges \*\/\}.*?<\/div>\s*<\/div>/s, '</div>');
 
 // Remove styles for badges
