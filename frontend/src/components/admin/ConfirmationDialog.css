@@ -1,0 +1,116 @@
+/* ConfirmationDialog.css */
+
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(16, 42, 67, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: backdropIn 0.18s ease;
+  padding: 16px;
+}
+
+@keyframes backdropIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.dialog-box {
+  background: #FFFFFF;
+  border-radius: 16px;
+  border: 1.5px solid var(--card-border);
+  box-shadow: 0 20px 60px rgba(16, 42, 67, 0.18), 0 0 40px rgba(25,199,209,0.12);
+  padding: 32px 28px 24px;
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  animation: dialogIn 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes dialogIn {
+  from { opacity: 0; transform: scale(0.88) translateY(12px); }
+  to   { opacity: 1; transform: scale(1)   translateY(0); }
+}
+
+.dialog-icon-ring {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(255, 100, 80, 0.08);
+  border: 2px solid rgba(255, 100, 80, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.dialog-icon-ring svg {
+  width: 24px;
+  height: 24px;
+  color: #E05252;
+}
+
+.dialog-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--red-darkest);
+  text-align: center;
+  margin: 0;
+}
+
+.dialog-message {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.dialog-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+  width: 100%;
+}
+
+.dialog-btn-cancel,
+.dialog-btn-confirm {
+  flex: 1;
+  padding: 10px 0;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.18s ease;
+}
+
+.dialog-btn-cancel {
+  background: var(--bg-deep);
+  color: var(--text-muted);
+  border: 1.5px solid var(--card-border);
+}
+
+.dialog-btn-cancel:hover {
+  background: #EAF9F7;
+  color: var(--red-darkest);
+  border-color: #B9E8E6;
+}
+
+.dialog-btn-confirm {
+  background: linear-gradient(135deg, #E05252 0%, #c53030 100%);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(224, 82, 82, 0.3);
+}
+
+.dialog-btn-confirm:hover {
+  background: linear-gradient(135deg, #c53030 0%, #a02020 100%);
+  box-shadow: 0 6px 20px rgba(224, 82, 82, 0.45);
+  transform: translateY(-1px);
+}

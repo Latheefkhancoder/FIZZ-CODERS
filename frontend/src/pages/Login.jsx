@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import AuthLayout from '../components/auth/AuthLayout';
 import AuthCard from '../components/auth/AuthCard';
@@ -11,6 +11,7 @@ import PixelCollaborationVisual from '../components/auth/PixelCollaborationVisua
 import './Login.css';
 
 export default function Login() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -68,7 +69,17 @@ export default function Login() {
     // Frontend-only simulation of brief button feedback
     setTimeout(() => {
       setIsSubmitting(false);
-      // Ready for backend integration
+      
+      // Route integration: If email contains "member" or is Priya, go to member dashboard.
+      // Otherwise default to admin dashboard.
+      const email = formData.email.toLowerCase();
+      if (email.includes('member') || email === 'priya@gmail.com') {
+        sessionStorage.setItem('fizz_role', 'member');
+        navigate('/member');
+      } else {
+        sessionStorage.setItem('fizz_role', 'admin');
+        navigate('/admin');
+      }
     }, 600);
   };
 

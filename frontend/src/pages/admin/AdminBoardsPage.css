@@ -1,0 +1,99 @@
+/* AdminBoardsPage.css */
+
+.boards-page {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-height: 100%;
+}
+
+/* ── Shared page header ── */
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.page-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--red-darkest);
+  margin: 0 0 3px;
+}
+
+.page-subtitle {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* ── Board grid ── */
+.boards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 12px;
+}
+
+/* ── Primary button (shared) ── */
+.btn-primary-aqua {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 18px;
+  background: linear-gradient(135deg, var(--red-primary) 0%, var(--red-dark) 100%);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  box-shadow: 0 4px 14px rgba(25,199,209,0.3);
+  transition: box-shadow 0.18s, transform 0.15s;
+  white-space: nowrap;
+}
+
+.btn-primary-aqua:hover {
+  box-shadow: 0 6px 22px rgba(25,199,209,0.45);
+  transform: translateY(-1px);
+}
+
+/* ── Empty state ── */
+.boards-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 60px 24px;
+  text-align: center;
+  background: #FFFFFF;
+  border: 1.5px dashed var(--card-border);
+  border-radius: 16px;
+}
+
+.boards-empty-icon {
+  font-size: 40px;
+  margin-bottom: 4px;
+}
+
+.boards-empty h3 {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--red-darkest);
+  margin: 0;
+}
+
+.boards-empty p {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* ── Responsive ── */
+@media (max-width: 700px) {
+  .boards-page { padding: 16px; gap: 16px; }
+}
