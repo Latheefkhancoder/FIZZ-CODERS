@@ -122,13 +122,30 @@ const requestPasswordReset = async (email) => {
     });
 
     // Send reset email containing the raw token
-    await emailService.sendPasswordResetEmail(user.email, rawToken);
+    const emailResult = await emailService.sendPasswordResetEmail(user.email, rawToken);
+    return {
+      message: "If an account exists for this email, a password reset link has been sent.",
+      resetLink: emailResult?.link,
+      resetToken: rawToken,
+    };
   }
 
   // Always return identical generic message to prevent account enumeration
   return {
     message: "If an account exists for this email, a password reset link has been sent.",
   };
+};
+
+/**
+ * Verify if a reset token is valid
+ * @param {string} token - Raw reset token
+ * @returns {Promise<{ valid: boolean }>}
+ */
+const verifyResetToken = async (token) => {
+  if (!token) return { valid: false };
+  const tokenHash = hashToken(token);
+  const tokenRecord = await passwordResetTokenModel.findValidToken(tokenHash);
+  return { valid: Boolean(tokenRecord) };
 };
 
 /**
@@ -192,6 +209,7 @@ module.exports = {
   registerUser,
   loginUser,
   requestPasswordReset,
+  verifyResetToken,
   resetPassword,
   getCurrentUser,
 };

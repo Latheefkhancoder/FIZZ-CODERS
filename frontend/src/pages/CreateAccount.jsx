@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import AuthLayout from '../components/auth/AuthLayout';
 import AuthCard from '../components/auth/AuthCard';
@@ -7,10 +7,13 @@ import AuthInput from '../components/auth/AuthInput';
 import PasswordInput from '../components/auth/PasswordInput';
 import AuthButton from '../components/auth/AuthButton';
 import PixelCollaborationVisual from '../components/auth/PixelCollaborationVisual';
+import { registerUser } from '../services/auth.service';
 
 import './CreateAccount.css';
 
 export default function CreateAccount() {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -19,6 +22,7 @@ export default function CreateAccount() {
   });
 
   const [errors, setErrors] = useState({});
+  const [serverError, setServerError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const validateForm = () => {
@@ -67,19 +71,38 @@ export default function CreateAccount() {
         [name]: null,
       }));
     }
+    if (serverError) {
+      setServerError('');
+    }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!validateForm()) return;
 
     setIsSubmitting(true);
+    setServerError('');
 
-    // Frontend-only submission simulation
-    setTimeout(() => {
+    try {
+      const res = await registerUser({
+        fullName: formData.fullName.trim(),
+        email: formData.email.trim(),
+        password: formData.password,
+        confirmPassword: formData.confirmPassword,
+      });
+
       setIsSubmitting(false);
-    }, 600);
+
+      if (res.data?.token) {
+        localStorage.setItem('auth_token', res.data.token);
+      }
+
+      navigate('/login');
+    } catch (err) {
+      setIsSubmitting(false);
+      setServerError(err.message || 'Registration failed. Please try again.');
+    }
   };
 
   return (
@@ -95,6 +118,22 @@ export default function CreateAccount() {
           className="auth-form-inner"
           noValidate
         >
+          {serverError && (
+            <div
+              style={{
+                padding: '10px 14px',
+                borderRadius: '6px',
+                backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                border: '1px solid rgba(239, 68, 68, 0.3)',
+                color: '#f87171',
+                fontSize: '0.875rem',
+                marginBottom: '1rem',
+              }}
+            >
+              {serverError}
+            </div>
+          )}
+
           {/* Full Name */}
           <AuthInput
             id="register-fullname"

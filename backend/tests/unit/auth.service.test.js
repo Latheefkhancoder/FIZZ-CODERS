@@ -135,6 +135,30 @@ describe("Auth Service Unit Tests", () => {
     });
   });
 
+  describe("verifyResetToken", () => {
+    it("should return valid: true when valid token is found", async () => {
+      passwordResetTokenModel.findValidToken.mockResolvedValue({
+        id: 5,
+        user_id: 1,
+      });
+
+      const result = await authService.verifyResetToken("valid-token");
+      expect(result.valid).toBe(true);
+    });
+
+    it("should return valid: false when token is not found or expired", async () => {
+      passwordResetTokenModel.findValidToken.mockResolvedValue(null);
+
+      const result = await authService.verifyResetToken("invalid-token");
+      expect(result.valid).toBe(false);
+    });
+
+    it("should return valid: false when empty token is provided", async () => {
+      const result = await authService.verifyResetToken("");
+      expect(result.valid).toBe(false);
+    });
+  });
+
   describe("resetPassword", () => {
     it("should reset password when valid token is provided", async () => {
       passwordResetTokenModel.findValidToken.mockResolvedValue({

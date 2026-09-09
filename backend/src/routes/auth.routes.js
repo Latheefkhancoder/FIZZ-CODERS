@@ -32,6 +32,13 @@ router.post("/login", validate(validateLogin), authController.login);
 router.post("/forgot-password", validate(validateForgotPassword), authController.forgotPassword);
 
 /**
+ * @route GET /api/auth/verify-reset-token
+ * @desc Verify reset token validity
+ * @access Public
+ */
+router.get("/verify-reset-token", authController.verifyResetToken);
+
+/**
  * @route POST /api/auth/reset-password
  * @desc Reset password using token
  * @access Public
