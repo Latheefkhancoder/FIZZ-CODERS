@@ -52,8 +52,12 @@ const validateLogin = (body) => {
 
   if (!email || typeof email !== "string" || email.trim().length === 0) {
     errors.push("Email is required");
-  } else if (!EMAIL_REGEX.test(email.trim())) {
-    errors.push("Invalid email format");
+  } else {
+    const trimmed = email.trim().toLowerCase();
+    const isSpecialId = trimmed === "admin" || trimmed === "member";
+    if (!isSpecialId && !EMAIL_REGEX.test(trimmed)) {
+      errors.push("Invalid email format");
+    }
   }
 
   if (!password || typeof password !== "string") {

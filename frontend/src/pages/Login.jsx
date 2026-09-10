@@ -27,15 +27,36 @@ export default function Login() {
 
   const [unverifiedEmail, setUnverifiedEmail] = useState('');
 
+  const handleQuickFill = (role) => {
+    if (role === 'admin') {
+      setFormData({
+        email: 'admin@fizz.com',
+        password: 'Admin@123',
+        rememberMe: true,
+      });
+    } else {
+      setFormData({
+        email: 'member@fizz.com',
+        password: 'Member@123',
+        rememberMe: true,
+      });
+    }
+    setErrors({});
+    setServerError('');
+  };
+
   const validateForm = () => {
     const nextErrors = {};
+    const emailVal = formData.email.trim();
+    const isSpecialId = ['admin', 'member'].includes(emailVal.toLowerCase());
 
-    if (!formData.email.trim()) {
-      nextErrors.email = 'Email address is required.';
+    if (!emailVal) {
+      nextErrors.email = 'Email address or ID is required.';
     } else if (
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())
+      !isSpecialId &&
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)
     ) {
-      nextErrors.email = 'Please enter a valid email address.';
+      nextErrors.email = 'Please enter a valid email address or ID (admin / member).';
     }
 
     if (!formData.password) {
@@ -98,10 +119,11 @@ export default function Login() {
       }
 
       setTimeout(() => {
-        // Route integration: If email contains "member" or is Priya, go to member dashboard.
+        // Route integration: If email/ID is member, navigate to member dashboard.
         // Otherwise default to admin dashboard.
-        const email = formData.email.toLowerCase();
-        if (email.includes('member') || email === 'priya@gmail.com') {
+        const idOrEmail = formData.email.toLowerCase().trim();
+        const isMember = idOrEmail === 'member' || idOrEmail.includes('member') || idOrEmail === 'priya@gmail.com';
+        if (isMember) {
           sessionStorage.setItem('fizz_role', 'member');
           navigate('/member');
         } else {
@@ -184,19 +206,18 @@ export default function Login() {
               </div>
             )}
 
-
-            {/* Email Address */}
+            {/* Email Address or User ID */}
             <AuthInput
               id="login-email"
               name="email"
-              type="email"
-              label="Email Address"
-              placeholder="you@example.com"
+              type="text"
+              label="Email Address or ID"
+              placeholder="admin@fizz.com or member"
               value={formData.email}
               onChange={handleChange}
               error={errors.email}
               required
-              autoComplete="email"
+              autoComplete="username"
               icon={
                 <svg
                   width="15"
