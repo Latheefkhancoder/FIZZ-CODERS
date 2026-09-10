@@ -86,16 +86,8 @@ export default function Login() {
       });
 
       setIsSubmitting(false);
-      // Route integration: If email contains "member" or is Priya, go to member dashboard.
-      // Otherwise default to admin dashboard.
-      const email = formData.email.toLowerCase();
-      if (email.includes('member') || email === 'priya@gmail.com') {
-        sessionStorage.setItem('fizz_role', 'member');
-        navigate('/member');
-      } else {
-        sessionStorage.setItem('fizz_role', 'admin');
-        navigate('/admin');
-      }
+      setLoginSuccess(true);
+      setUserProfile(res.data?.user);
 
       if (res.data?.token) {
         if (formData.rememberMe) {
@@ -104,6 +96,19 @@ export default function Login() {
           sessionStorage.setItem('auth_token', res.data.token);
         }
       }
+
+      setTimeout(() => {
+        // Route integration: If email contains "member" or is Priya, go to member dashboard.
+        // Otherwise default to admin dashboard.
+        const email = formData.email.toLowerCase();
+        if (email.includes('member') || email === 'priya@gmail.com') {
+          sessionStorage.setItem('fizz_role', 'member');
+          navigate('/member');
+        } else {
+          sessionStorage.setItem('fizz_role', 'admin');
+          navigate('/admin');
+        }
+      }, 600);
     } catch (err) {
       setIsSubmitting(false);
       const msg = err.message || 'Login failed. Please check your credentials.';
