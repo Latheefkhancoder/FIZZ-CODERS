@@ -1,0 +1,130 @@
+/* MemberTeamMembersPage.css */
+
+.member-team-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.member-team-content {
+  padding: 24px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* ── Table Card ── */
+.member-team-table-card {
+  background: #FFFFFF;
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+/* ── Table Header ── */
+.member-team-table-header {
+  display: grid;
+  grid-template-columns: 2fr 3fr 1fr;
+  padding: 16px 20px;
+  background: #FAFCF8;
+  border-bottom: 1.5px solid var(--card-border);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ── Table Row ── */
+.member-team-row {
+  display: grid;
+  grid-template-columns: 2fr 3fr 1fr;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--card-border);
+  align-items: center;
+  transition: background 0.2s;
+}
+
+.member-team-row:last-child {
+  border-bottom: none;
+}
+
+.member-team-row:hover {
+  background: rgba(25, 199, 209, 0.02);
+}
+
+.member-team-cell-name {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.member-team-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--red-primary) 0%, var(--red-dark) 100%);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.member-team-name-text {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--red-darkest);
+}
+
+.member-team-cell {
+  display: flex;
+  align-items: center;
+}
+
+.member-team-email {
+  font-size: 14px;
+  color: var(--text-light);
+}
+
+.member-role-badge {
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  display: inline-block;
+}
+
+.member-role-admin {
+  background: rgba(239, 68, 68, 0.1);
+  color: #C53030;
+}
+
+.member-role-regular {
+  background: rgba(25, 199, 209, 0.15);
+  color: var(--red-dark);
+}
+
+/* ── Empty State ── */
+.member-team-empty {
+  padding: 40px;
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 14px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .member-team-table-header {
+    display: none; /* hide headers on mobile */
+  }
+  .member-team-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 16px;
+  }
+  .member-team-cell {
+    padding-left: 48px; /* align with text next to avatar */
+  }
+}

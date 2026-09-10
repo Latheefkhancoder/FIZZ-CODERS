@@ -1,0 +1,28 @@
+/* MemberActivityLogsPage.css */
+
+.member-activity-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.member-activity-content {
+  padding: 24px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.member-activity-feed-card {
+  background: #FFFFFF;
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: var(--shadow-card);
+}
+
+.member-activity-empty {
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 14px;
+  padding: 40px 0;
+}

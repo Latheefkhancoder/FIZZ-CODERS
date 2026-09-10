@@ -218,6 +218,34 @@ describe("Auth Integration Tests", () => {
       expect(response.status).toBe(401);
       expect(response.body.success).toBe(false);
     });
+
+    it("should successfully log in hardcoded admin with admin@fizz.com and Admin@123", async () => {
+      const response = await request(app)
+        .post("/api/auth/login")
+        .send({
+          email: "admin@fizz.com",
+          password: "Admin@123",
+        });
+
+      expect(response.status).toBe(200);
+      expect(response.body.success).toBe(true);
+      expect(response.body.data.user.role).toBe("admin");
+      expect(response.body.data).toHaveProperty("token");
+    });
+
+    it("should successfully log in hardcoded member with member@fizz.com and Member@123", async () => {
+      const response = await request(app)
+        .post("/api/auth/login")
+        .send({
+          email: "member@fizz.com",
+          password: "Member@123",
+        });
+
+      expect(response.status).toBe(200);
+      expect(response.body.success).toBe(true);
+      expect(response.body.data.user.role).toBe("member");
+      expect(response.body.data).toHaveProperty("token");
+    });
   });
 
   describe("POST /api/auth/forgot-password", () => {

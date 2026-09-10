@@ -1,0 +1,153 @@
+/* MemberProfilePage.css */
+
+.member-profile-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.member-profile-content {
+  padding: 32px 24px;
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.member-profile-card {
+  width: 100%;
+  max-width: 560px;
+  background: #FFFFFF;
+  border-radius: 16px;
+  border: 1px solid var(--card-border);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+/* ── Header ── */
+.member-profile-card-header {
+  padding: 32px;
+  background: linear-gradient(135deg, rgba(25,199,209,0.05) 0%, rgba(25,199,209,0.15) 100%);
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.member-profile-avatar-large {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--red-primary) 0%, var(--red-dark) 100%);
+  color: #fff;
+  font-size: 32px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(25,199,209,0.3);
+  border: 3px solid #FFFFFF;
+}
+
+.member-profile-header-text h2 {
+  margin: 0 0 8px 0;
+  font-size: 24px;
+  color: var(--red-darkest);
+}
+
+.member-profile-role-badge {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--red-primary);
+  background: #FFFFFF;
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(25,199,209,0.2);
+}
+
+/* ── Form ── */
+.member-profile-form {
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.member-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.member-form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.member-form-group input,
+.member-form-group textarea {
+  background: var(--input-bg);
+  border: 1.5px solid var(--input-border);
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 14.5px;
+  color: var(--text-light);
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.member-form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.member-form-group input:focus,
+.member-form-group textarea:focus {
+  border-color: var(--input-border-focus);
+  box-shadow: 0 0 0 3px rgba(25,199,209,0.15);
+  background: #FFFFFF;
+  outline: none;
+}
+
+.member-form-actions {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+}
+
+.member-save-success {
+  color: #1E7E34;
+  font-size: 13.5px;
+  font-weight: 600;
+  animation: memberFadeIn 0.3s;
+}
+
+.member-btn-primary {
+  background: var(--red-primary);
+  color: #FFFFFF;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-size: 14.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.member-btn-primary:hover {
+  background: var(--red-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(25,199,209,0.25);
+}
+
+@media (max-width: 600px) {
+  .member-profile-card-header {
+    flex-direction: column;
+    text-align: center;
+    padding: 24px;
+  }
+}
