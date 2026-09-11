@@ -19,12 +19,12 @@
 .comments-title {
   font-size: 14px;
   font-weight: 700;
-  color: var(--red-darkest);
+  color: var(--text-white);
 }
 
 .comments-count {
-  background: rgba(25,199,209,0.12);
-  color: var(--red-primary);
+  background: rgba(20, 117, 228, 0.2);
+  color: var(--accent-light);
   font-size: 11px;
   font-weight: 700;
   border-radius: 20px;
@@ -91,17 +91,17 @@
 .comment-author {
   font-size: 13px;
   font-weight: 600;
-  color: var(--red-darkest);
+  color: var(--text-white);
 }
 
 .comment-time {
   font-size: 11px;
-  color: var(--text-dim);
+  color: var(--text-muted);
 }
 
 .comment-text {
   font-size: 13px;
-  color: var(--text-muted);
+  color: var(--text-white);
   line-height: 1.5;
   word-break: break-word;
   background: var(--bg-deep);
@@ -111,8 +111,8 @@
 }
 
 .comment-own .comment-text {
-  background: rgba(25,199,209,0.07);
-  border-color: rgba(25,199,209,0.2);
+  background: rgba(20, 117, 228,0.07);
+  border-color: rgba(20, 117, 228,0.2);
 }
 
 /* ── Input row ── */
@@ -144,8 +144,8 @@
   border-radius: 10px;
   font-size: 13px;
   font-family: var(--font-sans);
-  color: var(--red-darkest);
-  background: #FFFFFF;
+  color: var(--text-white);
+  background: var(--card-bg);
   resize: none;
   min-height: 38px;
   max-height: 120px;
@@ -153,10 +153,14 @@
   transition: border-color 0.18s, box-shadow 0.18s;
 }
 
+.comment-textarea::placeholder {
+  color: var(--text-muted);
+}
+
 .comment-textarea:focus {
   outline: none;
-  border-color: var(--red-primary);
-  box-shadow: 0 0 0 3px rgba(25,199,209,0.12);
+  border-color: var(--btn-primary);
+  box-shadow: 0 0 0 3px rgba(20, 117, 228, 0.2);
 }
 
 .comment-send-btn {
@@ -172,7 +176,7 @@
   justify-content: center;
   flex-shrink: 0;
   transition: opacity 0.18s, transform 0.15s, box-shadow 0.18s;
-  box-shadow: 0 3px 12px rgba(25,199,209,0.3);
+  box-shadow: 0 3px 12px rgba(20, 117, 228,0.3);
 }
 
 .comment-send-btn svg {
@@ -189,5 +193,5 @@
 
 .comment-send-btn:not(:disabled):hover {
   transform: translateY(-1px);
-  box-shadow: 0 5px 18px rgba(25,199,209,0.45);
+  box-shadow: 0 5px 18px rgba(20, 117, 228,0.45);
 }

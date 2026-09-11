@@ -39,7 +39,7 @@
 .member-name {
   font-size: 14px;
   font-weight: 600;
-  color: var(--red-darkest);
+  color: var(--text-white);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -65,15 +65,15 @@
 }
 
 .role-admin  {
-  background: rgba(25,199,209,0.12);
-  color: #087F86;
-  border: 1px solid rgba(25,199,209,0.25);
+  background: rgba(20, 117, 228, 0.18);
+  color: var(--accent-light);
+  border: 1px solid rgba(77, 150, 249, 0.35);
 }
 
 .role-member {
-  background: rgba(96,117,138,0.1);
-  color: #60758A;
-  border: 1px solid rgba(96,117,138,0.2);
+  background: rgba(14, 68, 178, 0.2);
+  color: #CBD5E1;
+  border: 1px solid rgba(203, 213, 225, 0.3);
 }
 
 /* Actions */

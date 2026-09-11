@@ -1,9 +1,9 @@
 /* ================================================================
-   AdminLayout.css â€” Sidebar + Topbar shell
-   FIZZ-CONNECT aqua / cream design system
+   AdminLayout.css — Sidebar + Topbar shell
+   Deep Royal Blue Design System
    ================================================================ */
 
-/* â”€â”€ Layout shell â”€â”€ */
+/* ── Layout shell ── */
 .admin-layout {
   display: flex;
   width: 100%;
@@ -13,12 +13,12 @@
   position: relative;
 }
 
-/* â”€â”€ Sidebar â”€â”€ */
+/* ── Sidebar ── */
 .admin-sidebar {
-  width: 220px;
-  min-width: 220px;
+  width: 230px;
+  min-width: 230px;
   height: 100vh;
-  background: linear-gradient(180deg, #EAF9F7 0%, #F0FBFA 100%);
+  background: var(--bg-dark);
   border-right: 1.5px solid var(--card-border);
   display: flex;
   flex-direction: column;
@@ -28,27 +28,28 @@
   transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* â”€â”€ Brand row â”€â”€ */
+/* ── Brand row ── */
 .sidebar-brand {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 18px 16px 16px;
-  border-bottom: 1px solid var(--card-border);
+  border-bottom: 1.5px solid var(--card-border);
   position: relative;
+  background: rgba(1, 26, 82, 0.5);
 }
 
 .sidebar-logo {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   object-fit: contain;
   flex-shrink: 0;
+  filter: drop-shadow(0 0 8px rgba(20, 117, 228, 0.5));
 }
 
 .sidebar-brand-text {
   display: flex;
   flex-direction: row;
-  gap: 0;
   font-family: var(--font-pixel);
   font-size: 11px;
   font-weight: 700;
@@ -56,8 +57,8 @@
   white-space: nowrap;
 }
 
-.brand-fizz    { color: var(--red-primary); }
-.brand-connect { color: var(--red-darkest); }
+.brand-fizz    { color: var(--text-white); }
+.brand-connect { color: var(--btn-primary); }
 
 .sidebar-close-btn {
   display: none;
@@ -72,8 +73,8 @@
 }
 
 .sidebar-close-btn:hover {
-  background: rgba(25, 199, 209, 0.12);
-  color: var(--red-primary);
+  background: rgba(14, 68, 178, 0.3);
+  color: var(--text-white);
 }
 
 .sidebar-close-btn svg {
@@ -81,13 +82,13 @@
   height: 18px;
 }
 
-/* â”€â”€ Nav items â”€â”€ */
+/* ── Nav items ── */
 .sidebar-nav {
   flex: 1;
-  padding: 12px 10px;
+  padding: 14px 10px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
   overflow-y: auto;
 }
 
@@ -101,21 +102,23 @@
   font-size: 13.5px;
   font-weight: 500;
   text-decoration: none;
-  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+  transition: all 0.18s ease;
   cursor: pointer;
+  border: 1px solid transparent;
 }
 
 .sidebar-nav-item:hover {
-  background: rgba(25, 199, 209, 0.1);
-  color: var(--red-primary);
-  text-shadow: none;
+  background: rgba(14, 68, 178, 0.25);
+  color: var(--text-white);
+  border-color: rgba(20, 117, 228, 0.3);
 }
 
 .nav-item-active {
-  background: linear-gradient(90deg, rgba(25,199,209,0.18) 0%, rgba(25,199,209,0.08) 100%);
-  color: var(--red-primary) !important;
+  background: linear-gradient(90deg, rgba(20, 117, 228, 0.3) 0%, rgba(14, 68, 178, 0.15) 100%);
+  color: var(--text-white) !important;
   font-weight: 600;
-  box-shadow: inset 3px 0 0 var(--red-primary);
+  border: 1px solid var(--btn-primary);
+  box-shadow: inset 3px 0 0 var(--btn-primary), 0 0 12px rgba(20, 117, 228, 0.25);
 }
 
 .nav-icon {
@@ -136,20 +139,20 @@
   white-space: nowrap;
 }
 
-/* â”€â”€ Sidebar footer â”€â”€ */
+/* ── Sidebar footer ── */
 .sidebar-footer {
   padding: 14px 16px;
-  border-top: 1px solid var(--card-border);
+  border-top: 1.5px solid var(--card-border);
+  background: rgba(1, 26, 82, 0.5);
 }
 
 .sidebar-tagline {
-  font-size: 8px;
-  color: var(--text-dim);
+  font-size: 9px;
+  color: var(--text-muted);
   line-height: 1.8;
-  opacity: 0.7;
 }
 
-/* â”€â”€ Main column â”€â”€ */
+/* ── Main column ── */
 .admin-main-col {
   flex: 1;
   min-width: 0;
@@ -159,16 +162,16 @@
   overflow: hidden;
 }
 
-/* â”€â”€ Topbar â”€â”€ */
+/* ── Topbar ── */
 .admin-topbar {
   height: 58px;
   min-height: 58px;
-  background: #FFFFFF;
+  background: var(--bg-dark);
   border-bottom: 1.5px solid var(--card-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 20px;
+  padding: 0 22px;
   gap: 12px;
   z-index: 50;
   flex-shrink: 0;
@@ -192,8 +195,8 @@
 }
 
 .menu-toggle-btn:hover {
-  background: rgba(25, 199, 209, 0.1);
-  color: var(--red-primary);
+  background: rgba(14, 68, 178, 0.3);
+  color: var(--text-white);
 }
 
 .menu-toggle-btn svg {
@@ -223,37 +226,14 @@
 .topbar-right {
   display: flex;
   align-items: center;
-  gap: 6px;
-}
-
-.topbar-icon-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--text-muted);
-  padding: 7px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.15s, color 0.15s;
-}
-
-.topbar-icon-btn:hover {
-  background: rgba(25, 199, 209, 0.1);
-  color: var(--red-primary);
-}
-
-.topbar-icon-btn svg {
-  width: 18px;
-  height: 18px;
+  gap: 10px;
 }
 
 .topbar-avatar {
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--red-primary) 0%, var(--red-dark) 100%);
+  background: linear-gradient(135deg, var(--btn-primary) 0%, var(--card-border-glow) 100%);
   color: #fff;
   font-weight: 700;
   font-size: 14px;
@@ -261,23 +241,22 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  border: 2px solid transparent;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  border: 1.5px solid var(--btn-primary);
+  transition: all 0.15s ease;
+  box-shadow: 0 0 10px rgba(20, 117, 228, 0.3);
 }
 
 .topbar-avatar:hover {
-  border-color: var(--red-primary);
-  box-shadow: 0 0 0 3px rgba(25,199,209,0.2);
+  box-shadow: 0 0 16px rgba(46, 122, 249, 0.6);
 }
 
 .topbar-username {
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 600;
-  color: var(--red-darkest);
-  margin-left: 2px;
+  color: var(--text-white);
 }
 
-/* â”€â”€ Page content area â”€â”€ */
+/* ── Page content area ── */
 .admin-page-content {
   flex: 1;
   overflow-y: auto;
@@ -286,14 +265,14 @@
   background-color: var(--bg-deep);
 }
 
-/* â”€â”€ Mobile overlay â”€â”€ */
+/* ── Mobile overlay ── */
 .sidebar-overlay {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(16, 42, 67, 0.35);
+  background: rgba(1, 26, 82, 0.6);
   z-index: 90;
-  backdrop-filter: blur(2px);
+  backdrop-filter: blur(4px);
   animation: fadeInOverlay 0.2s ease;
 }
 
@@ -306,7 +285,6 @@
    RESPONSIVE
    ================================================================ */
 
-/* Tablet (â‰¤ 900px) */
 @media (max-width: 900px) {
   .admin-sidebar {
     position: fixed;
@@ -315,7 +293,7 @@
     height: 100vh;
     z-index: 200;
     transform: translateX(-100%);
-    box-shadow: 4px 0 24px rgba(16,42,67,0.12);
+    box-shadow: 4px 0 24px rgba(1, 26, 82, 0.6);
   }
 
   .admin-sidebar.sidebar-open {
@@ -347,7 +325,6 @@
   }
 }
 
-/* Mobile (â‰¤ 540px) */
 @media (max-width: 540px) {
   .admin-topbar {
     padding: 0 12px;
@@ -363,14 +340,14 @@
   position: absolute;
   top: 48px;
   right: 0;
-  background: #FFFFFF;
-  border: 1px solid var(--card-border);
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(16, 42, 67, 0.08);
+  background: var(--card-bg);
+  border: 1.5px solid var(--card-border);
+  border-radius: 10px;
+  box-shadow: var(--shadow-card);
   display: flex;
   flex-direction: column;
   padding: 8px;
-  min-width: 150px;
+  min-width: 160px;
   z-index: 1000;
 }
 
@@ -378,25 +355,25 @@
   background: none;
   border: none;
   text-align: left;
-  padding: 10px 12px;
-  border-radius: 6px;
+  padding: 10px 14px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 13.5px;
   font-weight: 500;
-  color: var(--text-dark);
-  transition: background 0.15s, color 0.15s;
+  color: var(--text-white);
+  transition: all 0.15s ease;
 }
 
 .profile-dropdown-item:hover {
-  background: rgba(25, 199, 209, 0.1);
-  color: var(--red-primary);
+  background: rgba(14, 68, 178, 0.3);
+  color: var(--accent-light);
 }
 
 .profile-dropdown-item.text-red {
-  color: var(--red-primary);
+  color: #EF4444;
 }
 
 .profile-dropdown-item.text-red:hover {
-  background: rgba(240, 52, 52, 0.1);
-  color: #D32F2F;
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
 }

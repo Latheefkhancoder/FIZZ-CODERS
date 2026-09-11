@@ -1,4 +1,4 @@
-/* KanbanColumn.css */
+/* KanbanColumn.css — Deep Royal Blue styling */
 
 .kanban-column {
   display: flex;
@@ -26,29 +26,31 @@
   flex-shrink: 0;
 }
 
-.dot-todo     { background: #60758A; }
-.dot-progress { background: #19C7D1; box-shadow: 0 0 6px rgba(25,199,209,0.5); }
-.dot-done     { background: #28A745; box-shadow: 0 0 6px rgba(40,167,69,0.4); }
+/* Strict Task Status Colors (Exceptions) */
+.dot-todo     { background: #EF4444; box-shadow: 0 0 8px rgba(239, 68, 68, 0.6); }
+.dot-progress { background: #EAB308; box-shadow: 0 0 8px rgba(234, 179, 8, 0.6); }
+.dot-done     { background: #10B981; box-shadow: 0 0 8px rgba(16, 185, 129, 0.6); }
 
 .kanban-col-title {
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.8px;
   text-transform: uppercase;
-  color: var(--red-darkest);
+  color: var(--text-white);
   font-family: var(--font-pixel);
 }
 
 .kanban-col-count {
   background: var(--bg-deep);
   border: 1.5px solid var(--card-border);
-  color: var(--text-muted);
+  color: var(--accent-light);
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   border-radius: 20px;
   padding: 1px 8px;
   min-width: 22px;
   text-align: center;
+  font-family: var(--font-pixel);
 }
 
 /* ── Cards area ── */
@@ -61,7 +63,7 @@
 
 /* ── Empty state ── */
 .kanban-empty {
-  background: rgba(25, 199, 209, 0.04);
+  background: rgba(2, 32, 97, 0.4);
   border: 1.5px dashed var(--card-border);
   border-radius: 12px;
   padding: 24px 16px;
@@ -87,14 +89,14 @@
   font-weight: 500;
   padding: 9px 0;
   cursor: pointer;
-  transition: background 0.18s, border-color 0.18s, color 0.18s;
+  transition: all 0.18s ease;
   font-family: var(--font-sans);
   width: 100%;
   margin-top: 2px;
 }
 
 .kanban-add-task-btn:hover {
-  background: rgba(25, 199, 209, 0.07);
-  border-color: var(--red-primary);
-  color: var(--red-primary);
+  background: rgba(14, 68, 178, 0.2);
+  border-color: var(--btn-primary);
+  color: var(--text-white);
 }

@@ -1,38 +1,39 @@
 /* =========================================================
-   FIZZ-CONNECT - Modern SaaS Design System
+   FIZZ-CONNECT — Deep Royal Blue Design System
    ========================================================= */
 
 :root {
-  /* Color Palette */
-  --bg-deep: #FFFDF7;
-  --bg-dark: #FFFDF7;
-  --bg-crimson: #FFFDF7;
+  /* ── Core Deep Royal Blue Palette ── */
+  --bg-deep: #011A52;             /* Deep Royal Navy - Primary Page Background */
+  --bg-dark: #021048;             /* Midnight Blue - Dark areas & shadows */
+  --bg-midnight: #021048;
+  --card-bg: #022061;             /* Dark Royal Blue - Cards & Panels */
+  --card-border: #043293;         /* Royal Blue - Main borders */
+  --card-border-glow: #0E44B2;    /* Deep Electric Blue - Primary glow */
+  --btn-primary: #1475E4;         /* Electric Blue - Buttons & highlights */
+  --btn-highlight: #2E7AF9;       /* Bright Blue - Strong highlights & hovers */
+  --accent-light: #4D96F9;        /* Light Electric Blue - Small bright highlights */
+  --pure-white: #F8FAFC;          /* White - Main text */
+  --text-white: #F8FAFC;          /* Main text */
+  --text-light: #F8FAFC;          /* Light text */
+  --text-muted: #CBD5E1;          /* Clear readable secondary text (contrast > 6.8:1) */
+  --text-dim: #94A3B8;            /* Clear readable subtle/timestamp text (contrast > 4.4:1) */
 
-  --red-darkest: #102A43;
-  --red-dark: #087F88;
-  --red-mid: #19C7D1;
-  --red-primary: #19C7D1;
-  --red-light: #28D3D6;
-  --red-accent: #28D3D6;
-  --red-glow: rgba(25, 199, 209, 0.45);
-  --red-glow-subtle: rgba(25, 199, 209, 0.16);
-
-  /* Neutrals */
-  --text-white: #102A43; 
-  --text-light: #102A43;
-  --text-muted: #60758A;
-  --text-dim: #8AA0B2;
-  --pure-white: #FFFFFF;
+  /* Aliases for legacy component compatibility */
+  --red-darkest: #022061;
+  --red-dark: #0E44B2;
+  --red-mid: #2E7AF9;
+  --red-primary: #1475E4;
+  --red-light: #4D96F9;
+  --red-accent: #2E7AF9;
+  --red-glow: rgba(14, 68, 178, 0.5);
+  --red-glow-subtle: rgba(20, 117, 228, 0.2);
 
   /* Card & Surface Tokens */
-  --card-bg: #FFFFFF;
-  --card-border: #E8FAF8;
-  --card-border-glow: rgba(25, 199, 209, 0.4);
   --card-radius: 16px;
-
-  --input-bg: #FAF9F2;
-  --input-border: #E8FAF8;
-  --input-border-focus: #19C7D1;
+  --input-bg: #011A52;
+  --input-border: #043293;
+  --input-border-focus: #1475E4;
   --input-radius: 10px;
 
   /* Typography */
@@ -41,11 +42,22 @@
   --font-pixel-accent: 'Press Start 2P', monospace;
 
   /* Shadows */
-  --shadow-card: 0 10px 40px -10px rgba(0, 0, 0, 0.05), 0 0 35px -5px rgba(25, 199, 209, 0.15);
-  --shadow-card-hover: 0 15px 50px -10px rgba(0, 0, 0, 0.08), 0 0 50px -2px rgba(25, 199, 209, 0.25);
-  --shadow-btn: 0 4px 20px rgba(25, 199, 209, 0.35);
-  --shadow-btn-hover: 0 6px 30px rgba(25, 199, 209, 0.5);
-  --shadow-node: 0 0 15px rgba(25, 199, 209, 0.3);
+  --shadow-card: 0 10px 40px -10px rgba(2, 16, 72, 0.8), 0 0 25px -5px rgba(14, 68, 178, 0.35);
+  --shadow-card-hover: 0 16px 50px -10px rgba(2, 16, 72, 0.95), 0 0 35px -2px rgba(20, 117, 228, 0.5);
+  --shadow-btn: 0 4px 20px rgba(20, 117, 228, 0.45);
+  --shadow-btn-hover: 0 6px 30px rgba(46, 122, 249, 0.65);
+  --shadow-node: 0 0 15px rgba(20, 117, 228, 0.4);
+
+  /* ── Task Status Exception Colors (Badges Only) ── */
+  --status-todo: #EF4444;
+  --status-inprogress: #EAB308;
+  --status-done: #10B981;
+
+  /* ── Task Priority Exception Colors (Badges Only) ── */
+  --priority-urgent: #F97316;
+  --priority-high: #EF4444;
+  --priority-medium: #EAB308;
+  --priority-low: #10B981;
 }
 
 /* CSS Reset & Defaults */
@@ -92,8 +104,8 @@ body {
   z-index: 0;
   background-color: var(--bg-deep);
   background-image:
-    linear-gradient(to right, rgba(25, 199, 209, 0.08) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(25, 199, 209, 0.08) 1px, transparent 1px);
+    linear-gradient(to right, rgba(14, 68, 178, 0.15) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(14, 68, 178, 0.15) 1px, transparent 1px);
   background-size: 28px 28px, 28px 28px;
 }
 
@@ -103,12 +115,12 @@ body {
   position: absolute;
   inset: 0;
   background: repeating-linear-gradient(0deg,
-      rgba(25, 199, 209, 0.02),
-      rgba(25, 199, 209, 0.02) 1px,
+      rgba(20, 117, 228, 0.03),
+      rgba(20, 117, 228, 0.03) 1px,
       transparent 1px,
       transparent 2px);
   pointer-events: none;
-  opacity: 0.5;
+  opacity: 0.6;
 }
 
 /* Links */
@@ -131,9 +143,16 @@ button {
   outline: none;
 }
 
-input {
+input,
+textarea,
+select {
   font-family: inherit;
   outline: none;
+}
+
+::placeholder {
+  color: var(--text-muted);
+  opacity: 1;
 }
 
 /* Animations */
@@ -150,49 +169,37 @@ input {
 }
 
 @keyframes pixelBob {
-
-  0%,
-  100% {
+  0%, 100% {
     transform: translateY(0px);
   }
-
   50% {
     transform: translateY(-8px);
   }
 }
 
 @keyframes pixelBobDelayed {
-
-  0%,
-  100% {
+  0%, 100% {
     transform: translateY(0px);
   }
-
   50% {
     transform: translateY(-12px);
   }
 }
 
 @keyframes pulseRedGlow {
-
-  0%,
-  100% {
-    box-shadow: 0 0 15px rgba(25, 199, 209, 0.15);
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(20, 117, 228, 0.25);
   }
-
   50% {
-    box-shadow: 0 0 30px rgba(25, 199, 209, 0.35);
+    box-shadow: 0 0 30px rgba(46, 122, 249, 0.55);
   }
 }
 
 @keyframes pixelCrossBlink {
-
-  0%,
-  100% {
+  0%, 100% {
     opacity: 0.35;
     transform: scale(1);
   }
-
   50% {
     opacity: 0.9;
     transform: scale(1.15);
@@ -200,15 +207,12 @@ input {
 }
 
 @keyframes pulseText {
-
-  0%,
-  100% {
+  0%, 100% {
     opacity: 0.7;
   }
-
   50% {
     opacity: 1;
-    text-shadow: 0 0 8px rgba(25, 199, 209, 0.6);
+    text-shadow: 0 0 8px rgba(46, 122, 249, 0.6);
   }
 }
 
@@ -217,12 +221,10 @@ input {
     transform: scale(0.6);
     opacity: 0;
   }
-
   70% {
     transform: scale(1.1);
     opacity: 1;
   }
-
   100% {
     transform: scale(1);
     opacity: 1;
@@ -262,10 +264,10 @@ input {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--red-dark);
+  background: var(--card-border);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--red-primary);
+  background: var(--btn-primary);
 }

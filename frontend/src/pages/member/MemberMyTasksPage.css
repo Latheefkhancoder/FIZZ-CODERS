@@ -1,4 +1,4 @@
-/* MemberMyTasksPage.css */
+/* MemberMyTasksPage.css — Deep Royal Blue styling */
 
 .member-my-tasks-page {
   display: flex;
@@ -13,19 +13,20 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  border-bottom: 1px solid var(--card-border);
-  background: #FFFFFF;
+  border-bottom: 1.5px solid var(--card-border);
+  background: var(--bg-dark);
 }
 
 .member-page-title {
   font-size: 24px;
-  font-weight: 700;
-  color: var(--red-darkest);
+  font-weight: 800;
+  color: var(--text-white);
   margin-bottom: 4px;
+  letter-spacing: -0.5px;
 }
 
 .member-page-subtitle {
-  font-size: 14px;
+  font-size: 13.5px;
   color: var(--text-muted);
 }
 
@@ -43,24 +44,24 @@
   gap: 8px;
   background: var(--input-bg);
   border: 1.5px solid var(--input-border);
-  padding: 8px 14px;
+  padding: 9px 14px;
   border-radius: var(--input-radius);
   flex: 1;
   min-width: 200px;
   max-width: 300px;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
 }
 
 .member-search-box:focus-within {
   border-color: var(--input-border-focus);
-  box-shadow: 0 0 0 3px rgba(25, 199, 209, 0.15);
-  background: #FFFFFF;
+  box-shadow: 0 0 0 3px rgba(20, 117, 228, 0.25);
+  background: var(--card-bg);
 }
 
 .member-search-box svg {
   width: 16px;
   height: 16px;
-  color: var(--text-dim);
+  color: var(--text-muted);
 }
 
 .member-search-box input {
@@ -68,29 +69,35 @@
   background: transparent;
   width: 100%;
   font-size: 13.5px;
-  color: var(--text-light);
+  color: var(--text-white);
+  font-family: var(--font-sans);
+}
+
+.member-search-box input::placeholder {
+  color: var(--text-muted);
 }
 
 .member-filter-select {
   background: var(--input-bg);
   border: 1.5px solid var(--input-border);
-  padding: 8px 32px 8px 14px;
+  padding: 9px 32px 9px 14px;
   border-radius: var(--input-radius);
   font-size: 13.5px;
-  color: var(--text-light);
+  color: var(--text-white);
   cursor: pointer;
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' stroke='%238AA0B2' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 10px center;
   background-size: 16px;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
+  font-family: var(--font-sans);
 }
 
 .member-filter-select:focus {
   border-color: var(--input-border-focus);
   outline: none;
-  box-shadow: 0 0 0 3px rgba(25, 199, 209, 0.15);
+  box-shadow: 0 0 0 3px rgba(20, 117, 228, 0.25);
 }
 
 /* ── Main Content Area ── */
@@ -100,43 +107,9 @@
   padding: 24px;
   display: flex;
   flex-direction: column;
-  gap: 40px;
+  gap: 32px;
 }
 
-/* ── Empty State ── */
-.member-my-tasks-global-empty {
-  margin: auto;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  padding: 40px;
-}
-
-.member-empty-icon {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: rgba(25,199,209,0.1);
-  color: var(--red-primary);
-  font-size: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 8px;
-}
-
-.member-my-tasks-global-empty h3 {
-  font-size: 20px;
-  color: var(--red-darkest);
-}
-
-.member-my-tasks-global-empty p {
-  color: var(--text-muted);
-}
-
-/* ── Board Groups ── */
 .member-board-group {
   display: flex;
   flex-direction: column;
@@ -144,25 +117,68 @@
 }
 
 .member-board-group-title {
-  font-size: 15px;
-  color: var(--red-darkest);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent-light);
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding-bottom: 8px;
-  border-bottom: 2px dashed rgba(25,199,209,0.2);
+  gap: 8px;
+  letter-spacing: 0.5px;
 }
 
 .member-board-icon {
-  color: var(--red-primary);
-  font-size: 12px;
+  color: var(--btn-primary);
+  font-size: 10px;
 }
 
-/* ── Kanban Board layout ── */
 .member-kanban-board {
   display: flex;
   gap: 24px;
   overflow-x: auto;
   padding-bottom: 8px;
+}
+
+/* ── Global Empty ── */
+.member-my-tasks-global-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
+  gap: 12px;
+  padding: 60px 24px;
+  text-align: center;
+  background: var(--card-bg);
+  border: 1.5px dashed var(--card-border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-card);
+  margin: auto;
+  max-width: 480px;
+  width: 100%;
+}
+
+.member-empty-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(20, 117, 228, 0.2);
+  border: 1.5px solid var(--btn-primary);
+  color: var(--accent-light);
+  font-size: 20px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.member-my-tasks-global-empty h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-white);
+  margin: 0;
+}
+
+.member-my-tasks-global-empty p {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  margin: 0;
 }

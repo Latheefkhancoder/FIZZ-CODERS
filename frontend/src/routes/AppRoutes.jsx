@@ -6,6 +6,7 @@ import VerifyEmail from '../pages/VerifyEmail';
 import ForgotPassword from '../pages/ForgotPassword';
 import ResetPassword from '../pages/ResetPassword';
 import ResetSuccess from '../pages/ResetSuccess';
+import RoleSelection from '../pages/RoleSelection';
 
 /* ── Admin Dashboard ── */
 import { AdminProvider } from '../context/AdminContext';
@@ -20,6 +21,7 @@ import AdminProfilePage      from '../pages/admin/AdminProfilePage';
 /* ── Member Dashboard ── */
 import { MemberProvider } from '../context/MemberContext';
 import MemberLayout from '../layouts/MemberLayout';
+import MemberJoinBoard       from '../pages/member/MemberJoinBoard';
 import MemberMyTasksPage      from '../pages/member/MemberMyTasksPage';
 import MemberTeamMembersPage  from '../pages/member/MemberTeamMembersPage';
 import MemberActivityLogsPage from '../pages/member/MemberActivityLogsPage';
@@ -27,13 +29,18 @@ import MemberTeamChatbotPage  from '../pages/member/MemberTeamChatbotPage';
 import MemberProfilePage      from '../pages/member/MemberProfilePage';
 
 /**
- * AppRoutes - Configures all authentication routes, Admin Dashboard, and Member Dashboard.
- * Existing auth routes are completely unchanged.
+ * AppRoutes - Configures all authentication routes, Role Selection, Admin Dashboard, and Member Dashboard.
+ * Existing auth routes and dashboard functionality are preserved.
  */
 const ProtectedRoute = ({ children, allowedRole }) => {
-  const role = sessionStorage.getItem('fizz_role');
-  if (!role) {
+  const role = sessionStorage.getItem('fizz_role') || localStorage.getItem('fizz_role');
+  const token = sessionStorage.getItem('auth_token') || localStorage.getItem('auth_token');
+
+  if (!token && !role) {
     return <Navigate to="/login" replace />;
+  }
+  if (!role) {
+    return <Navigate to="/select-role" replace />;
   }
   if (allowedRole && role !== allowedRole && role !== 'admin') {
     return <Navigate to={role === 'member' ? '/member' : '/login'} replace />;
@@ -54,6 +61,19 @@ export default function AppRoutes() {
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/reset-success" element={<ResetSuccess />} />
+
+      {/* Role Selection Page */}
+      <Route path="/select-role" element={<RoleSelection />} />
+
+      {/* Member Join Board Page */}
+      <Route
+        path="/member/join-board"
+        element={
+          <AdminProvider>
+            <MemberJoinBoard />
+          </AdminProvider>
+        }
+      />
 
       {/* Admin Dashboard */}
       <Route
@@ -96,10 +116,8 @@ export default function AppRoutes() {
         <Route path="profile"        element={<MemberProfilePage />} />
       </Route>
 
-
       {/* Fallback redirect */}
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );
 }
-

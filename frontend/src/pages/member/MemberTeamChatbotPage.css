@@ -13,13 +13,13 @@
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid var(--card-border);
-  background: #FFFFFF;
+  background: var(--card-bg);
 }
 
 .member-chatbot-title {
   font-size: 24px;
   font-weight: 700;
-  color: var(--red-darkest);
+  color: var(--text-white);
   margin-bottom: 4px;
 }
 
@@ -81,7 +81,7 @@
   flex: 1;
   overflow: hidden;
   margin: 24px;
-  background: #FFFFFF;
+  background: var(--card-bg);
   border-radius: 12px;
   border: 1px solid var(--card-border);
   box-shadow: var(--shadow-card);
@@ -91,7 +91,7 @@
 .member-chatbot-tabs {
   width: 220px;
   border-right: 1px solid var(--card-border);
-  background: #FAFCF8;
+  background: var(--bg-dark);
   display: flex;
   flex-direction: column;
 }
@@ -110,9 +110,9 @@
 }
 
 .member-chatbot-tab-active {
-  background: rgba(25, 199, 209, 0.08);
-  color: var(--red-darkest);
-  border-left: 3px solid var(--red-primary);
+  background: rgba(20, 117, 228, 0.15);
+  color: var(--text-white);
+  border-left: 3px solid var(--btn-primary);
 }
 
 .member-chatbot-members-list {
@@ -153,7 +153,7 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
-  background: #FFFFFF;
+  background: var(--card-bg);
 }
 
 .member-chatbot-empty {
@@ -180,8 +180,8 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: #E8FAF8;
-  color: var(--red-primary);
+  background: linear-gradient(135deg, var(--btn-primary) 0%, var(--card-border-glow) 100%);
+  color: #fff;
   font-size: 11px;
   font-weight: 700;
   display: flex;
@@ -191,21 +191,21 @@
 }
 
 .member-chat-msg-own .member-chat-avatar {
-  background: linear-gradient(135deg, var(--red-primary) 0%, var(--red-dark) 100%);
+  background: linear-gradient(135deg, var(--btn-highlight) 0%, var(--btn-primary) 100%);
   color: #fff;
 }
 
 .member-chat-bubble {
-  background: #FAFCF8;
+  background: var(--bg-deep);
   border: 1px solid var(--card-border);
   padding: 14px 18px;
   border-radius: 16px 16px 16px 4px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
 .member-chat-msg-own .member-chat-bubble {
-  background: rgba(25,199,209,0.08);
-  border-color: rgba(25,199,209,0.2);
+  background: rgba(20, 117, 228, 0.14);
+  border-color: rgba(20, 117, 228, 0.3);
   border-radius: 16px 16px 4px 16px;
 }
 
@@ -219,18 +219,18 @@
 .member-chat-author {
   font-size: 12.5px;
   font-weight: 700;
-  color: var(--red-darkest);
+  color: var(--text-white);
 }
 
 .member-chat-time {
   font-size: 10.5px;
-  color: var(--text-dim);
+  color: var(--text-muted);
 }
 
 .member-chat-text {
   font-size: 14.5px;
   line-height: 1.5;
-  color: var(--text-light);
+  color: var(--text-white);
   margin: 0;
   white-space: pre-wrap;
 }
@@ -238,7 +238,7 @@
 /* ── Input ── */
 .member-chatbot-input-row {
   padding: 20px 24px;
-  background: #FAFCF8;
+  background: var(--bg-dark);
   border-top: 1px solid var(--card-border);
   display: flex;
   align-items: flex-end;
@@ -251,8 +251,8 @@
   border-radius: 24px;
   padding: 12px 20px;
   font-size: 14.5px;
-  background: #FFFFFF;
-  color: var(--text-light);
+  background: var(--card-bg);
+  color: var(--text-white);
   resize: none;
   min-height: 48px;
   max-height: 120px;
@@ -260,9 +260,13 @@
   overflow-y: auto;
 }
 
+.member-chatbot-textarea::placeholder {
+  color: var(--text-muted);
+}
+
 .member-chatbot-textarea:focus {
-  border-color: var(--red-primary);
-  box-shadow: 0 0 0 4px rgba(25,199,209,0.15);
+  border-color: var(--btn-primary);
+  box-shadow: 0 0 0 3px rgba(20, 117, 228, 0.25);
   outline: none;
 }
 
@@ -270,7 +274,7 @@
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: var(--red-primary);
+  background: var(--btn-primary);
   color: #fff;
   border: none;
   display: flex;
@@ -282,13 +286,13 @@
 }
 
 .member-chatbot-send-btn:hover:not(:disabled) {
-  background: var(--red-dark);
+  background: var(--btn-highlight);
   transform: scale(1.05);
 }
 
 .member-chatbot-send-btn:disabled {
-  background: #E8FAF8;
-  color: #B9E8E6;
+  background: rgba(14, 68, 178, 0.3);
+  color: var(--text-muted);
   cursor: not-allowed;
 }
 

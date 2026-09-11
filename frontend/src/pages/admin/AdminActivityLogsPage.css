@@ -8,7 +8,7 @@
 }
 
 .activity-feed-card {
-  background: #FFFFFF;
+  background: var(--card-bg);
   border: 1.5px solid var(--card-border);
   border-radius: 14px;
   margin: 0 24px 24px;

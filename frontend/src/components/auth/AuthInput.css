@@ -26,19 +26,19 @@
 }
 
 .auth-input-wrapper:hover {
-  border-color: rgba(22, 198, 210, 0.45);
+  border-color: var(--card-border-glow);
 }
 
 .auth-input-wrapper:focus-within {
   border-color: var(--input-border-focus);
   box-shadow:
-    0 0 0 3px rgba(22, 198, 210, 0.18),
-    0 0 15px rgba(22, 198, 210, 0.15);
+    0 0 0 3px rgba(20, 117, 228, 0.25),
+    0 0 15px rgba(20, 117, 228, 0.2);
 }
 
 .auth-input-wrapper.has-error {
-  border-color: #28d3d6;
-  box-shadow: 0 0 0 2px rgba(255, 51, 68, 0.25);
+  border-color: #EF4444;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.25);
 }
 
 .auth-input-icon {
@@ -52,7 +52,7 @@
 }
 
 .auth-input-wrapper:focus-within .auth-input-icon {
-  color: var(--red-primary);
+  color: var(--btn-primary);
 }
 
 .auth-input-element {
@@ -67,13 +67,13 @@
 }
 
 .auth-input-element::placeholder {
-  color: var(--text-dim);
+  color: var(--text-muted);
   font-size: 13.5px;
 }
 
 .auth-field-error {
   font-size: 11.5px;
-  color: #28d3d6;
+  color: #EF4444;
   font-family: var(--font-sans);
   padding-left: 2px;
   display: flex;

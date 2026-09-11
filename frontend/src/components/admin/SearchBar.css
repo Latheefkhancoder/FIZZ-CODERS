@@ -29,21 +29,21 @@
   padding: 8px 32px 8px 36px;
   border: 1.5px solid var(--card-border);
   border-radius: 10px;
-  background: #FFFFFF;
+  background: var(--input-bg);
   font-size: 13.5px;
-  color: var(--red-darkest);
+  color: var(--text-white);
   transition: border-color 0.18s, box-shadow 0.18s;
   font-family: var(--font-sans);
 }
 
 .searchbar-input::placeholder {
-  color: var(--text-dim);
+  color: var(--text-muted);
 }
 
 .searchbar-input:focus {
   outline: none;
-  border-color: var(--red-primary);
-  box-shadow: 0 0 0 3px rgba(25, 199, 209, 0.14);
+  border-color: var(--btn-primary);
+  box-shadow: 0 0 0 3px rgba(20, 117, 228, 0.25);
 }
 
 /* remove native 'X' from search input */
