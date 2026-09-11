@@ -2,8 +2,8 @@
   position: relative;
   width: 100%;
   padding: 13px 24px;
-  background: linear-gradient(135deg, #16c6d2 0%, #42d8d2 100%);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: linear-gradient(135deg, var(--btn-primary) 0%, var(--btn-highlight) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 9999px;
   color: var(--pure-white);
   font-family: var(--font-sans);
@@ -21,13 +21,13 @@
 
 .auth-btn-primary:hover:not(:disabled) {
   transform: translateY(-2px);
-  background: linear-gradient(135deg, #39d9d5 0%, #16c6d2 100%);
+  background: linear-gradient(135deg, var(--btn-highlight) 0%, var(--accent-light) 100%);
   box-shadow: var(--shadow-btn-hover);
 }
 
 .auth-btn-primary:active:not(:disabled) {
   transform: translateY(0);
-  box-shadow: 0 2px 10px rgba(22, 198, 210, 0.5);
+  box-shadow: 0 2px 10px rgba(20, 117, 228, 0.5);
 }
 
 .auth-btn-primary:disabled {

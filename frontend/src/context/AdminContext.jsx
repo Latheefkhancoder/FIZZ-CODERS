@@ -19,7 +19,7 @@ const SEED_MEMBERS = [
 ];
 
 const SEED_BOARDS = [
-  { id: 'b1', name: 'Development Board', createdAt: '2025-09-01T10:00:00Z' },
+  { id: 'b1', name: 'Development Board', code: 'A7K2P', createdAt: '2025-09-01T10:00:00Z' },
 ];
 
 const SEED_TASKS = [
@@ -103,7 +103,18 @@ const uid = (prefix) => `${prefix}${++_idCounter}_${Date.now()}`;
 // ── Provider ─────────────────────────────────────────────────────
 
 export function AdminProvider({ children }) {
-  const [boards,   setBoards]   = useState(SEED_BOARDS);
+  const [boards, setBoards] = useState(() => {
+    try {
+      const stored = localStorage.getItem('fizz_boards');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    return SEED_BOARDS;
+  });
   const [tasks,    setTasks]    = useState(SEED_TASKS);
   const [members,  setMembers]  = useState(SEED_MEMBERS);
   const [logs,     setLogs]     = useState(SEED_LOGS);
@@ -118,16 +129,38 @@ export function AdminProvider({ children }) {
   }, []);
 
   // ── Boards ─────────────────────────────────────────────────────
-  const createBoard = useCallback((name) => {
-    const board = { id: uid('b'), name, createdAt: new Date().toISOString() };
-    setBoards(prev => [...prev, board]);
-    addLog(profile.name, `created board "${name}"`);
+  const createBoard = useCallback((name, code) => {
+    const cleanCode = (code || '').trim().toUpperCase();
+    const board = {
+      id: uid('b'),
+      name: name.trim(),
+      code: cleanCode,
+      createdAt: new Date().toISOString()
+    };
+    setBoards(prev => {
+      const next = [...prev, board];
+      try {
+        localStorage.setItem('fizz_boards', JSON.stringify(next));
+      } catch (e) {
+        console.error(e);
+      }
+      return next;
+    });
+    addLog(profile.name, `created board "${name}" (Code: ${cleanCode})`);
     return board;
   }, [addLog, profile.name]);
 
   const deleteBoard = useCallback((boardId) => {
     const board = boards.find(b => b.id === boardId);
-    setBoards(prev => prev.filter(b => b.id !== boardId));
+    setBoards(prev => {
+      const next = prev.filter(b => b.id !== boardId);
+      try {
+        localStorage.setItem('fizz_boards', JSON.stringify(next));
+      } catch (e) {
+        console.error(e);
+      }
+      return next;
+    });
     setTasks(prev => prev.filter(t => t.boardId !== boardId));
     if (board) addLog(profile.name, `deleted board "${board.name}"`);
   }, [boards, addLog, profile.name]);
@@ -254,11 +287,17 @@ export function AdminProvider({ children }) {
     boards.find(b => b.id === id),
   [boards]);
 
+  const getBoardByCode = useCallback((code) => {
+    if (!code) return null;
+    const clean = code.trim().toUpperCase();
+    return boards.find(b => b.code?.toUpperCase() === clean) || null;
+  }, [boards]);
+
   const value = {
     // State
     boards, tasks, members, logs, chat, profile,
     // Board actions
-    createBoard, deleteBoard, getBoardById,
+    createBoard, deleteBoard, getBoardById, getBoardByCode,
     // Task actions
     createTask, updateTask, moveTask, deleteTask, getBoardTasks, getMyTasks,
     // Comment actions

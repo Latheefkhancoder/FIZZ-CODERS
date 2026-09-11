@@ -45,7 +45,7 @@
 .board-view-title {
   font-size: 20px;
   font-weight: 800;
-  color: var(--red-darkest);
+  color: var(--text-white);
   margin: 0;
 }
 

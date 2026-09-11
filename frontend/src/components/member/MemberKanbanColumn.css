@@ -1,4 +1,4 @@
-/* MemberKanbanColumn.css */
+/* MemberKanbanColumn.css — Deep Royal Blue styling */
 
 .member-kanban-column {
   flex: 1;
@@ -8,15 +8,16 @@
   gap: 16px;
   border-radius: 14px;
   padding: 14px;
-  background: rgba(25,199,209,0.03);
-  border: 1.5px solid transparent;
-  transition: border-color 0.18s, background 0.18s;
+  background: rgba(2, 32, 97, 0.4);
+  border: 1.5px solid var(--card-border);
+  transition: all 0.18s ease;
   min-height: 200px;
 }
 
 .member-col-drag-over {
-  border-color: var(--red-primary);
-  background: rgba(25,199,209,0.07);
+  border-color: var(--btn-primary);
+  background: rgba(14, 68, 178, 0.25);
+  box-shadow: 0 0 20px rgba(20, 117, 228, 0.3);
 }
 
 /* ── Column header ── */
@@ -37,29 +38,31 @@
   flex-shrink: 0;
 }
 
-.member-dot-todo { background: #60758A; }
-.member-dot-progress { background: #19C7D1; box-shadow: 0 0 6px rgba(25,199,209,0.5); }
-.member-dot-done { background: #28A745; box-shadow: 0 0 6px rgba(40,167,69,0.4); }
+/* Strict Task Status Colors (Exceptions) */
+.member-dot-todo     { background: #EF4444; box-shadow: 0 0 8px rgba(239, 68, 68, 0.6); }
+.member-dot-progress { background: #EAB308; box-shadow: 0 0 8px rgba(234, 179, 8, 0.6); }
+.member-dot-done     { background: #10B981; box-shadow: 0 0 8px rgba(16, 185, 129, 0.6); }
 
 .member-kanban-col-title {
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.8px;
   text-transform: uppercase;
-  color: var(--red-darkest);
+  color: var(--text-white);
   font-family: var(--font-pixel);
 }
 
 .member-kanban-col-count {
   background: var(--bg-deep);
   border: 1.5px solid var(--card-border);
-  color: var(--text-muted);
+  color: var(--accent-light);
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   border-radius: 20px;
   padding: 1px 8px;
   min-width: 22px;
   text-align: center;
+  font-family: var(--font-pixel);
 }
 
 /* ── Task cards container ── */
@@ -71,7 +74,6 @@
 }
 
 .member-draggable-wrapper {
-  /* wrapper to ensure drag events work smoothly */
   cursor: grab;
 }
 
@@ -85,6 +87,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  background: rgba(1, 26, 82, 0.3);
 }
 
 .member-kanban-empty p {

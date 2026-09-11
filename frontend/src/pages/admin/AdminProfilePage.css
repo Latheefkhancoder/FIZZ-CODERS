@@ -16,7 +16,7 @@
 
 /* ── Profile card ── */
 .profile-card {
-  background: #FFFFFF;
+  background: var(--card-bg);
   border: 1.5px solid var(--card-border);
   border-radius: 16px;
   padding: 24px;
@@ -34,7 +34,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 0 4px rgba(25,199,209,0.2), var(--shadow-btn);
+  box-shadow: 0 0 0 4px rgba(20, 117, 228,0.2), var(--shadow-btn);
   flex-shrink: 0;
 }
 
@@ -55,7 +55,7 @@
 .profile-name {
   font-size: 20px;
   font-weight: 800;
-  color: var(--red-darkest);
+  color: var(--text-white);
   margin: 0;
 }
 
@@ -71,9 +71,9 @@
   font-weight: 700;
   padding: 3px 10px;
   border-radius: 20px;
-  background: rgba(25,199,209,0.12);
+  background: rgba(20, 117, 228,0.12);
   color: #087F86;
-  border: 1px solid rgba(25,199,209,0.25);
+  border: 1px solid rgba(20, 117, 228,0.25);
   width: fit-content;
   margin-top: 2px;
 }
@@ -92,7 +92,7 @@
 
 /* ── Edit card ── */
 .profile-edit-card {
-  background: #FFFFFF;
+  background: var(--card-bg);
   border: 1.5px solid var(--card-border);
   border-radius: 16px;
   padding: 24px;
@@ -105,7 +105,7 @@
 .edit-form-title {
   font-size: 15px;
   font-weight: 700;
-  color: var(--red-darkest);
+  color: var(--text-white);
   margin: 0;
 }
 
@@ -136,25 +136,25 @@
   background: var(--bg-deep);
   font-size: 13.5px;
   font-family: var(--font-sans);
-  color: var(--red-darkest);
+  color: var(--text-white);
   transition: border-color 0.18s, box-shadow 0.18s;
 }
 
-.edit-form-input::placeholder { color: var(--text-dim); }
+.edit-form-input::placeholder { color: var(--text-muted); }
 
 .edit-form-input:focus {
   outline: none;
-  border-color: var(--red-primary);
-  box-shadow: 0 0 0 3px rgba(25,199,209,0.14);
+  border-color: var(--btn-primary);
+  box-shadow: 0 0 0 3px rgba(20, 117, 228, 0.25);
 }
 
 .input-err {
-  border-color: #E05252 !important;
+  border-color: #EF4444 !important;
 }
 
 .edit-form-error {
   font-size: 12px;
-  color: #C53030;
+  color: #EF4444;
   font-weight: 500;
 }
 
@@ -179,20 +179,20 @@
   font-weight: 600;
   cursor: pointer;
   font-family: var(--font-sans);
-  box-shadow: 0 4px 14px rgba(25,199,209,0.3);
+  box-shadow: 0 4px 14px rgba(20, 117, 228,0.3);
   transition: box-shadow 0.18s, transform 0.15s;
   white-space: nowrap;
 }
 
 .btn-primary-aqua svg { width: 15px; height: 15px; }
-.btn-primary-aqua:hover { box-shadow: 0 6px 22px rgba(25,199,209,0.45); transform: translateY(-1px); }
+.btn-primary-aqua:hover { box-shadow: 0 6px 22px rgba(20, 117, 228,0.45); transform: translateY(-1px); }
 
 .btn-outline-aqua {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 9px 18px;
-  background: #FFFFFF;
+  background: var(--card-bg);
   color: var(--red-primary);
   border: 1.5px solid var(--red-primary);
   border-radius: 10px;
@@ -205,7 +205,7 @@
 }
 
 .btn-outline-aqua svg { width: 15px; height: 15px; }
-.btn-outline-aqua:hover { background: rgba(25,199,209,0.08); box-shadow: 0 3px 12px rgba(25,199,209,0.18); }
+.btn-outline-aqua:hover { background: rgba(20, 117, 228,0.08); box-shadow: 0 3px 12px rgba(20, 117, 228,0.18); }
 
 /* Responsive */
 @media (max-width: 640px) {

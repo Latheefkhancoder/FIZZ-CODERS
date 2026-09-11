@@ -18,8 +18,8 @@ export default function AdminBoardsPage() {
 
   const activeBoard = activeBoardId ? getBoardById(activeBoardId) : null;
 
-  const handleCreateBoard = (name) => {
-    const board = createBoard(name);
+  const handleCreateBoard = (name, code) => {
+    const board = createBoard(name, code);
     setActiveBoardId(board.id);
   };
 

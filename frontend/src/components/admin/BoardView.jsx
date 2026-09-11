@@ -68,7 +68,26 @@ export default function BoardView({ board, onBack }) {
           <span>Boards</span>
         </button>
         <div className="board-view-title-row">
-          <h2 className="board-view-title">{board.name}</h2>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <h2 className="board-view-title">{board.name}</h2>
+            {board.code && (
+              <span
+                className="font-pixel"
+                style={{
+                  fontSize: '11px',
+                  fontWeight: '700',
+                  padding: '3px 10px',
+                  borderRadius: '6px',
+                  backgroundColor: 'rgba(1, 26, 82, 0.8)',
+                  border: '1px solid var(--card-border)',
+                  color: 'var(--accent-light)',
+                  letterSpacing: '1px',
+                }}
+              >
+                CODE: {board.code}
+              </span>
+            )}
+          </div>
           <button
             id="add-task-btn"
             className="btn-primary-aqua"

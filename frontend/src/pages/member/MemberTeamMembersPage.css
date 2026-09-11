@@ -14,7 +14,7 @@
 
 /* ── Table Card ── */
 .member-team-table-card {
-  background: #FFFFFF;
+  background: var(--card-bg);
   border: 1px solid var(--card-border);
   border-radius: 12px;
   box-shadow: var(--shadow-card);
@@ -26,7 +26,7 @@
   display: grid;
   grid-template-columns: 2fr 3fr 1fr;
   padding: 16px 20px;
-  background: #FAFCF8;
+  background: rgba(1, 26, 82, 0.6);
   border-bottom: 1.5px solid var(--card-border);
   font-size: 11px;
   font-weight: 700;
@@ -50,7 +50,7 @@
 }
 
 .member-team-row:hover {
-  background: rgba(25, 199, 209, 0.02);
+  background: rgba(20, 117, 228, 0.02);
 }
 
 .member-team-cell-name {
@@ -75,7 +75,7 @@
 .member-team-name-text {
   font-size: 14.5px;
   font-weight: 600;
-  color: var(--red-darkest);
+  color: var(--text-white);
 }
 
 .member-team-cell {
@@ -97,20 +97,22 @@
 }
 
 .member-role-admin {
-  background: rgba(239, 68, 68, 0.1);
-  color: #C53030;
+  background: rgba(239, 68, 68, 0.15);
+  color: #FCA5A5;
+  border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
 .member-role-regular {
-  background: rgba(25, 199, 209, 0.15);
-  color: var(--red-dark);
+  background: rgba(20, 117, 228, 0.18);
+  color: var(--accent-light);
+  border: 1px solid rgba(77, 150, 249, 0.35);
 }
 
 /* ── Empty State ── */
 .member-team-empty {
   padding: 40px;
   text-align: center;
-  color: var(--text-dim);
+  color: var(--text-muted);
   font-size: 14px;
 }
 

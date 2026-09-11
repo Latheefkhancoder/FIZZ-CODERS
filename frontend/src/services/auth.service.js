@@ -59,45 +59,12 @@ export const resendVerification = async (email) => {
  * @param {object} payload - { email, password, rememberMe }
  */
 export const loginUser = async (payload) => {
-  const normalizedEmail = (payload?.email || '').toLowerCase().trim();
-  const password = payload?.password || '';
-
-  try {
-    const response = await fetch(`${API_BASE_URL}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-    return await handleResponse(response);
-  } catch (err) {
-    // If backend is offline or unreachable, support hardcoded Admin and Member accounts
-    const isAdmin = ['admin@fizz.com', 'admin', 'arun@gmail.com'].includes(normalizedEmail);
-    const isMember = ['member@fizz.com', 'member', 'priya@gmail.com'].includes(normalizedEmail);
-
-    if (isAdmin && (password === 'Admin@123' || password === 'admin123')) {
-      return {
-        success: true,
-        message: 'Login successful (Admin)',
-        data: {
-          user: { id: 'admin-1', name: 'Admin User', email: 'admin@fizz.com', role: 'admin' },
-          token: 'mock-jwt-admin-token-' + Date.now(),
-        },
-      };
-    }
-
-    if (isMember && (password === 'Member@123' || password === 'member123')) {
-      return {
-        success: true,
-        message: 'Login successful (Member)',
-        data: {
-          user: { id: 'member-1', name: 'Team Member', email: 'member@fizz.com', role: 'member' },
-          token: 'mock-jwt-member-token-' + Date.now(),
-        },
-      };
-    }
-
-    throw err;
-  }
+  const response = await fetch(`${API_BASE_URL}/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  return handleResponse(response);
 };
 
 /**

@@ -18,7 +18,7 @@
 .member-profile-card {
   width: 100%;
   max-width: 560px;
-  background: #FFFFFF;
+  background: var(--card-bg);
   border-radius: 16px;
   border: 1px solid var(--card-border);
   box-shadow: var(--shadow-card);
@@ -28,7 +28,7 @@
 /* ── Header ── */
 .member-profile-card-header {
   padding: 32px;
-  background: linear-gradient(135deg, rgba(25,199,209,0.05) 0%, rgba(25,199,209,0.15) 100%);
+  background: linear-gradient(135deg, rgba(20, 117, 228,0.05) 0%, rgba(20, 117, 228,0.15) 100%);
   display: flex;
   align-items: center;
   gap: 24px;
@@ -46,24 +46,24 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(25,199,209,0.3);
+  box-shadow: 0 4px 12px rgba(20, 117, 228,0.3);
   border: 3px solid #FFFFFF;
 }
 
 .member-profile-header-text h2 {
   margin: 0 0 8px 0;
   font-size: 24px;
-  color: var(--red-darkest);
+  color: var(--text-white);
 }
 
 .member-profile-role-badge {
   font-size: 12px;
   font-weight: 700;
   color: var(--red-primary);
-  background: #FFFFFF;
+  background: var(--card-bg);
   padding: 4px 12px;
   border-radius: 20px;
-  border: 1px solid rgba(25,199,209,0.2);
+  border: 1px solid rgba(20, 117, 228,0.2);
 }
 
 /* ── Form ── */
@@ -106,8 +106,8 @@
 .member-form-group input:focus,
 .member-form-group textarea:focus {
   border-color: var(--input-border-focus);
-  box-shadow: 0 0 0 3px rgba(25,199,209,0.15);
-  background: #FFFFFF;
+  box-shadow: 0 0 0 3px rgba(20, 117, 228,0.15);
+  background: var(--card-bg);
   outline: none;
 }
 
@@ -120,14 +120,14 @@
 }
 
 .member-save-success {
-  color: #1E7E34;
+  color: #10B981;
   font-size: 13.5px;
   font-weight: 600;
   animation: memberFadeIn 0.3s;
 }
 
 .member-btn-primary {
-  background: var(--red-primary);
+  background: var(--btn-primary);
   color: #FFFFFF;
   border: none;
   padding: 12px 24px;
@@ -141,7 +141,7 @@
 .member-btn-primary:hover {
   background: var(--red-dark);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(25,199,209,0.25);
+  box-shadow: 0 4px 12px rgba(20, 117, 228,0.25);
 }
 
 @media (max-width: 600px) {
