@@ -1,4 +1,11 @@
-const db = require("../config/database");
+/**
+ * Email Verification Model
+ * Decoupled in-memory storage for email verification codes pending Firebase/Firestore integration.
+ * Starts empty with zero synthetic or seed data.
+ */
+
+const codes = new Map();
+let nextCodeId = 1;
 
 /**
  * Create a new email verification code record
@@ -9,13 +16,31 @@ const db = require("../config/database");
  * @returns {Promise<object>}
  */
 const createCode = async ({ email, otpHash, expiresAt }) => {
-  const queryText = `
-    INSERT INTO email_verification_codes (email, otp_hash, expires_at, created_at, verified_at, attempts)
-    VALUES ($1, $2, $3, NOW(), NULL, 0)
-    RETURNING id, email, otp_hash, expires_at, created_at, verified_at, attempts;
-  `;
-  const result = await db.query(queryText, [email.toLowerCase().trim(), otpHash, expiresAt]);
-  return result.rows[0];
+  const id = nextCodeId++;
+  const cleanEmail = email.toLowerCase().trim();
+  const now = new Date().toISOString();
+
+  const record = {
+    id,
+    email: cleanEmail,
+    otp_hash: otpHash,
+    expires_at: expiresAt instanceof Date ? expiresAt.toISOString() : expiresAt,
+    created_at: now,
+    verified_at: null,
+    attempts: 0,
+  };
+
+  codes.set(id, record);
+
+  return {
+    id: record.id,
+    email: record.email,
+    otp_hash: record.otp_hash,
+    expires_at: record.expires_at,
+    created_at: record.created_at,
+    verified_at: record.verified_at,
+    attempts: record.attempts,
+  };
 };
 
 /**
@@ -24,16 +49,29 @@ const createCode = async ({ email, otpHash, expiresAt }) => {
  * @returns {Promise<object|null>}
  */
 const findLatestActiveCode = async (email) => {
-  const queryText = `
-    SELECT id, email, otp_hash, expires_at, created_at, verified_at, attempts
-    FROM email_verification_codes
-    WHERE LOWER(email) = LOWER($1)
-      AND verified_at IS NULL
-    ORDER BY id DESC
-    LIMIT 1;
-  `;
-  const result = await db.query(queryText, [email]);
-  return result.rows[0] || null;
+  if (!email) return null;
+  const cleanEmail = email.toLowerCase().trim();
+
+  let latest = null;
+  for (const record of codes.values()) {
+    if (record.email === cleanEmail && record.verified_at === null) {
+      if (!latest || record.id > latest.id) {
+        latest = record;
+      }
+    }
+  }
+
+  if (!latest) return null;
+
+  return {
+    id: latest.id,
+    email: latest.email,
+    otp_hash: latest.otp_hash,
+    expires_at: latest.expires_at,
+    created_at: latest.created_at,
+    verified_at: latest.verified_at,
+    attempts: latest.attempts,
+  };
 };
 
 /**
@@ -42,48 +80,54 @@ const findLatestActiveCode = async (email) => {
  * @returns {Promise<boolean>}
  */
 const isEmailVerified = async (email) => {
-  const queryText = `
-    SELECT id, verified_at
-    FROM email_verification_codes
-    WHERE LOWER(email) = LOWER($1)
-      AND verified_at IS NOT NULL
-    ORDER BY id DESC
-    LIMIT 1;
-  `;
-  const result = await db.query(queryText, [email]);
-  return result.rowCount > 0;
+  if (!email) return false;
+  const cleanEmail = email.toLowerCase().trim();
+
+  for (const record of codes.values()) {
+    if (record.email === cleanEmail && record.verified_at !== null) {
+      return true;
+    }
+  }
+  return false;
 };
 
 /**
  * Increment the failed attempt counter for a verification code
  * @param {number|string} id
- * @returns {Promise<object>}
+ * @returns {Promise<object|null>}
  */
 const incrementAttempts = async (id) => {
-  const queryText = `
-    UPDATE email_verification_codes
-    SET attempts = attempts + 1
-    WHERE id = $1
-    RETURNING id, attempts;
-  `;
-  const result = await db.query(queryText, [id]);
-  return result.rows[0] || null;
+  const idStr = String(id);
+  for (const [codeId, record] of codes.entries()) {
+    if (String(codeId) === idStr) {
+      record.attempts += 1;
+      return {
+        id: record.id,
+        attempts: record.attempts,
+      };
+    }
+  }
+  return null;
 };
 
 /**
  * Mark a verification code as verified
  * @param {number|string} id
- * @returns {Promise<object>}
+ * @returns {Promise<object|null>}
  */
 const markVerified = async (id) => {
-  const queryText = `
-    UPDATE email_verification_codes
-    SET verified_at = NOW()
-    WHERE id = $1
-    RETURNING id, email, verified_at;
-  `;
-  const result = await db.query(queryText, [id]);
-  return result.rows[0] || null;
+  const idStr = String(id);
+  for (const [codeId, record] of codes.entries()) {
+    if (String(codeId) === idStr) {
+      record.verified_at = new Date().toISOString();
+      return {
+        id: record.id,
+        email: record.email,
+        verified_at: record.verified_at,
+      };
+    }
+  }
+  return null;
 };
 
 /**
@@ -92,15 +136,31 @@ const markVerified = async (id) => {
  * @returns {Promise<number>}
  */
 const invalidateActiveCodes = async (email) => {
-  const queryText = `
-    UPDATE email_verification_codes
-    SET expires_at = NOW()
-    WHERE LOWER(email) = LOWER($1)
-      AND verified_at IS NULL
-      AND expires_at > NOW();
-  `;
-  const result = await db.query(queryText, [email]);
-  return result.rowCount;
+  if (!email) return 0;
+  const cleanEmail = email.toLowerCase().trim();
+  const now = new Date().toISOString();
+  let count = 0;
+
+  for (const record of codes.values()) {
+    if (
+      record.email === cleanEmail &&
+      record.verified_at === null &&
+      new Date(record.expires_at) > new Date()
+    ) {
+      record.expires_at = now;
+      count++;
+    }
+  }
+
+  return count;
+};
+
+/**
+ * Reset in-memory storage (useful for tests)
+ */
+const clear = () => {
+  codes.clear();
+  nextCodeId = 1;
 };
 
 module.exports = {
@@ -110,4 +170,5 @@ module.exports = {
   incrementAttempts,
   markVerified,
   invalidateActiveCodes,
+  clear,
 };

@@ -48,7 +48,7 @@ class UserRepository {
         };
       }
     } catch {
-      // Database error or non-integer ID in PostgreSQL
+      // User lookup failed or not found in user model
     }
 
     // Check memoryStore fallback
@@ -93,7 +93,7 @@ class UserRepository {
         };
       }
     } catch {
-      // Database error
+      // User lookup failed or not found in user model
     }
 
     for (const profile of memoryStore.userProfiles.values()) {

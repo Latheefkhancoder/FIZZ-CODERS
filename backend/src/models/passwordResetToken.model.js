@@ -1,4 +1,11 @@
-const db = require("../config/database");
+/**
+ * Password Reset Token Model
+ * Decoupled in-memory storage for reset tokens pending Firebase/Firestore integration.
+ * Starts empty with zero synthetic or seed data.
+ */
+
+const tokens = new Map();
+let nextTokenId = 1;
 
 /**
  * Store a new password reset token hash
@@ -9,13 +16,25 @@ const db = require("../config/database");
  * @returns {Promise<object>}
  */
 const createToken = async ({ userId, tokenHash, expiresAt }) => {
-  const queryText = `
-    INSERT INTO password_reset_tokens (user_id, token_hash, expires_at, created_at, used_at)
-    VALUES ($1, $2, $3, NOW(), NULL)
-    RETURNING id, user_id, token_hash, expires_at, created_at;
-  `;
-  const result = await db.query(queryText, [userId, tokenHash, expiresAt]);
-  return result.rows[0];
+  const id = nextTokenId++;
+  const record = {
+    id,
+    user_id: userId,
+    token_hash: tokenHash,
+    expires_at: expiresAt instanceof Date ? expiresAt.toISOString() : expiresAt,
+    created_at: new Date().toISOString(),
+    used_at: null,
+  };
+
+  tokens.set(id, record);
+
+  return {
+    id: record.id,
+    user_id: record.user_id,
+    token_hash: record.token_hash,
+    expires_at: record.expires_at,
+    created_at: record.created_at,
+  };
 };
 
 /**
@@ -24,16 +43,22 @@ const createToken = async ({ userId, tokenHash, expiresAt }) => {
  * @returns {Promise<object|null>}
  */
 const findValidToken = async (tokenHash) => {
-  const queryText = `
-    SELECT id, user_id, token_hash, expires_at, created_at, used_at
-    FROM password_reset_tokens
-    WHERE token_hash = $1
-      AND expires_at > NOW()
-      AND used_at IS NULL
-    LIMIT 1;
-  `;
-  const result = await db.query(queryText, [tokenHash]);
-  return result.rows[0] || null;
+  if (!tokenHash) return null;
+  const now = new Date();
+
+  for (const token of tokens.values()) {
+    if (token.token_hash === tokenHash && !token.used_at && new Date(token.expires_at) > now) {
+      return {
+        id: token.id,
+        user_id: token.user_id,
+        token_hash: token.token_hash,
+        expires_at: token.expires_at,
+        created_at: token.created_at,
+        used_at: token.used_at,
+      };
+    }
+  }
+  return null;
 };
 
 /**
@@ -42,14 +67,14 @@ const findValidToken = async (tokenHash) => {
  * @returns {Promise<boolean>}
  */
 const markTokenUsed = async (tokenId) => {
-  const queryText = `
-    UPDATE password_reset_tokens
-    SET used_at = NOW()
-    WHERE id = $1
-    RETURNING id;
-  `;
-  const result = await db.query(queryText, [tokenId]);
-  return result.rowCount > 0;
+  const idStr = String(tokenId);
+  for (const [id, token] of tokens.entries()) {
+    if (String(id) === idStr) {
+      token.used_at = new Date().toISOString();
+      return true;
+    }
+  }
+  return false;
 };
 
 /**
@@ -58,14 +83,26 @@ const markTokenUsed = async (tokenId) => {
  * @returns {Promise<number>} Number of invalidated tokens
  */
 const invalidateUserTokens = async (userId) => {
-  const queryText = `
-    UPDATE password_reset_tokens
-    SET used_at = NOW()
-    WHERE user_id = $1
-      AND used_at IS NULL;
-  `;
-  const result = await db.query(queryText, [userId]);
-  return result.rowCount;
+  const userStr = String(userId);
+  let count = 0;
+  const now = new Date().toISOString();
+
+  for (const token of tokens.values()) {
+    if (String(token.user_id) === userStr && !token.used_at) {
+      token.used_at = now;
+      count++;
+    }
+  }
+
+  return count;
+};
+
+/**
+ * Reset in-memory storage (useful for tests)
+ */
+const clear = () => {
+  tokens.clear();
+  nextTokenId = 1;
 };
 
 module.exports = {
@@ -73,4 +110,5 @@ module.exports = {
   findValidToken,
   markTokenUsed,
   invalidateUserTokens,
+  clear,
 };

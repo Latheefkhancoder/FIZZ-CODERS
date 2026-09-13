@@ -10,8 +10,7 @@ Production-ready backend service architecture for **FIZZ-CONNECT**, built with N
 backend/
 ├── src/
 │   ├── config/             # Configuration & environment variables
-│   │   ├── env.js          # Environment loader
-│   │   └── database.js     # Embedded database configuration
+│   │   └── env.js          # Environment loader
 │   │
 │   ├── repositories/       # Isolated persistence layer (prepared for Firestore)
 │   │   ├── memoryStore.js  # Clean in-memory Map collections (no synthetic data)

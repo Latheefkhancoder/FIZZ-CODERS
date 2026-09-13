@@ -1,4 +1,11 @@
-const db = require("../config/database");
+/**
+ * User Model
+ * Decoupled in-memory storage for authentication users pending Firebase/Firestore integration.
+ * Starts empty with zero synthetic or seed data.
+ */
+
+const users = new Map();
+let nextUserId = 1;
 
 /**
  * Find user by normalized email address
@@ -6,14 +13,22 @@ const db = require("../config/database");
  * @returns {Promise<object|null>}
  */
 const findByEmail = async (email) => {
-  const queryText = `
-    SELECT id, name, email, password_hash, created_at, updated_at
-    FROM users
-    WHERE LOWER(email) = LOWER($1)
-    LIMIT 1;
-  `;
-  const result = await db.query(queryText, [email]);
-  return result.rows[0] || null;
+  if (!email) return null;
+  const cleanEmail = email.toLowerCase().trim();
+
+  for (const user of users.values()) {
+    if (user.email.toLowerCase() === cleanEmail) {
+      return {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        password_hash: user.password_hash,
+        created_at: user.created_at,
+        updated_at: user.updated_at,
+      };
+    }
+  }
+  return null;
 };
 
 /**
@@ -22,14 +37,21 @@ const findByEmail = async (email) => {
  * @returns {Promise<object|null>}
  */
 const findById = async (id) => {
-  const queryText = `
-    SELECT id, name, email, created_at, updated_at
-    FROM users
-    WHERE id = $1
-    LIMIT 1;
-  `;
-  const result = await db.query(queryText, [id]);
-  return result.rows[0] || null;
+  if (id === undefined || id === null) return null;
+  const idStr = String(id);
+
+  for (const user of users.values()) {
+    if (String(user.id) === idStr) {
+      return {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        created_at: user.created_at,
+        updated_at: user.updated_at,
+      };
+    }
+  }
+  return null;
 };
 
 /**
@@ -41,13 +63,28 @@ const findById = async (id) => {
  * @returns {Promise<object>} Created user without password_hash
  */
 const createUser = async ({ name, email, passwordHash }) => {
-  const queryText = `
-    INSERT INTO users (name, email, password_hash, created_at, updated_at)
-    VALUES ($1, $2, $3, NOW(), NOW())
-    RETURNING id, name, email, created_at, updated_at;
-  `;
-  const result = await db.query(queryText, [name, email.toLowerCase().trim(), passwordHash]);
-  return result.rows[0];
+  const id = nextUserId++;
+  const cleanEmail = email.toLowerCase().trim();
+  const now = new Date().toISOString();
+
+  const record = {
+    id,
+    name: name.trim(),
+    email: cleanEmail,
+    password_hash: passwordHash,
+    created_at: now,
+    updated_at: now,
+  };
+
+  users.set(id, record);
+
+  return {
+    id: record.id,
+    name: record.name,
+    email: record.email,
+    created_at: record.created_at,
+    updated_at: record.updated_at,
+  };
 };
 
 /**
@@ -57,14 +94,23 @@ const createUser = async ({ name, email, passwordHash }) => {
  * @returns {Promise<boolean>}
  */
 const updatePassword = async (userId, newPasswordHash) => {
-  const queryText = `
-    UPDATE users
-    SET password_hash = $1, updated_at = NOW()
-    WHERE id = $2
-    RETURNING id;
-  `;
-  const result = await db.query(queryText, [newPasswordHash, userId]);
-  return result.rowCount > 0;
+  const idStr = String(userId);
+  for (const [id, user] of users.entries()) {
+    if (String(id) === idStr) {
+      user.password_hash = newPasswordHash;
+      user.updated_at = new Date().toISOString();
+      return true;
+    }
+  }
+  return false;
+};
+
+/**
+ * Reset in-memory storage (useful for tests)
+ */
+const clear = () => {
+  users.clear();
+  nextUserId = 1;
 };
 
 module.exports = {
@@ -72,4 +118,5 @@ module.exports = {
   findById,
   createUser,
   updatePassword,
+  clear,
 };

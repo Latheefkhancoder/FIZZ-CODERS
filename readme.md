@@ -28,7 +28,7 @@ FIZZ-CONNECT provides:
 - Activity logs
 - Search and filtering
 - REST APIs
-- PostgreSQL database
+- Database (Firebase/Firestore integration pending.)
 - Automated testing
 - CI/CD
 - Deployment
@@ -42,7 +42,7 @@ FIZZ-CONNECT provides:
 | Frontend | React.js |
 | Build Tool | Vite |
 | Backend | Node.js + Express.js |
-| Database | PostgreSQL |
+| Database | Firebase/Firestore integration pending. |
 | Authentication | JWT |
 | Password Security | bcrypt |
 | API | REST API |
@@ -92,11 +92,6 @@ collabboard/
 │   ├── .env.example
 │   └── package.json
 │
-├── database/                 # PostgreSQL related files
-│   ├── migrations/
-│   ├── seeds/
-│   └── README.md
-│
 ├── .github/
 │   └── workflows/
 │       ├── ci.yml
@@ -104,5 +99,4 @@ collabboard/
 │
 ├── .gitignore
 ├── .env.example
-├── docker-compose.yml
 └── README.md

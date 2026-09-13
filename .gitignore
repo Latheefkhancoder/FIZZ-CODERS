@@ -159,3 +159,5 @@ env/
 
 *.orig
 *.rej
+
+backend/credentials/
