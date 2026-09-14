@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAdmin } from '../../context/AdminContext';
 import './AdminProfilePage.css';
 
@@ -39,7 +39,7 @@ export default function AdminProfilePage() {
     }
   }, [profile]);
 
-  const initials = profile?.name ? profile.name.charAt(0).toUpperCase() : 'A';
+  const initials = profile?.name ? profile.name.charAt(0).toUpperCase() : (profile?.email ? profile.email.charAt(0).toUpperCase() : 'A');
 
   const validate = () => {
     const errs = {};
@@ -100,11 +100,11 @@ export default function AdminProfilePage() {
           </div>
 
           <div className="profile-info">
-            <h2 className="profile-name">{profile.name}</h2>
-            <p className="profile-email">{profile.email}</p>
-            {profile.bio && <p className="profile-bio" style={{ marginTop: '8px', color: 'var(--text-muted)', fontSize: '0.9rem' }}>{profile.bio}</p>}
+            <h2 className="profile-name">{profile?.name || 'Admin'}</h2>
+            <p className="profile-email">{profile?.email || 'admin@fizz.com'}</p>
+            {profile?.bio && <p className="profile-bio" style={{ marginTop: '8px', color: 'var(--text-muted)', fontSize: '0.9rem' }}>{profile.bio}</p>}
             <span className="profile-role-badge" style={{ marginTop: '8px', display: 'inline-block' }}>
-              {profile.role}
+              {profile?.role || 'Admin'}
             </span>
           </div>
 

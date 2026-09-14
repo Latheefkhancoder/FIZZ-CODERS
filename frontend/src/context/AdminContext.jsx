@@ -124,17 +124,15 @@ export function AdminProvider({ children }) {
 
   const deleteBoard = useCallback(async (boardId) => {
     await boardService.deleteBoard(boardId);
-    setBoards(prev => prev.filter(b => b.id !== boardId));
-    setTasks(prev => prev.filter(t => t.boardId !== boardId));
-
-    if (activeBoardRef.current === boardId) {
-      setBoards(remaining => {
-        const nextBoard = remaining.find(b => b.id !== boardId);
-        const nextId = nextBoard ? nextBoard.id : '';
+    setBoards(prev => {
+      const remaining = prev.filter(b => b.id !== boardId);
+      if (activeBoardRef.current === boardId) {
+        const nextId = remaining.length > 0 ? remaining[0].id : '';
         selectBoard(nextId);
-        return remaining;
-      });
-    }
+      }
+      return remaining;
+    });
+    setTasks(prev => prev.filter(t => t.boardId !== boardId));
   }, [selectBoard]);
 
   // ── Tasks ──────────────────────────────────────────────────────

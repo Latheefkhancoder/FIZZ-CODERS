@@ -8,15 +8,15 @@ let transporter = null;
  */
 const getTransporter = () => {
   if (!transporter && env.SMTP_HOST && env.SMTP_HOST.trim()) {
-    const isSecure = env.SMTP_PORT === 465;
+    const isSecure = Number(env.SMTP_PORT) === 465;
     transporter = nodemailer.createTransport({
       host: env.SMTP_HOST.trim(),
-      port: env.SMTP_PORT,
+      port: Number(env.SMTP_PORT) || 587,
       secure: isSecure,
       auth: env.SMTP_USER
         ? {
             user: env.SMTP_USER.trim(),
-            pass: env.SMTP_PASSWORD,
+            pass: env.SMTP_PASSWORD ? env.SMTP_PASSWORD.replace(/\s+/g, '') : '',
           }
         : undefined,
     });
@@ -109,8 +109,14 @@ const sendPasswordResetEmail = async (toEmail, resetToken) => {
       return { delivered: false, link: resetLink, error: err.message };
     }
   } else {
-    // Development / mock fallback logger (safe, no raw secret credentials logged)
-    console.log(`[FIZZ-CONNECT Email (Dev Mock)] Password reset email simulated for recipient: ${toEmail} (SMTP not configured in backend/.env)`);
+    // Development fallback — print reset link directly to terminal since no SMTP is configured
+    console.log(`\n${'='.repeat(60)}`);
+    console.log(`  📧 DEV MODE — PASSWORD RESET LINK`);
+    console.log(`  Recipient  : ${toEmail}`);
+    console.log(`  Reset Link : \x1b[36m${resetLink}\x1b[0m`);
+    console.log(`  Expires    : 1 hour`);
+    console.log(`  (Configure SMTP in backend/.env to send real emails)`);
+    console.log(`${'='.repeat(60)}\n`);
     return { delivered: true, link: resetLink, simulated: true };
   }
 };
@@ -161,8 +167,14 @@ const sendEmailVerificationOtp = async (toEmail, otp) => {
       return { delivered: false, error: err.message };
     }
   } else {
-    // Development / mock fallback logger (safe, no secret credentials logged)
-    console.log(`[FIZZ-CONNECT Email (Dev Mock)] Verification email simulated for recipient: ${toEmail} (SMTP not configured in backend/.env)`);
+    // Development fallback — print OTP directly to terminal since no SMTP is configured
+    console.log(`\n${'='.repeat(60)}`);
+    console.log(`  📧 DEV MODE — EMAIL VERIFICATION OTP`);
+    console.log(`  Recipient : ${toEmail}`);
+    console.log(`  OTP Code  : \x1b[32m\x1b[1m${otp}\x1b[0m`);
+    console.log(`  Expires   : 10 minutes`);
+    console.log(`  (Configure SMTP in backend/.env to send real emails)`);
+    console.log(`${'='.repeat(60)}\n`);
     return { delivered: true, simulated: true };
   }
 };

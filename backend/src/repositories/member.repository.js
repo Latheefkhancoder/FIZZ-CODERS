@@ -40,20 +40,27 @@ class MemberRepository {
    * @param {string} userId
    * @returns {Promise<object|null>}
    */
-  async findByBoardAndUser(boardId, userId) {
-    if (!boardId || !userId) return null;
+  async findByBoardAndUser(boardId, userId, email = null) {
+    if (!boardId || (!userId && !email)) return null;
 
     const snapshot = await db.collection("members")
       .where("boardId", "==", String(boardId))
-      .where("userId", "==", String(userId))
-      .limit(1)
       .get();
 
     if (snapshot.empty) {
       return null;
     }
 
-    const doc = snapshot.docs[0];
+    const cleanEmail = email ? email.toLowerCase().trim() : null;
+    const doc = snapshot.docs.find(d => {
+      const data = d.data();
+      if (userId && String(data.userId) === String(userId)) return true;
+      if (cleanEmail && data.email && data.email.toLowerCase().trim() === cleanEmail) return true;
+      return false;
+    });
+
+    if (!doc) return null;
+
     return {
       ...doc.data(),
       id: doc.id,
@@ -134,15 +141,15 @@ class MemberRepository {
 
     const snapshot = await db.collection("members")
       .where("boardId", "==", String(boardId))
-      .where("userId", "==", String(userId))
-      .limit(1)
       .get();
 
     if (snapshot.empty) {
       return null;
     }
 
-    const doc = snapshot.docs[0];
+    const doc = snapshot.docs.find(d => String(d.data().userId) === String(userId));
+    if (!doc) return null;
+
     const updatedRole = role === "Admin" ? "Admin" : "Member";
     const updatedAt = new Date().toISOString();
 
@@ -170,15 +177,16 @@ class MemberRepository {
 
     const snapshot = await db.collection("members")
       .where("boardId", "==", String(boardId))
-      .where("userId", "==", String(userId))
-      .limit(1)
       .get();
 
     if (snapshot.empty) {
       return false;
     }
 
-    await snapshot.docs[0].ref.delete();
+    const doc = snapshot.docs.find(d => String(d.data().userId) === String(userId));
+    if (!doc) return false;
+
+    await doc.ref.delete();
     return true;
   }
 

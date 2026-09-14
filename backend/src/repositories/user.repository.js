@@ -1,11 +1,6 @@
 const { db } = require("../config/firebase");
 const { userModel } = require("../models");
 
-const HARDCODED_USERS = [
-  { id: "admin-1", name: "Admin User", email: "admin@fizz.com", role: "Admin" },
-  { id: "member-1", name: "Team Member", email: "member@fizz.com", role: "Member" },
-];
-
 /**
  * User Repository
  * Bridges between the authentication user database and Firestore profile metadata.
@@ -20,47 +15,27 @@ class UserRepository {
     if (!id) return null;
     const idStr = String(id);
 
-    // Check hardcoded auth accounts (for tests and dev accounts)
-    const hardcoded = HARDCODED_USERS.find((u) => u.id === idStr);
-    if (hardcoded) {
-      let profileExtra = {};
-      try {
-        const doc = await db.collection("userProfiles").doc(idStr).get();
-        if (doc.exists) {
-          profileExtra = doc.data();
-        }
-      } catch {
-        // Fallback gracefully
-      }
-
-      return {
-        id: hardcoded.id,
-        name: profileExtra.name || hardcoded.name,
-        email: hardcoded.email,
-        role: profileExtra.role || hardcoded.role || "Admin",
-        bio: profileExtra.bio || "",
-        createdAt: new Date().toISOString(),
-      };
-    }
-
+    // Try primary auth user model first
     try {
       const user = await userModel.findById(id);
       if (user) {
         let profileExtra = {};
         try {
-          const doc = await db.collection("userProfiles").doc(idStr).get();
-          if (doc.exists) {
-            profileExtra = doc.data();
+          if (db) {
+            const doc = await db.collection("userProfiles").doc(idStr).get();
+            if (doc.exists) {
+              profileExtra = doc.data();
+            }
           }
         } catch {
-          // Fallback gracefully
+          // Firestore unavailable — proceed with auth data only
         }
 
         return {
           id: String(user.id),
           name: profileExtra.name || user.name,
           email: user.email,
-          role: profileExtra.role || user.role || "Member",
+          role: profileExtra.role || "Member",
           bio: profileExtra.bio || "",
           createdAt: user.created_at || user.createdAt,
         };
@@ -69,14 +44,16 @@ class UserRepository {
       // User lookup failed or not found in user model
     }
 
-    // Check userProfiles Firestore collection fallback
+    // Fallback: check userProfiles Firestore collection directly
     try {
-      const doc = await db.collection("userProfiles").doc(idStr).get();
-      if (doc.exists) {
-        return { ...doc.data(), id: doc.id };
+      if (db) {
+        const doc = await db.collection("userProfiles").doc(idStr).get();
+        if (doc.exists) {
+          return { ...doc.data(), id: doc.id };
+        }
       }
     } catch {
-      // Fallback
+      // Firestore unavailable
     }
 
     return null;
@@ -91,47 +68,27 @@ class UserRepository {
     if (!email) return null;
     const cleanEmail = email.toLowerCase().trim();
 
-    // Check hardcoded accounts
-    const hardcoded = HARDCODED_USERS.find((u) => u.email.toLowerCase() === cleanEmail);
-    if (hardcoded) {
-      let profileExtra = {};
-      try {
-        const doc = await db.collection("userProfiles").doc(hardcoded.id).get();
-        if (doc.exists) {
-          profileExtra = doc.data();
-        }
-      } catch {
-        // Fallback gracefully
-      }
-
-      return {
-        id: hardcoded.id,
-        name: profileExtra.name || hardcoded.name,
-        email: hardcoded.email,
-        role: profileExtra.role || hardcoded.role || "Admin",
-        bio: profileExtra.bio || "",
-        createdAt: new Date().toISOString(),
-      };
-    }
-
+    // Try primary auth user model first
     try {
       const user = await userModel.findByEmail(cleanEmail);
       if (user) {
         let profileExtra = {};
         try {
-          const doc = await db.collection("userProfiles").doc(String(user.id)).get();
-          if (doc.exists) {
-            profileExtra = doc.data();
+          if (db) {
+            const doc = await db.collection("userProfiles").doc(String(user.id)).get();
+            if (doc.exists) {
+              profileExtra = doc.data();
+            }
           }
         } catch {
-          // Fallback gracefully
+          // Firestore unavailable — proceed with auth data only
         }
 
         return {
           id: String(user.id),
           name: profileExtra.name || user.name,
           email: user.email,
-          role: profileExtra.role || user.role || "Member",
+          role: profileExtra.role || "Member",
           bio: profileExtra.bio || "",
           createdAt: user.created_at || user.createdAt,
         };
@@ -140,18 +97,21 @@ class UserRepository {
       // User lookup failed or not found in user model
     }
 
+    // Fallback: query userProfiles Firestore collection by email
     try {
-      const snapshot = await db.collection("userProfiles")
-        .where("email", "==", cleanEmail)
-        .limit(1)
-        .get();
+      if (db) {
+        const snapshot = await db.collection("userProfiles")
+          .where("email", "==", cleanEmail)
+          .limit(1)
+          .get();
 
-      if (!snapshot.empty) {
-        const doc = snapshot.docs[0];
-        return { ...doc.data(), id: doc.id };
+        if (!snapshot.empty) {
+          const doc = snapshot.docs[0];
+          return { ...doc.data(), id: doc.id };
+        }
       }
     } catch {
-      // Fallback
+      // Firestore unavailable
     }
 
     return null;
@@ -169,6 +129,10 @@ class UserRepository {
     const existing = await this.findById(userId);
     if (!existing) {
       throw new Error("User not found");
+    }
+
+    if (!db) {
+      throw new Error("Firestore is not available. Please configure Firebase credentials.");
     }
 
     const userIdStr = String(userId);

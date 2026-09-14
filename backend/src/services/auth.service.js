@@ -196,29 +196,6 @@ const resendVerification = async (email) => {
   };
 };
 
-const HARDCODED_ACCOUNTS = [
-  {
-    identifiers: ["admin@fizz.com", "admin", "arun@gmail.com"],
-    passwords: ["Admin@123", "admin123"],
-    user: {
-      id: "admin-1",
-      name: "Admin User",
-      email: "admin@fizz.com",
-      role: "admin",
-    },
-  },
-  {
-    identifiers: ["member@fizz.com", "member", "priya@gmail.com"],
-    passwords: ["Member@123", "member123"],
-    user: {
-      id: "member-1",
-      name: "Team Member",
-      email: "member@fizz.com",
-      role: "member",
-    },
-  },
-];
-
 /**
  * Authenticate user login (requires verified email)
  * @param {object} params
@@ -229,33 +206,6 @@ const HARDCODED_ACCOUNTS = [
  */
 const loginUser = async ({ email, password, rememberMe = false }) => {
   const normalizedEmail = (email || "").toLowerCase().trim();
-
-  // Check hardcoded credentials for Admin & Member
-  const hardcodedMatch = HARDCODED_ACCOUNTS.find((acc) =>
-    acc.identifiers.includes(normalizedEmail)
-  );
-
-  if (hardcodedMatch) {
-    if (!hardcodedMatch.passwords.includes(password)) {
-      const error = new Error("Invalid email or password");
-      error.statusCode = 401;
-      throw error;
-    }
-
-    const safeUser = {
-      id: hardcodedMatch.user.id,
-      name: hardcodedMatch.user.name,
-      email: hardcodedMatch.user.email,
-      role: hardcodedMatch.user.role,
-    };
-
-    const token = generateJwt(safeUser, Boolean(rememberMe));
-
-    return {
-      user: safeUser,
-      token,
-    };
-  }
 
   // Find user by email
   const user = await userModel.findByEmail(normalizedEmail);
@@ -273,7 +223,7 @@ const loginUser = async ({ email, password, rememberMe = false }) => {
     throw error;
   }
 
-  // Verify email verification status in email_verification_codes
+  // Verify email verification status
   const isVerified = await emailVerificationModel.isEmailVerified(normalizedEmail);
   if (!isVerified) {
     const error = new Error("Email verification required. Please verify your email before logging in.");
@@ -287,6 +237,7 @@ const loginUser = async ({ email, password, rememberMe = false }) => {
     id: user.id,
     name: user.name,
     email: user.email,
+    role: user.role || "Admin",
   };
 
   // Generate JWT token with rememberMe configuration
@@ -329,7 +280,7 @@ const requestPasswordReset = async (email) => {
     await emailService.sendPasswordResetEmail(user.email, rawToken);
   }
 
-  // Always return identical generic message without resetToken or link to prevent account enumeration
+  // Always return identical generic message to prevent account enumeration
   return {
     message: "If an account exists for this email, a password reset link has been sent.",
   };
@@ -388,42 +339,14 @@ const resetPassword = async ({ token, newPassword }) => {
  * @returns {Promise<object>}
  */
 const getCurrentUser = async (userId) => {
-  // First try findById from database / mock
-  try {
-    const user = await userModel.findById(userId);
-    if (user) {
-      return {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        createdAt: user.created_at,
-        updatedAt: user.updated_at,
-      };
-    }
-  } catch (err) {
-    // Database query failed (e.g. string ID on integer column) - check hardcoded fallback below
-  }
-
-  // Fallback for hardcoded admin & member
-  if (userId === "admin-1" || userId === "admin") {
+  const user = await userModel.findById(userId);
+  if (user) {
     return {
-      id: "admin-1",
-      name: "Admin User",
-      email: "admin@fizz.com",
-      role: "admin",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-  }
-
-  if (userId === "member-1" || userId === "member") {
-    return {
-      id: "member-1",
-      name: "Team Member",
-      email: "member@fizz.com",
-      role: "member",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      createdAt: user.created_at,
+      updatedAt: user.updated_at,
     };
   }
 
@@ -442,4 +365,3 @@ module.exports = {
   resetPassword,
   getCurrentUser,
 };
-

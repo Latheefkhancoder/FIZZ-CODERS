@@ -4,7 +4,6 @@ import { taskService } from '../../services/task.service';
 import BoardCard from '../../components/admin/BoardCard';
 import BoardView from '../../components/admin/BoardView';
 import CreateBoardModal from '../../components/admin/CreateBoardModal';
-import ConfirmationDialog from '../../components/admin/ConfirmationDialog';
 import './AdminBoardsPage.css';
 
 /**
@@ -15,7 +14,6 @@ export default function AdminBoardsPage() {
 
   const [activeBoardId, setActiveBoardId] = useState(null);
   const [createModalOpen, setCreateModalOpen] = useState(false);
-  const [boardToDelete, setBoardToDelete] = useState(null);
   const [taskCounts, setTaskCounts] = useState({});
   const [createError, setCreateError] = useState('');
 
@@ -66,41 +64,24 @@ export default function AdminBoardsPage() {
     }
   };
 
-  const handleDeleteBoard = (boardId) => {
-    setBoardToDelete(boardId);
-  };
-
-  const confirmDeleteBoard = async () => {
-    if (boardToDelete) {
-      try {
-        await deleteBoard(boardToDelete);
-        if (boardToDelete === activeBoardId) setActiveBoardId(null);
-      } catch (err) {
-        alert(err.message || 'Failed to delete board.');
+  const handleDeleteBoard = async (boardId) => {
+    try {
+      await deleteBoard(boardId);
+      if (boardId === activeBoardId) {
+        setActiveBoardId(null);
       }
+    } catch (err) {
+      console.error('Failed to delete board:', err);
     }
-    setBoardToDelete(null);
   };
-
-  const boardToDeleteObj = boardToDelete ? boards.find(b => b.id === boardToDelete) : null;
 
   /* ── If a board is open, show its Kanban view ── */
   if (activeBoard) {
     return (
-      <>
-        <BoardView
-          board={activeBoard}
-          onBack={() => setActiveBoardId(null)}
-        />
-        <ConfirmationDialog
-          isOpen={!!boardToDelete}
-          title="Delete Board?"
-          message={`Are you sure you want to delete "${boardToDeleteObj?.name}"? All tasks inside will also be deleted.`}
-          confirmLabel="Delete Board"
-          onConfirm={confirmDeleteBoard}
-          onCancel={() => setBoardToDelete(null)}
-        />
-      </>
+      <BoardView
+        board={activeBoard}
+        onBack={() => setActiveBoardId(null)}
+      />
     );
   }
 
@@ -165,16 +146,6 @@ export default function AdminBoardsPage() {
         isOpen={createModalOpen}
         onClose={() => setCreateModalOpen(false)}
         onSubmit={handleCreateBoard}
-      />
-
-      {/* Delete Board Confirmation */}
-      <ConfirmationDialog
-        isOpen={!!boardToDelete}
-        title="Delete Board?"
-        message={`Are you sure you want to delete "${boardToDeleteObj?.name}"? All tasks inside will also be deleted.`}
-        confirmLabel="Delete Board"
-        onConfirm={confirmDeleteBoard}
-        onCancel={() => setBoardToDelete(null)}
       />
     </div>
   );

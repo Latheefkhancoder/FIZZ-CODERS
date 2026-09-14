@@ -44,10 +44,10 @@ export default function ConfirmationDialog({
         {message && <p className="dialog-message">{message}</p>}
 
         <div className="dialog-actions">
-          <button className="dialog-btn-cancel" onClick={onCancel}>
+          <button type="button" className="dialog-btn-cancel" onClick={onCancel}>
             Cancel
           </button>
-          <button className="dialog-btn-confirm" onClick={onConfirm}>
+          <button type="button" className="dialog-btn-confirm" onClick={onConfirm}>
             {confirmLabel}
           </button>
         </div>

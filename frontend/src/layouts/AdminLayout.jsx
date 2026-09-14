@@ -40,7 +40,7 @@ export default function AdminLayout() {
     navigate('/login');
   };
 
-  const initials = profile.name ? profile.name.charAt(0).toUpperCase() : 'A';
+  const initials = profile?.name ? profile.name.charAt(0).toUpperCase() : (profile?.email ? profile.email.charAt(0).toUpperCase() : 'A');
 
   return (
     <div className="admin-layout">
