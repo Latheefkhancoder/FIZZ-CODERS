@@ -1,116 +1,203 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useAdmin } from './AdminContext';
+import { taskService } from '../services/task.service';
+import { commentService } from '../services/comment.service';
+import { chatService } from '../services/chat.service';
+import { profileService } from '../services/profile.service';
+import { memberService } from '../services/member.service';
+import { activityService } from '../services/activity.service';
 
 /* ================================================================
    FIZZ-CONNECT — MemberContext
-   Scoped member view on top of the shared AdminContext workspace.
-   The CURRENT_MEMBER_ID represents the authenticated member.
-   Replace with real auth user ID when backend is connected.
+   Scoped member workspace backed by real Express + Firestore APIs.
+   Zero mock/seed data. Real authenticated user ID.
    ================================================================ */
 
 const MemberContext = createContext(null);
 
-// The currently logged-in member (Priya, m2).
-// Replace with auth token payload when backend is integrated.
-export const CURRENT_MEMBER_ID = 'm2';
-
 export function MemberProvider({ children }) {
   const admin = useAdmin();
 
-  // Local bio state (additive — not in AdminContext seed)
-  const [bio, setBio] = useState('');
-  // Local name/email overrides for the member profile
-  const [profileOverride, setProfileOverride] = useState({});
-
-  // ── Derived member profile ────────────────────────────────────
-  const memberRecord = admin.members.find(m => m.id === CURRENT_MEMBER_ID) || {
-    id: CURRENT_MEMBER_ID,
-    name: 'Priya',
-    email: 'priya@gmail.com',
+  const [myTasks, setMyTasks] = useState([]);
+  const [loadingTasks, setLoadingTasks] = useState(false);
+  const [profile, setProfile] = useState(admin.profile || {
+    id: '',
+    name: 'Member',
+    email: '',
     role: 'Member',
-  };
+    bio: '',
+    initials: 'M',
+  });
 
-  const profile = {
-    ...memberRecord,
-    ...profileOverride,
-    bio,
-  };
+  // Current active board for the member
+  const [currentBoardId, setCurrentBoardId] = useState(() => {
+    return sessionStorage.getItem('fizz_current_board_id') || admin.activeBoardId || '';
+  });
 
-  // ── My Tasks selector ─────────────────────────────────────────
-  const getMyTasks = useCallback(() =>
-    admin.tasks.filter(t => t.assignee === CURRENT_MEMBER_ID),
-  [admin.tasks]);
+  // Board-scoped data for member view
+  const [boardMembers, setBoardMembers] = useState([]);
+  const [boardLogs, setBoardLogs] = useState([]);
+  const [boardChat, setBoardChat] = useState([]);
 
-  // ── Move task (member can move their own assigned tasks) ──────
-  const moveMyTask = useCallback((taskId, newStatus) => {
-    const task = admin.tasks.find(t => t.id === taskId);
-    if (!task) return;
-    // Use AdminContext moveTask — it updates shared state
-    admin.moveTask(taskId, newStatus);
+  // Sync profile when admin.profile changes
+  useEffect(() => {
+    if (admin.profile && admin.profile.id) {
+      setProfile(admin.profile);
+    }
+  }, [admin.profile]);
+
+  // Load member's real profile if not already loaded
+  useEffect(() => {
+    profileService.getProfile()
+      .then((data) => {
+        if (data) setProfile(data);
+      })
+      .catch((err) => {
+        console.warn('Could not load member profile:', err.message);
+      });
+  }, []);
+
+  // Determine active board ID
+  useEffect(() => {
+    if (!currentBoardId && admin.boards.length > 0) {
+      const firstId = admin.boards[0].id;
+      setCurrentBoardId(firstId);
+      sessionStorage.setItem('fizz_current_board_id', firstId);
+    }
+  }, [currentBoardId, admin.boards]);
+
+  // ── Fetch My Tasks ─────────────────────────────────────────────
+  const fetchMyTasks = useCallback(async () => {
+    try {
+      setLoadingTasks(true);
+      const data = await taskService.getMyTasks();
+      setMyTasks(data);
+      return data;
+    } catch (err) {
+      console.warn('Could not fetch assigned tasks for member:', err.message);
+      return [];
+    } finally {
+      setLoadingTasks(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchMyTasks();
+  }, [fetchMyTasks]);
+
+  // ── Board-scoped data for member ───────────────────────────────
+  const fetchBoardData = useCallback(async (boardId) => {
+    if (!boardId) return;
+    try {
+      const [membersData, logsData, chatData] = await Promise.all([
+        memberService.getBoardMembers(boardId).catch(() => []),
+        activityService.getActivityLogs(boardId).catch(() => []),
+        chatService.getChatMessages(boardId).catch(() => []),
+      ]);
+      setBoardMembers(membersData);
+      setBoardLogs(logsData);
+      setBoardChat(chatData);
+    } catch (err) {
+      console.warn('Error fetching board data for member:', err.message);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (currentBoardId) {
+      fetchBoardData(currentBoardId);
+    }
+  }, [currentBoardId, fetchBoardData]);
+
+  // ── Member Actions ─────────────────────────────────────────────
+  const moveMyTask = useCallback(async (taskId, newStatus) => {
+    // Optimistic UI update
+    setMyTasks(prev => prev.map(t => t.id === taskId ? { ...t, status: newStatus } : t));
+    try {
+      const updated = await taskService.updateTaskStatus(taskId, newStatus);
+      setMyTasks(prev => prev.map(t => t.id === taskId ? updated : t));
+      if (currentBoardId) {
+        activityService.getActivityLogs(currentBoardId).then(setBoardLogs).catch(() => {});
+      }
+      return updated;
+    } catch (err) {
+      fetchMyTasks();
+      throw err;
+    }
+  }, [currentBoardId, fetchMyTasks]);
+
+  const addMyComment = useCallback(async (taskId, text) => {
+    const comment = await commentService.addComment(taskId, text);
+    setMyTasks(prev => prev.map(t => {
+      if (t.id === taskId) {
+        const existing = Array.isArray(t.comments) ? t.comments : [];
+        return { ...t, comments: [...existing, comment] };
+      }
+      return t;
+    }));
+    return comment;
+  }, []);
+
+  const sendMyChatMessage = useCallback(async (text) => {
+    const targetBoardId = currentBoardId || admin.activeBoardId;
+    if (!targetBoardId) {
+      throw new Error('Please join or select a board before sending chat messages.');
+    }
+    const msg = await chatService.sendMessage(targetBoardId, text);
+    setBoardChat(prev => [...prev, msg]);
+    return msg;
+  }, [currentBoardId, admin.activeBoardId]);
+
+  const updateMyProfile = useCallback(async (updates) => {
+    const updated = await profileService.updateProfile(updates);
+    if (updated) {
+      setProfile(prev => ({
+        ...prev,
+        ...updated,
+        initials: updated.name ? updated.name[0].toUpperCase() : prev.initials,
+      }));
+      admin.fetchProfile();
+    }
+    return updated;
   }, [admin]);
 
-  // ── Add comment (shared thread, sent as member name) ──────────
-  // AdminContext.addComment uses the admin profile.name.
-  // We call addComment directly then patch author via updateTask.
-  const addMyComment = useCallback((taskId, text) => {
-    // Build the comment manually so author = member name
-    const comment = {
-      id: `mc_${Date.now()}_${Math.random().toString(36).slice(2)}`,
-      taskId,
-      author: profile.name,
-      text,
-      timestamp: new Date().toISOString(),
-    };
-    // Patch tasks state via AdminContext.updateTask (merges comments)
-    const task = admin.tasks.find(t => t.id === taskId);
-    if (!task) return;
-    admin.updateTask(taskId, {
-      comments: [...task.comments, comment],
-    });
-    return comment;
-  }, [admin, profile.name]);
-
-  // ── Send chat message (member name) ───────────────────────────
-  // AdminContext.sendChatMessage uses admin profile.name.
-  // We call addChatMessageDirect which we will expose in AdminContext.
-  const sendMyChatMessage = useCallback((text) => {
-    admin.sendChatMessageAs(profile.name, text);
-  }, [admin, profile.name]);
-
-  // ── Update member profile ─────────────────────────────────────
-  const updateMyProfile = useCallback((updates) => {
-    if (updates.bio !== undefined) setBio(updates.bio);
-    if (updates.name !== undefined || updates.email !== undefined) {
-      setProfileOverride(prev => ({
-        ...prev,
-        ...(updates.name  !== undefined && { name:  updates.name  }),
-        ...(updates.email !== undefined && { email: updates.email }),
-      }));
+  const selectCurrentBoard = useCallback((boardId) => {
+    setCurrentBoardId(boardId);
+    if (boardId) {
+      sessionStorage.setItem('fizz_current_board_id', boardId);
+    } else {
+      sessionStorage.removeItem('fizz_current_board_id');
     }
   }, []);
 
   const value = {
     // Member identity
     profile,
-    memberId: CURRENT_MEMBER_ID,
+    memberId: profile.id,
 
-    // Shared workspace state (read access)
-    tasks:   admin.tasks,
-    members: admin.members,
-    boards:  admin.boards,
-    logs:    admin.logs,
-    chat:    admin.chat,
+    // Real API workspace state
+    tasks: myTasks,
+    members: boardMembers.length > 0 ? boardMembers : admin.members,
+    boards: admin.boards,
+    logs: boardLogs.length > 0 ? boardLogs : admin.logs,
+    chat: boardChat.length > 0 ? boardChat : admin.chat,
+    currentBoardId,
+    loadingTasks,
 
     // Member-scoped actions
-    getMyTasks,
+    getMyTasks: () => myTasks,
+    fetchMyTasks,
     moveMyTask,
     addMyComment,
     sendMyChatMessage,
     updateMyProfile,
+    selectCurrentBoard,
 
     // Helpers
-    getMemberById: admin.getMemberById,
-    getBoardById:  admin.getBoardById,
+    getMemberById: (id) => {
+      const allMembers = boardMembers.length > 0 ? boardMembers : admin.members;
+      return allMembers.find(m => m.userId === id || m.id === id);
+    },
+    getBoardById: admin.getBoardById,
   };
 
   return (

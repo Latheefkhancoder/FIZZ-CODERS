@@ -1,14 +1,12 @@
 const request = require("supertest");
 const app = require("../../src/app");
-const { memoryStore, userRepository } = require("../../src/repositories");
+const { db } = require("../../src/config/firebase");
 const { generateJwt } = require("../../src/utils/crypto");
 
 describe("Profile Integration Tests", () => {
   let token;
 
-  beforeEach(() => {
-    memoryStore.clear();
-
+  beforeEach(async () => {
     token = generateJwt({
       id: "usr_alice",
       name: "Alice",
@@ -16,20 +14,19 @@ describe("Profile Integration Tests", () => {
       role: "Member",
     });
 
-    jest.spyOn(userRepository, "findById").mockImplementation(async (id) => {
-      const stored = memoryStore.userProfiles.get(String(id)) || {};
-      return {
-        id: String(id),
-        name: stored.name || "Alice",
-        email: "alice@fizz.com",
-        role: "Member",
-        bio: stored.bio || "",
-      };
+    await db.collection("userProfiles").doc("usr_alice").set({
+      id: "usr_alice",
+      name: "Alice",
+      email: "alice@fizz.com",
+      role: "Member",
+      bio: "",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     });
   });
 
-  afterEach(() => {
-    jest.restoreAllMocks();
+  afterEach(async () => {
+    await db.collection("userProfiles").doc("usr_alice").delete().catch(() => {});
   });
 
   describe("GET & PATCH /api/profile", () => {

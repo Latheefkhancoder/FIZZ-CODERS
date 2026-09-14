@@ -11,6 +11,7 @@ export default function AddMemberForm({ onAdd }) {
   const [email, setEmail] = useState('');
   const [role,  setRole]  = useState('Member');
   const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   const validate = () => {
     if (!email.trim()) return 'Email is required.';
@@ -18,14 +19,21 @@ export default function AddMemberForm({ onAdd }) {
     return '';
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const err = validate();
     if (err) { setError(err); return; }
-    onAdd(email.trim(), role);
-    setEmail('');
-    setRole('Member');
+    setSubmitting(true);
     setError('');
+    try {
+      await onAdd(email.trim(), role);
+      setEmail('');
+      setRole('Member');
+    } catch (apiErr) {
+      setError(apiErr.message || 'Failed to add member.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -55,8 +63,8 @@ export default function AddMemberForm({ onAdd }) {
           ))}
         </select>
 
-        <button type="submit" className="add-member-btn" id="add-member-submit-btn">
-          + Add Member
+        <button type="submit" className="add-member-btn" id="add-member-submit-btn" disabled={submitting}>
+          {submitting ? 'Adding...' : '+ Add Member'}
         </button>
       </div>
     </form>

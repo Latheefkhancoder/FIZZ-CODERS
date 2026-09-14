@@ -1,11 +1,19 @@
 const { memberService, boardService } = require("../../src/services");
-const { memoryStore, userRepository } = require("../../src/repositories");
+const { boardRepository, userRepository } = require("../../src/repositories");
 
 describe("Member Service Unit Tests", () => {
   let board;
 
+  const cleanupBoardByCode = async (code) => {
+    const existing = await boardRepository.findByCode(code);
+    if (existing) {
+      await boardService.deleteBoard(existing.id, existing.ownerId, "cleanup").catch(() => {});
+    }
+  };
+
   beforeEach(async () => {
-    memoryStore.clear();
+    await cleanupBoardByCode("ORG01");
+
     board = await boardService.createBoard({
       name: "Org Board",
       code: "ORG01",
@@ -27,8 +35,12 @@ describe("Member Service Unit Tests", () => {
     });
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     jest.restoreAllMocks();
+    if (board && board.id) {
+      await boardService.deleteBoard(board.id, "user_owner", "Board Owner").catch(() => {});
+    }
+    await cleanupBoardByCode("ORG01");
   });
 
   describe("addMember", () => {

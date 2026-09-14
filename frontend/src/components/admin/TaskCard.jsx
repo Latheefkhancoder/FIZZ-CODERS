@@ -27,13 +27,14 @@ const IconMore = () => (
 );
 
 /**
- * TaskCard — Compact kanban card shown in a column.
- * Props: task, onClick, onDelete
+ * TaskCard — Compact kanban card shown in a column with drag support.
+ * Props: task, onClick, onDelete, onDragStart, onDragEnd, isDragging
  */
-export default function TaskCard({ task, onClick, onDelete }) {
+export default function TaskCard({ task, onClick, onDelete, onDragStart, onDragEnd, isDragging }) {
   const { getMemberById } = useAdmin();
   const member = task.assignee ? getMemberById(task.assignee) : null;
-  const initials = member ? member.name.charAt(0).toUpperCase() : '?';
+  const displayName = member ? member.name : (task.assignee ? 'Assigned' : 'Unassigned');
+  const initials = displayName.charAt(0).toUpperCase();
 
   const handleDeleteClick = (e) => {
     e.stopPropagation();
@@ -41,22 +42,25 @@ export default function TaskCard({ task, onClick, onDelete }) {
   };
 
   const dueDateStr = task.dueDate
-    ? new Date(task.dueDate + 'T00:00:00').toLocaleDateString('en-US', {
+    ? new Date(task.dueDate + (task.dueDate.includes('T') ? '' : 'T00:00:00')).toLocaleDateString('en-US', {
         month: 'short', day: 'numeric', year: 'numeric',
       })
     : null;
 
   return (
     <div
-      className="task-card"
+      className={`task-card ${isDragging ? 'card-dragging' : ''}`}
       onClick={() => onClick(task)}
       role="button"
       tabIndex={0}
+      draggable={!!onDragStart}
+      onDragStart={onDragStart ? (e) => onDragStart(e, task.id) : undefined}
+      onDragEnd={onDragEnd}
       onKeyDown={(e) => e.key === 'Enter' && onClick(task)}
     >
       {/* Header row */}
       <div className="task-card-header">
-        <span className={`task-priority-badge ${PRIORITY_CLASSES[task.priority] || ''}`}>
+        <span className={`task-priority-badge ${PRIORITY_CLASSES[task.priority] || 'priority-medium'}`}>
           {task.priority}
         </span>
         <button
@@ -80,9 +84,9 @@ export default function TaskCard({ task, onClick, onDelete }) {
 
       {/* Footer: assignee + due date */}
       <div className="task-card-footer">
-        <div className="task-card-assignee" title={member ? member.name : 'Unassigned'}>
+        <div className="task-card-assignee" title={displayName}>
           <span className="assignee-avatar">{initials}</span>
-          <span className="assignee-name">{member ? member.name : 'Unassigned'}</span>
+          <span className="assignee-name">{displayName}</span>
         </div>
 
         {dueDateStr && (

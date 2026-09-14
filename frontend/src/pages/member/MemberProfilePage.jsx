@@ -1,34 +1,62 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useMember } from '../../context/MemberContext';
 import './MemberProfilePage.css';
 
 /**
- * MemberProfilePage — Allows member to update their own bio, name, email.
+ * MemberProfilePage — Allows member to update their own bio and name.
  */
 export default function MemberProfilePage() {
   const { profile, updateMyProfile } = useMember();
   
   const [formData, setFormData] = useState({
-    name: profile.name || '',
-    email: profile.email || '',
-    bio: profile.bio || ''
+    name: profile?.name || '',
+    email: profile?.email || '',
+    bio: profile?.bio || ''
   });
 
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (profile) {
+      setFormData({
+        name: profile.name || '',
+        email: profile.email || '',
+        bio: profile.bio || ''
+      });
+    }
+  }, [profile]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setSaved(false);
+    setError('');
   };
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
-    updateMyProfile(formData);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+    if (!formData.name.trim()) {
+      setError('Full name is required.');
+      return;
+    }
+    setSaving(true);
+    setError('');
+    try {
+      await updateMyProfile({
+        name: formData.name.trim(),
+        bio: formData.bio ? formData.bio.trim() : '',
+      });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (err) {
+      setError(err.message || 'Failed to update profile.');
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const initials = profile.name ? profile.name.charAt(0).toUpperCase() : 'M';
+  const initials = profile?.name ? profile.name.charAt(0).toUpperCase() : 'M';
 
   return (
     <div className="member-profile-page">
@@ -47,14 +75,20 @@ export default function MemberProfilePage() {
               {initials}
             </div>
             <div className="member-profile-header-text">
-              <h2>{profile.name}</h2>
-              <span className="member-profile-role-badge">{profile.role}</span>
+              <h2>{profile?.name}</h2>
+              <span className="member-profile-role-badge">{profile?.role || 'Member'}</span>
             </div>
           </div>
 
           <form className="member-profile-form" onSubmit={handleSave}>
+            {error && (
+              <div style={{ color: '#f87171', marginBottom: '1rem', fontSize: '0.875rem' }}>
+                {error}
+              </div>
+            )}
+
             <div className="member-form-group">
-              <label htmlFor="name">Full Name</label>
+              <label htmlFor="name">Full Name *</label>
               <input
                 id="name"
                 name="name"
@@ -66,14 +100,16 @@ export default function MemberProfilePage() {
             </div>
 
             <div className="member-form-group">
-              <label htmlFor="email">Email Address</label>
+              <label htmlFor="email">Email Address (Account ID)</label>
               <input
                 id="email"
                 name="email"
                 type="email"
                 value={formData.email}
-                onChange={handleChange}
-                required
+                disabled
+                readOnly
+                title="Email cannot be changed as it is your account identifier"
+                style={{ opacity: 0.6, cursor: 'not-allowed' }}
               />
             </div>
 
@@ -91,8 +127,8 @@ export default function MemberProfilePage() {
 
             <div className="member-form-actions">
               {saved && <span className="member-save-success">Profile updated successfully!</span>}
-              <button type="submit" className="member-btn-primary">
-                Save Changes
+              <button type="submit" className="member-btn-primary" disabled={saving}>
+                {saving ? 'Saving...' : 'Save Changes'}
               </button>
             </div>
           </form>

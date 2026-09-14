@@ -1,14 +1,22 @@
 const request = require("supertest");
 const app = require("../../src/app");
-const { memoryStore, userRepository } = require("../../src/repositories");
+const { boardRepository, userRepository } = require("../../src/repositories");
+const { boardService } = require("../../src/services");
 const { generateJwt } = require("../../src/utils/crypto");
 
 describe("Member Integration Tests", () => {
   let adminToken;
   let boardId;
 
+  const cleanupBoardByCode = async (code) => {
+    const existing = await boardRepository.findByCode(code);
+    if (existing) {
+      await boardService.deleteBoard(existing.id, existing.ownerId, "cleanup").catch(() => {});
+    }
+  };
+
   beforeEach(async () => {
-    memoryStore.clear();
+    await cleanupBoardByCode("MEM01");
 
     adminToken = generateJwt({
       id: "admin_1",
@@ -37,8 +45,12 @@ describe("Member Integration Tests", () => {
     });
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     jest.restoreAllMocks();
+    if (boardId) {
+      await boardService.deleteBoard(boardId, "admin_1", "Admin Alice").catch(() => {});
+    }
+    await cleanupBoardByCode("MEM01");
   });
 
   describe("Member Management", () => {

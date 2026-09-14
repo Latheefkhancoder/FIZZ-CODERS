@@ -18,9 +18,19 @@ function formatChatTime(isoString) {
  * AdminTeamChatbotPage — General team communication channel (not task-specific).
  */
 export default function AdminTeamChatbotPage() {
-  const { chat, sendChatMessage, profile, members } = useAdmin();
-  const [text,       setText]    = useState('');
+  const {
+    chat,
+    sendChatMessage,
+    profile,
+    members,
+    boards,
+    activeBoardId,
+    selectBoard,
+  } = useAdmin();
+  const [text, setText] = useState('');
   const bottomRef = useRef(null);
+
+  const currentBoard = boards.find(b => b.id === activeBoardId);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -41,8 +51,14 @@ export default function AdminTeamChatbotPage() {
     }
   };
 
+  const myName = profile?.name || 'Admin';
   // All participants
-  const allParticipants = [profile.name, ...members.filter(m => m.name !== profile.name).map(m => m.name)];
+  const allParticipants = [
+    myName,
+    ...members
+      .map(m => m.name || m.user?.name)
+      .filter(name => Boolean(name) && name !== myName),
+  ];
 
   return (
     <div className="chatbot-page">
@@ -50,22 +66,43 @@ export default function AdminTeamChatbotPage() {
       <div className="chatbot-header">
         <div>
           <h1 className="chatbot-title">Team Chatbot</h1>
-          <p className="chatbot-subtitle">Discuss, share ideas, and stay connected with your team.</p>
+          <p className="chatbot-subtitle">
+            {currentBoard ? `Team chat for ${currentBoard.name} (Code: ${currentBoard.code})` : 'Discuss, share ideas, and stay connected with your team.'}
+          </p>
         </div>
 
-        {/* Participant avatars */}
-        <div className="chatbot-participants">
-          {allParticipants.slice(0, 7).map((name, i) => (
-            <span key={i} className="participant-avatar" title={name}>
-              {name.charAt(0).toUpperCase()}
-            </span>
-          ))}
-          {allParticipants.length > 7 && (
-            <span className="participant-more">+{allParticipants.length - 7}</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+          {boards.length > 1 && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <label htmlFor="chat-board-select" style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Board:</label>
+              <select
+                id="chat-board-select"
+                value={activeBoardId}
+                onChange={(e) => selectBoard(e.target.value)}
+                className="filter-select"
+                style={{ width: 'auto', padding: '6px 12px' }}
+              >
+                {boards.map(b => (
+                  <option key={b.id} value={b.id}>{b.name} ({b.code})</option>
+                ))}
+              </select>
+            </div>
           )}
-          <span className="participants-label">
-            {allParticipants.length} member{allParticipants.length !== 1 ? 's' : ''}
-          </span>
+
+          {/* Participant avatars */}
+          <div className="chatbot-participants">
+            {allParticipants.slice(0, 7).map((name, i) => (
+              <span key={i} className="participant-avatar" title={name}>
+                {name.charAt(0).toUpperCase()}
+              </span>
+            ))}
+            {allParticipants.length > 7 && (
+              <span className="participant-more">+{allParticipants.length - 7}</span>
+            )}
+            <span className="participants-label">
+              {allParticipants.length} member{allParticipants.length !== 1 ? 's' : ''}
+            </span>
+          </div>
         </div>
       </div>
 

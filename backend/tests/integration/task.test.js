@@ -1,14 +1,22 @@
 const request = require("supertest");
 const app = require("../../src/app");
-const { memoryStore } = require("../../src/repositories");
+const { boardRepository } = require("../../src/repositories");
+const { boardService } = require("../../src/services");
 const { generateJwt } = require("../../src/utils/crypto");
 
 describe("Task Integration Tests", () => {
   let token;
   let boardId;
 
+  const cleanupBoardByCode = async (code) => {
+    const existing = await boardRepository.findByCode(code);
+    if (existing) {
+      await boardService.deleteBoard(existing.id, existing.ownerId, "cleanup").catch(() => {});
+    }
+  };
+
   beforeEach(async () => {
-    memoryStore.clear();
+    await cleanupBoardByCode("TSK01");
 
     token = generateJwt({
       id: "usr_alice",
@@ -23,6 +31,13 @@ describe("Task Integration Tests", () => {
       .send({ name: "Task Testing Board", code: "TSK01" });
 
     boardId = boardRes.body.data.id;
+  });
+
+  afterEach(async () => {
+    if (boardId) {
+      await boardService.deleteBoard(boardId, "usr_alice", "Alice").catch(() => {});
+    }
+    await cleanupBoardByCode("TSK01");
   });
 
   describe("Task Lifecycle", () => {

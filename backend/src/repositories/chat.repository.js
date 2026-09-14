@@ -1,8 +1,8 @@
-const memoryStore = require("./memoryStore");
+const { db } = require("../config/firebase");
 
 /**
  * Chat Repository
- * Manages team chat messages for boards with in-memory persistence.
+ * Manages team chat messages for boards using Firebase Firestore.
  */
 class ChatRepository {
   /**
@@ -15,11 +15,11 @@ class ChatRepository {
    * @returns {Promise<object>}
    */
   async create({ boardId, author, authorId, text }) {
-    const id = `ch_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+    const chatRef = db.collection("chatMessages").doc();
     const now = new Date().toISOString();
 
     const message = {
-      id,
+      id: chatRef.id,
       boardId: String(boardId),
       author: author || "User",
       authorId: String(authorId),
@@ -28,7 +28,7 @@ class ChatRepository {
       createdAt: now,
     };
 
-    memoryStore.chatMessages.set(id, message);
+    await chatRef.set(message);
     return { ...message };
   }
 
@@ -38,14 +38,16 @@ class ChatRepository {
    * @returns {Promise<Array<object>>}
    */
   async findByBoardId(boardId) {
-    const boardIdStr = String(boardId);
-    const results = [];
+    if (!boardId) return [];
 
-    for (const msg of memoryStore.chatMessages.values()) {
-      if (msg.boardId === boardIdStr) {
-        results.push({ ...msg });
-      }
-    }
+    const snapshot = await db.collection("chatMessages")
+      .where("boardId", "==", String(boardId))
+      .get();
+
+    const results = snapshot.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
 
     return results.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
   }
@@ -56,16 +58,25 @@ class ChatRepository {
    * @returns {Promise<number>}
    */
   async deleteByBoardId(boardId) {
-    const boardIdStr = String(boardId);
-    let count = 0;
+    if (!boardId) return 0;
 
-    for (const [id, msg] of memoryStore.chatMessages.entries()) {
-      if (msg.boardId === boardIdStr) {
-        memoryStore.chatMessages.delete(id);
-        count++;
-      }
+    const snapshot = await db.collection("chatMessages")
+      .where("boardId", "==", String(boardId))
+      .get();
+
+    if (snapshot.empty) return 0;
+
+    const docs = snapshot.docs;
+    const batchSize = 400;
+
+    for (let i = 0; i < docs.length; i += batchSize) {
+      const batch = db.batch();
+      const chunk = docs.slice(i, i + batchSize);
+      chunk.forEach((d) => batch.delete(d.ref));
+      await batch.commit();
     }
-    return count;
+
+    return docs.length;
   }
 }
 

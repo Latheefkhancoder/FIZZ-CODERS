@@ -10,13 +10,30 @@ const COLUMN_CONFIG = {
 
 /**
  * KanbanColumn — One column in the Kanban board.
- * Props: status, tasks, onTaskClick, onDeleteTask, onAddTask
+ * Props: status, tasks, onTaskClick, onDeleteTask, onAddTask, onDragOver, onDrop, onDragStart, onDragEnd, dragOverCol, dragTaskId
  */
-export default function KanbanColumn({ status, tasks, onTaskClick, onDeleteTask, onAddTask }) {
+export default function KanbanColumn({
+  status,
+  tasks,
+  onTaskClick,
+  onDeleteTask,
+  onAddTask,
+  onDragOver,
+  onDrop,
+  onDragStart,
+  onDragEnd,
+  dragOverCol,
+  dragTaskId,
+}) {
   const config = COLUMN_CONFIG[status] || { label: status, dotClass: '' };
+  const isOver = dragOverCol === status;
 
   return (
-    <div className="kanban-column">
+    <div
+      className={`kanban-column ${isOver ? 'col-drag-over' : ''}`}
+      onDragOver={onDragOver ? (e) => onDragOver(e, status) : undefined}
+      onDrop={onDrop ? (e) => onDrop(e, status) : undefined}
+    >
       {/* Column header */}
       <div className="kanban-col-header">
         <div className="kanban-col-title-row">
@@ -39,6 +56,9 @@ export default function KanbanColumn({ status, tasks, onTaskClick, onDeleteTask,
               task={task}
               onClick={onTaskClick}
               onDelete={onDeleteTask}
+              onDragStart={onDragStart}
+              onDragEnd={onDragEnd}
+              isDragging={dragTaskId === task.id}
             />
           ))
         )}

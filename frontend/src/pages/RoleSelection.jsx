@@ -19,8 +19,12 @@ export default function RoleSelection() {
 
   const handleLogout = () => {
     sessionStorage.removeItem('auth_token');
+    sessionStorage.removeItem('fizz_token');
     sessionStorage.removeItem('fizz_role');
+    sessionStorage.removeItem('fizz_active_board_id');
+    sessionStorage.removeItem('fizz_current_board_id');
     localStorage.removeItem('auth_token');
+    localStorage.removeItem('fizz_token');
     localStorage.removeItem('fizz_role');
     navigate('/login');
   };

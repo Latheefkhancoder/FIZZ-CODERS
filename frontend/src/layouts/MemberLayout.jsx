@@ -29,10 +29,16 @@ export default function MemberLayout() {
 
   const handleLogout = () => {
     sessionStorage.removeItem('fizz_role');
+    sessionStorage.removeItem('fizz_token');
+    sessionStorage.removeItem('auth_token');
+    sessionStorage.removeItem('fizz_current_board_id');
+    localStorage.removeItem('fizz_role');
+    localStorage.removeItem('fizz_token');
+    localStorage.removeItem('auth_token');
     navigate('/login');
   };
 
-  const initials = profile.name ? profile.name.charAt(0).toUpperCase() : 'M';
+  const initials = profile?.name ? profile.name.charAt(0).toUpperCase() : 'M';
 
   return (
     <div className="member-layout">
@@ -123,7 +129,7 @@ export default function MemberLayout() {
             >
               {initials}
             </button>
-            <span className="member-topbar-username">{profile.name}</span>
+            <span className="member-topbar-username">{profile?.name || 'Member'}</span>
             <span className="member-topbar-role-chip">Member</span>
 
             {profileMenuOpen && (

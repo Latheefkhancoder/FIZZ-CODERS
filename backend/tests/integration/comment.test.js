@@ -1,14 +1,23 @@
 const request = require("supertest");
 const app = require("../../src/app");
-const { memoryStore } = require("../../src/repositories");
+const { boardRepository } = require("../../src/repositories");
+const { boardService } = require("../../src/services");
 const { generateJwt } = require("../../src/utils/crypto");
 
 describe("Comment Integration Tests", () => {
   let token;
   let taskId;
+  let boardId;
+
+  const cleanupBoardByCode = async (code) => {
+    const existing = await boardRepository.findByCode(code);
+    if (existing) {
+      await boardService.deleteBoard(existing.id, existing.ownerId, "cleanup").catch(() => {});
+    }
+  };
 
   beforeEach(async () => {
-    memoryStore.clear();
+    await cleanupBoardByCode("COM01");
 
     token = generateJwt({
       id: "usr_alice",
@@ -22,12 +31,21 @@ describe("Comment Integration Tests", () => {
       .set("Authorization", `Bearer ${token}`)
       .send({ name: "Comment Test Board", code: "COM01" });
 
+    boardId = boardRes.body.data.id;
+
     const taskRes = await request(app)
-      .post(`/api/boards/${boardRes.body.data.id}/tasks`)
+      .post(`/api/boards/${boardId}/tasks`)
       .set("Authorization", `Bearer ${token}`)
       .send({ title: "Task with comments" });
 
     taskId = taskRes.body.data.id;
+  });
+
+  afterEach(async () => {
+    if (boardId) {
+      await boardService.deleteBoard(boardId, "usr_alice", "Alice").catch(() => {});
+    }
+    await cleanupBoardByCode("COM01");
   });
 
   describe("POST & GET /api/tasks/:taskId/comments", () => {

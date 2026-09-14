@@ -1,14 +1,38 @@
 const request = require("supertest");
 const app = require("../../src/app");
-const { memoryStore } = require("../../src/repositories");
+const { boardRepository } = require("../../src/repositories");
+const { boardService } = require("../../src/services");
 const { generateJwt } = require("../../src/utils/crypto");
 
 describe("Board Integration Tests", () => {
   let user1Token;
   let user2Token;
 
-  beforeEach(() => {
-    memoryStore.clear();
+  const TEST_CODES = ["T1T2N", "ALC01", "BOB01", "JOIN1", "SCR01", "DEL01"];
+
+  const cleanupTestBoards = async () => {
+    // Delete any boards matching test codes
+    for (const code of TEST_CODES) {
+      const existing = await boardRepository.findByCode(code);
+      if (existing) {
+        await boardService.deleteBoard(existing.id, existing.ownerId, "cleanup").catch(() => {});
+      }
+    }
+
+    // Delete any remaining boards owned by usr_1 or usr_2
+    const u1Boards = await boardRepository.findUserBoards("usr_1");
+    for (const b of u1Boards) {
+      await boardService.deleteBoard(b.id, b.ownerId, "cleanup").catch(() => {});
+    }
+
+    const u2Boards = await boardRepository.findUserBoards("usr_2");
+    for (const b of u2Boards) {
+      await boardService.deleteBoard(b.id, b.ownerId, "cleanup").catch(() => {});
+    }
+  };
+
+  beforeEach(async () => {
+    await cleanupTestBoards();
 
     user1Token = generateJwt({
       id: "usr_1",
@@ -23,6 +47,10 @@ describe("Board Integration Tests", () => {
       email: "bob@fizz.com",
       role: "Member",
     });
+  });
+
+  afterAll(async () => {
+    await cleanupTestBoards();
   });
 
   describe("POST /api/boards", () => {

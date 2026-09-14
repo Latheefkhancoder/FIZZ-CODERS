@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAdmin } from '../../context/AdminContext';
 import KanbanColumn from './KanbanColumn';
 import TaskDetails from './TaskDetails';
@@ -21,7 +21,14 @@ const IconArrowLeft = () => (
  * Props: board, onBack
  */
 export default function BoardView({ board, onBack }) {
-  const { getBoardTasks, createTask, deleteTask } = useAdmin();
+  const {
+    getBoardTasks,
+    fetchBoardTasks,
+    fetchMembers,
+    createTask,
+    deleteTask,
+    moveTask,
+  } = useAdmin();
 
   const [search,         setSearch]         = useState('');
   const [priorityFilter, setPriorityFilter] = useState('All');
@@ -30,13 +37,25 @@ export default function BoardView({ board, onBack }) {
   const [taskToDelete,   setTaskToDelete]   = useState(null);
   const [createModalOpen, setCreateModalOpen] = useState(false);
 
+  // Drag & drop state
+  const [dragTaskId,   setDragTaskId]   = useState(null);
+  const [dragOverCol,  setDragOverCol]  = useState(null);
+
+  // Fetch board tasks and board members when board ID changes
+  useEffect(() => {
+    if (board && board.id) {
+      fetchBoardTasks(board.id);
+      fetchMembers(board.id);
+    }
+  }, [board?.id, fetchBoardTasks, fetchMembers]);
+
   const allTasks = getBoardTasks(board.id);
 
   const filteredTasks = useMemo(() => {
     return allTasks.filter(task => {
       const matchSearch = !search.trim() ||
         task.title.toLowerCase().includes(search.toLowerCase()) ||
-        task.description.toLowerCase().includes(search.toLowerCase());
+        (task.description && task.description.toLowerCase().includes(search.toLowerCase()));
       const matchPriority = priorityFilter === 'All' || task.priority === priorityFilter;
       const matchAssignee = assigneeFilter === 'All' || task.assignee === assigneeFilter;
       return matchSearch && matchPriority && matchAssignee;
@@ -45,18 +64,49 @@ export default function BoardView({ board, onBack }) {
 
   const getColumnTasks = (status) => filteredTasks.filter(t => t.status === status);
 
+  /* ── Drag & drop handlers ── */
+  const handleDragStart = (e, taskId) => {
+    setDragTaskId(taskId);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e, status) => {
+    e.preventDefault();
+    setDragOverCol(status);
+  };
+
+  const handleDrop = async (e, status) => {
+    e.preventDefault();
+    if (dragTaskId) {
+      try {
+        await moveTask(dragTaskId, status);
+      } catch (err) {
+        console.error('Failed to move task:', err);
+      }
+    }
+    setDragTaskId(null);
+    setDragOverCol(null);
+  };
+
+  const handleDragEnd = () => {
+    setDragTaskId(null);
+    setDragOverCol(null);
+  };
+
   const handleDeleteTask = (taskId) => {
     setSelectedTask(null);
     setTaskToDelete(taskId);
   };
 
-  const confirmDeleteTask = () => {
-    if (taskToDelete) deleteTask(taskToDelete);
+  const confirmDeleteTask = async () => {
+    if (taskToDelete) {
+      await deleteTask(taskToDelete);
+    }
     setTaskToDelete(null);
   };
 
-  const handleCreateTask = (boardId, taskData) => {
-    createTask(boardId, taskData);
+  const handleCreateTask = async (boardId, taskData) => {
+    await createTask(boardId, taskData);
   };
 
   return (
@@ -120,6 +170,12 @@ export default function BoardView({ board, onBack }) {
             onTaskClick={setSelectedTask}
             onDeleteTask={handleDeleteTask}
             onAddTask={() => setCreateModalOpen(true)}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
+            dragOverCol={dragOverCol}
+            dragTaskId={dragTaskId}
           />
         ))}
       </div>
@@ -153,3 +209,4 @@ export default function BoardView({ board, onBack }) {
     </div>
   );
 }
+

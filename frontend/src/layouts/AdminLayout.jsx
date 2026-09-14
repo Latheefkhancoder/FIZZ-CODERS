@@ -31,6 +31,12 @@ export default function AdminLayout() {
 
   const handleLogout = () => {
     sessionStorage.removeItem('fizz_role');
+    sessionStorage.removeItem('fizz_token');
+    sessionStorage.removeItem('auth_token');
+    sessionStorage.removeItem('fizz_active_board_id');
+    localStorage.removeItem('fizz_role');
+    localStorage.removeItem('fizz_token');
+    localStorage.removeItem('auth_token');
     navigate('/login');
   };
 
@@ -120,7 +126,7 @@ export default function AdminLayout() {
             >
               {initials}
             </button>
-            <span className="topbar-username">Admin</span>
+            <span className="topbar-username">{profile.name || 'Admin'}</span>
 
             {profileMenuOpen && (
               <div className="profile-dropdown-menu">

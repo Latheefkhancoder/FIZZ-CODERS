@@ -34,7 +34,9 @@ export default function TaskFilters({ priority, assignee, onPriorityChange, onAs
       >
         <option value="All">Assignee</option>
         {members.map((m) => (
-          <option key={m.id} value={m.id}>{m.name}</option>
+          <option key={m.id || m.userId} value={m.userId || m.id}>
+            {m.name || m.user?.name || m.email || 'Member'}
+          </option>
         ))}
       </select>
     </div>

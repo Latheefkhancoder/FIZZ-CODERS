@@ -1,8 +1,8 @@
-const memoryStore = require("./memoryStore");
+const { db } = require("../config/firebase");
 
 /**
  * Board Member Repository
- * Manages board membership records with in-memory persistence.
+ * Manages board membership records using Firebase Firestore.
  */
 class MemberRepository {
   /**
@@ -12,15 +12,15 @@ class MemberRepository {
    * @param {string} params.userId
    * @param {string} params.name
    * @param {string} params.email
-   * @param {string} [params.role] - 'Admin' or 'Member'
+   * @param {string} [params.role='Member'] - 'Admin' or 'Member'
    * @returns {Promise<object>}
    */
   async create({ boardId, userId, name, email, role = "Member" }) {
-    const id = `member_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+    const memberRef = db.collection("members").doc();
     const initials = (name && name.trim().length > 0) ? name.trim()[0].toUpperCase() : "U";
 
     const member = {
-      id,
+      id: memberRef.id,
       boardId: String(boardId),
       userId: String(userId),
       name: name ? name.trim() : "",
@@ -30,7 +30,7 @@ class MemberRepository {
       joinedAt: new Date().toISOString(),
     };
 
-    memoryStore.members.set(id, member);
+    await memberRef.set(member);
     return { ...member };
   }
 
@@ -41,15 +41,23 @@ class MemberRepository {
    * @returns {Promise<object|null>}
    */
   async findByBoardAndUser(boardId, userId) {
-    const boardIdStr = String(boardId);
-    const userIdStr = String(userId);
+    if (!boardId || !userId) return null;
 
-    for (const member of memoryStore.members.values()) {
-      if (member.boardId === boardIdStr && member.userId === userIdStr) {
-        return { ...member };
-      }
+    const snapshot = await db.collection("members")
+      .where("boardId", "==", String(boardId))
+      .where("userId", "==", String(userId))
+      .limit(1)
+      .get();
+
+    if (snapshot.empty) {
+      return null;
     }
-    return null;
+
+    const doc = snapshot.docs[0];
+    return {
+      ...doc.data(),
+      id: doc.id,
+    };
   }
 
   /**
@@ -58,8 +66,17 @@ class MemberRepository {
    * @returns {Promise<object|null>}
    */
   async findById(id) {
-    const member = memoryStore.members.get(String(id));
-    return member ? { ...member } : null;
+    if (!id) return null;
+
+    const doc = await db.collection("members").doc(String(id)).get();
+    if (!doc.exists) {
+      return null;
+    }
+
+    return {
+      ...doc.data(),
+      id: doc.id,
+    };
   }
 
   /**
@@ -68,14 +85,16 @@ class MemberRepository {
    * @returns {Promise<Array<object>>}
    */
   async findByBoardId(boardId) {
-    const boardIdStr = String(boardId);
-    const results = [];
+    if (!boardId) return [];
 
-    for (const member of memoryStore.members.values()) {
-      if (member.boardId === boardIdStr) {
-        results.push({ ...member });
-      }
-    }
+    const snapshot = await db.collection("members")
+      .where("boardId", "==", String(boardId))
+      .get();
+
+    const results = snapshot.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
 
     return results.sort((a, b) => new Date(a.joinedAt) - new Date(b.joinedAt));
   }
@@ -86,14 +105,19 @@ class MemberRepository {
    * @returns {Promise<Set<string>>}
    */
   async findUserBoardIds(userId) {
-    const userIdStr = String(userId);
-    const boardIds = new Set();
+    if (!userId) return new Set();
 
-    for (const member of memoryStore.members.values()) {
-      if (member.userId === userIdStr) {
-        boardIds.add(member.boardId);
+    const snapshot = await db.collection("members")
+      .where("userId", "==", String(userId))
+      .get();
+
+    const boardIds = new Set();
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      if (data.boardId) {
+        boardIds.add(String(data.boardId));
       }
-    }
+    });
 
     return boardIds;
   }
@@ -106,21 +130,33 @@ class MemberRepository {
    * @returns {Promise<object|null>}
    */
   async updateRole(boardId, userId, role) {
-    const boardIdStr = String(boardId);
-    const userIdStr = String(userId);
+    if (!boardId || !userId) return null;
 
-    for (const [id, member] of memoryStore.members.entries()) {
-      if (member.boardId === boardIdStr && member.userId === userIdStr) {
-        const updated = {
-          ...member,
-          role: role === "Admin" ? "Admin" : "Member",
-          updatedAt: new Date().toISOString(),
-        };
-        memoryStore.members.set(id, updated);
-        return { ...updated };
-      }
+    const snapshot = await db.collection("members")
+      .where("boardId", "==", String(boardId))
+      .where("userId", "==", String(userId))
+      .limit(1)
+      .get();
+
+    if (snapshot.empty) {
+      return null;
     }
-    return null;
+
+    const doc = snapshot.docs[0];
+    const updatedRole = role === "Admin" ? "Admin" : "Member";
+    const updatedAt = new Date().toISOString();
+
+    await doc.ref.update({
+      role: updatedRole,
+      updatedAt,
+    });
+
+    return {
+      ...doc.data(),
+      id: doc.id,
+      role: updatedRole,
+      updatedAt,
+    };
   }
 
   /**
@@ -130,16 +166,20 @@ class MemberRepository {
    * @returns {Promise<boolean>}
    */
   async delete(boardId, userId) {
-    const boardIdStr = String(boardId);
-    const userIdStr = String(userId);
+    if (!boardId || !userId) return false;
 
-    for (const [id, member] of memoryStore.members.entries()) {
-      if (member.boardId === boardIdStr && member.userId === userIdStr) {
-        memoryStore.members.delete(id);
-        return true;
-      }
+    const snapshot = await db.collection("members")
+      .where("boardId", "==", String(boardId))
+      .where("userId", "==", String(userId))
+      .limit(1)
+      .get();
+
+    if (snapshot.empty) {
+      return false;
     }
-    return false;
+
+    await snapshot.docs[0].ref.delete();
+    return true;
   }
 
   /**
@@ -148,16 +188,25 @@ class MemberRepository {
    * @returns {Promise<number>}
    */
   async deleteByBoardId(boardId) {
-    const boardIdStr = String(boardId);
-    let count = 0;
+    if (!boardId) return 0;
 
-    for (const [id, member] of memoryStore.members.entries()) {
-      if (member.boardId === boardIdStr) {
-        memoryStore.members.delete(id);
-        count++;
-      }
+    const snapshot = await db.collection("members")
+      .where("boardId", "==", String(boardId))
+      .get();
+
+    if (snapshot.empty) return 0;
+
+    const docs = snapshot.docs;
+    const batchSize = 400;
+
+    for (let i = 0; i < docs.length; i += batchSize) {
+      const batch = db.batch();
+      const chunk = docs.slice(i, i + batchSize);
+      chunk.forEach((d) => batch.delete(d.ref));
+      await batch.commit();
     }
-    return count;
+
+    return docs.length;
   }
 }
 

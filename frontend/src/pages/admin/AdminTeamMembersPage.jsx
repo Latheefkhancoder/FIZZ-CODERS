@@ -11,21 +11,32 @@ const ROLES = ['Admin', 'Member'];
  * AdminTeamMembersPage — View, add, edit role, and remove team members.
  */
 export default function AdminTeamMembersPage() {
-  const { members, addMember, updateMemberRole, removeMember } = useAdmin();
+  const {
+    members,
+    addMember,
+    updateMemberRole,
+    removeMember,
+    boards,
+    activeBoardId,
+    selectBoard,
+  } = useAdmin();
 
   const [memberToRemove,  setMemberToRemove]  = useState(null);
   const [editingMember,   setEditingMember]   = useState(null);
   const [editRole,        setEditRole]        = useState('');
 
-  const memberToRemoveObj = memberToRemove ? members.find(m => m.id === memberToRemove) : null;
+  const currentBoard = boards.find(b => b.id === activeBoardId);
+  const memberToRemoveObj = memberToRemove ? members.find(m => m.id === memberToRemove || m.userId === memberToRemove) : null;
 
   const handleEdit = (member) => {
     setEditingMember(member);
     setEditRole(member.role);
   };
 
-  const handleSaveRole = () => {
-    if (editingMember) updateMemberRole(editingMember.id, editRole);
+  const handleSaveRole = async () => {
+    if (editingMember) {
+      await updateMemberRole(editingMember.userId || editingMember.id, editRole);
+    }
     setEditingMember(null);
   };
 
@@ -33,9 +44,30 @@ export default function AdminTeamMembersPage() {
     <div className="team-page">
       {/* Header */}
       <div className="page-header" style={{ padding: '24px 24px 0' }}>
-        <div>
-          <h1 className="page-title">Team Members</h1>
-          <p className="page-subtitle">Manage your team members.</p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
+          <div>
+            <h1 className="page-title">Team Members</h1>
+            <p className="page-subtitle">
+              {currentBoard ? `Managing members for ${currentBoard.name} (Code: ${currentBoard.code})` : 'Manage your team members.'}
+            </p>
+          </div>
+
+          {boards.length > 1 && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <label htmlFor="team-board-select" style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Board:</label>
+              <select
+                id="team-board-select"
+                value={activeBoardId}
+                onChange={(e) => selectBoard(e.target.value)}
+                className="filter-select"
+                style={{ width: 'auto', padding: '6px 12px' }}
+              >
+                {boards.map(b => (
+                  <option key={b.id} value={b.id}>{b.name} ({b.code})</option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
       </div>
 
