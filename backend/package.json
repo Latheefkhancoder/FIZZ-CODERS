@@ -18,6 +18,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@google-cloud/firestore": "^9.1.0",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
@@ -40,6 +41,7 @@
     "testMatch": [
       "**/tests/**/*.test.js"
     ],
-    "verbose": true
+    "verbose": true,
+    "testTimeout": 15000
   }
 }

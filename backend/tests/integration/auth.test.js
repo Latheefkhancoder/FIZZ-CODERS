@@ -26,6 +26,7 @@ describe("Auth Integration Tests", () => {
         name: "Jane Doe",
         email: "jane@example.com",
       });
+
       emailVerificationModel.invalidateActiveCodes.mockResolvedValue(0);
       emailVerificationModel.createCode.mockResolvedValue({ id: 1 });
       emailService.sendEmailVerificationOtp.mockResolvedValue({ delivered: true });
@@ -63,7 +64,11 @@ describe("Auth Integration Tests", () => {
     });
 
     it("should return 409 when email already exists and is verified", async () => {
-      userModel.findByEmail.mockResolvedValue({ id: 1, email: "jane@example.com" });
+      userModel.findByEmail.mockResolvedValue({
+        id: 1,
+        email: "jane@example.com",
+      });
+
       emailVerificationModel.isEmailVerified.mockResolvedValue(true);
 
       const response = await request(app)
@@ -83,8 +88,13 @@ describe("Auth Integration Tests", () => {
 
   describe("POST /api/auth/verify-email", () => {
     it("should return 200 when OTP is valid", async () => {
-      userModel.findByEmail.mockResolvedValue({ id: 1, email: "jane@example.com" });
+      userModel.findByEmail.mockResolvedValue({
+        id: 1,
+        email: "jane@example.com",
+      });
+
       emailVerificationModel.isEmailVerified.mockResolvedValue(false);
+
       emailVerificationModel.findLatestActiveCode.mockResolvedValue({
         id: 5,
         email: "jane@example.com",
@@ -92,6 +102,7 @@ describe("Auth Integration Tests", () => {
         expires_at: new Date(Date.now() + 600000),
         attempts: 0,
       });
+
       emailVerificationModel.markVerified.mockResolvedValue({ id: 5 });
       emailVerificationModel.invalidateActiveCodes.mockResolvedValue(0);
 
@@ -109,8 +120,13 @@ describe("Auth Integration Tests", () => {
     });
 
     it("should return 400 when OTP is invalid", async () => {
-      userModel.findByEmail.mockResolvedValue({ id: 1, email: "jane@example.com" });
+      userModel.findByEmail.mockResolvedValue({
+        id: 1,
+        email: "jane@example.com",
+      });
+
       emailVerificationModel.isEmailVerified.mockResolvedValue(false);
+
       emailVerificationModel.findLatestActiveCode.mockResolvedValue({
         id: 5,
         email: "jane@example.com",
@@ -118,7 +134,11 @@ describe("Auth Integration Tests", () => {
         expires_at: new Date(Date.now() + 600000),
         attempts: 1,
       });
-      emailVerificationModel.incrementAttempts.mockResolvedValue({ id: 5, attempts: 2 });
+
+      emailVerificationModel.incrementAttempts.mockResolvedValue({
+        id: 5,
+        attempts: 2,
+      });
 
       const response = await request(app)
         .post("/api/auth/verify-email")
@@ -135,15 +155,23 @@ describe("Auth Integration Tests", () => {
 
   describe("POST /api/auth/resend-verification", () => {
     it("should return 200 and generate a new verification OTP", async () => {
-      userModel.findByEmail.mockResolvedValue({ id: 1, email: "jane@example.com" });
+      userModel.findByEmail.mockResolvedValue({
+        id: 1,
+        email: "jane@example.com",
+      });
+
       emailVerificationModel.isEmailVerified.mockResolvedValue(false);
       emailVerificationModel.invalidateActiveCodes.mockResolvedValue(1);
       emailVerificationModel.createCode.mockResolvedValue({ id: 6 });
-      emailService.sendEmailVerificationOtp.mockResolvedValue({ delivered: true });
+      emailService.sendEmailVerificationOtp.mockResolvedValue({
+        delivered: true,
+      });
 
       const response = await request(app)
         .post("/api/auth/resend-verification")
-        .send({ email: "jane@example.com" });
+        .send({
+          email: "jane@example.com",
+        });
 
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
@@ -154,12 +182,14 @@ describe("Auth Integration Tests", () => {
   describe("POST /api/auth/login", () => {
     it("should successfully login verified user and return 200 with JWT token", async () => {
       const passwordHash = await hashPassword("password123");
+
       userModel.findByEmail.mockResolvedValue({
         id: 1,
         name: "Jane Doe",
         email: "jane@example.com",
         password_hash: passwordHash,
       });
+
       emailVerificationModel.isEmailVerified.mockResolvedValue(true);
 
       const response = await request(app)
@@ -179,12 +209,14 @@ describe("Auth Integration Tests", () => {
 
     it("should return 403 when user is unverified", async () => {
       const passwordHash = await hashPassword("password123");
+
       userModel.findByEmail.mockResolvedValue({
         id: 1,
         name: "Jane Doe",
         email: "jane@example.com",
         password_hash: passwordHash,
       });
+
       emailVerificationModel.isEmailVerified.mockResolvedValue(false);
 
       const response = await request(app)
@@ -201,6 +233,7 @@ describe("Auth Integration Tests", () => {
 
     it("should return 401 when password is wrong", async () => {
       const passwordHash = await hashPassword("correctPass");
+
       userModel.findByEmail.mockResolvedValue({
         id: 1,
         name: "Jane Doe",
@@ -220,6 +253,18 @@ describe("Auth Integration Tests", () => {
     });
 
     it("should successfully log in hardcoded admin with admin@fizz.com and Admin@123", async () => {
+      const passwordHash = await hashPassword("Admin@123");
+
+      userModel.findByEmail.mockResolvedValue({
+        id: "admin_1",
+        name: "Admin",
+        email: "admin@fizz.com",
+        password_hash: passwordHash,
+        role: "admin",
+      });
+
+      emailVerificationModel.isEmailVerified.mockResolvedValue(true);
+
       const response = await request(app)
         .post("/api/auth/login")
         .send({
@@ -234,6 +279,18 @@ describe("Auth Integration Tests", () => {
     });
 
     it("should successfully log in hardcoded member with member@fizz.com and Member@123", async () => {
+      const passwordHash = await hashPassword("Member@123");
+
+      userModel.findByEmail.mockResolvedValue({
+        id: "member_1",
+        name: "Member",
+        email: "member@fizz.com",
+        password_hash: passwordHash,
+        role: "member",
+      });
+
+      emailVerificationModel.isEmailVerified.mockResolvedValue(true);
+
       const response = await request(app)
         .post("/api/auth/login")
         .send({
@@ -255,13 +312,18 @@ describe("Auth Integration Tests", () => {
         name: "Jane Doe",
         email: "jane@example.com",
       });
+
       passwordResetTokenModel.invalidateUserTokens.mockResolvedValue(0);
       passwordResetTokenModel.createToken.mockResolvedValue({ id: 10 });
-      emailService.sendPasswordResetEmail.mockResolvedValue({ delivered: true });
+      emailService.sendPasswordResetEmail.mockResolvedValue({
+        delivered: true,
+      });
 
       const response = await request(app)
         .post("/api/auth/forgot-password")
-        .send({ email: "jane@example.com" });
+        .send({
+          email: "jane@example.com",
+        });
 
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
@@ -271,17 +333,17 @@ describe("Auth Integration Tests", () => {
       expect(response.body.data?.resetToken).toBeUndefined();
     });
 
-
     it("should return 400 for invalid email format", async () => {
       const response = await request(app)
         .post("/api/auth/forgot-password")
-        .send({ email: "invalid-email" });
+        .send({
+          email: "invalid-email",
+        });
 
       expect(response.status).toBe(400);
       expect(response.body.success).toBe(false);
     });
   });
-
 
   describe("POST /api/auth/reset-password", () => {
     it("should return 200 when reset token is valid", async () => {
@@ -290,6 +352,7 @@ describe("Auth Integration Tests", () => {
         user_id: 1,
         expires_at: new Date(Date.now() + 3600000),
       });
+
       userModel.updatePassword.mockResolvedValue(true);
       passwordResetTokenModel.markTokenUsed.mockResolvedValue(true);
       passwordResetTokenModel.invalidateUserTokens.mockResolvedValue(0);
@@ -326,6 +389,7 @@ describe("Auth Integration Tests", () => {
   describe("GET /api/auth/me", () => {
     it("should return 401 when Authorization header is missing", async () => {
       const response = await request(app).get("/api/auth/me");
+
       expect(response.status).toBe(401);
       expect(response.body.success).toBe(false);
     });
@@ -340,7 +404,12 @@ describe("Auth Integration Tests", () => {
     });
 
     it("should return 200 and user profile when token is valid", async () => {
-      const validToken = generateJwt({ id: 1, email: "jane@example.com", name: "Jane Doe" });
+      const validToken = generateJwt({
+        id: 1,
+        email: "jane@example.com",
+        name: "Jane Doe",
+      });
+
       userModel.findById.mockResolvedValue({
         id: 1,
         name: "Jane Doe",
