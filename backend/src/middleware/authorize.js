@@ -3,7 +3,7 @@ const { errorResponse } = require("../utils/response");
 
 /**
  * Middleware: requireBoardAccess
- * Ensures the authenticated user is the owner or a member of the target board.
+ * Ensures the authenticated user is the owner, a member, or a system admin of the target board.
  * Extracts boardId from req.params.boardId, req.body.boardId, or resolves from req.params.taskId.
  */
 const requireBoardAccess = async (req, res, next) => {
@@ -35,17 +35,21 @@ const requireBoardAccess = async (req, res, next) => {
     }
 
     const userIdStr = String(userId);
-    const isOwner = String(board.ownerId) === userIdStr;
-    const membership = await memberRepository.findByBoardAndUser(boardId, userIdStr);
+    const userEmail = req.user?.email ? req.user.email.toLowerCase().trim() : "";
+    const isOwner = String(board.ownerId) === userIdStr || (board.ownerEmail && board.ownerEmail.toLowerCase().trim() === userEmail);
+    const membership = await memberRepository.findByBoardAndUser(boardId, userIdStr, userEmail);
 
-    if (!isOwner && !membership) {
+    const userRole = (req.user?.role || "Admin").toLowerCase();
+    const isSystemAdmin = userRole === "admin" || userRole === "developer";
+
+    if (!isOwner && !membership && !isSystemAdmin) {
       return errorResponse(res, "Access denied: You are not a member of this board", null, 403);
     }
 
     req.board = board;
-    req.isOwner = isOwner;
+    req.isOwner = isOwner || isSystemAdmin;
     req.membership = membership;
-    req.boardRole = isOwner ? "Admin" : (membership?.role || "Member");
+    req.boardRole = (isOwner || isSystemAdmin) ? "Admin" : (membership?.role || "Member");
 
     next();
   } catch (err) {
@@ -55,21 +59,25 @@ const requireBoardAccess = async (req, res, next) => {
 
 /**
  * Middleware: requireBoardAdmin
- * Ensures the authenticated user is the board owner or has role 'Admin'.
+ * Ensures the authenticated user is the board owner, has role 'Admin' on the board, or is a system admin.
  */
 const requireBoardAdmin = async (req, res, next) => {
   try {
-    // If requireBoardAccess hasn't run yet, run it
     if (!req.board) {
-      return requireBoardAccess(req, res, () => {
-        if (!req.isOwner && req.boardRole !== "Admin") {
-          return errorResponse(res, "Forbidden: Administrator privileges required for this board", null, 403);
-        }
-        next();
+      await new Promise((resolve) => {
+        requireBoardAccess(req, res, () => {
+          resolve();
+        });
       });
     }
 
-    if (!req.isOwner && req.boardRole !== "Admin") {
+    if (res.headersSent) return;
+
+    const userRole = (req.user?.role || "Admin").toLowerCase();
+    const isSystemAdmin = userRole === "admin" || userRole === "developer";
+    const isBoardAdmin = req.isOwner || (req.boardRole && req.boardRole.toLowerCase() === "admin") || (req.membership?.role && req.membership.role.toLowerCase() === "admin") || isSystemAdmin;
+
+    if (!isBoardAdmin) {
       return errorResponse(res, "Forbidden: Administrator privileges required for this board", null, 403);
     }
 
@@ -83,3 +91,4 @@ module.exports = {
   requireBoardAccess,
   requireBoardAdmin,
 };
+

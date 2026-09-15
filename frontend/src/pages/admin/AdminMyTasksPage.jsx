@@ -33,19 +33,35 @@ const IconGrip = () => (
 );
 
 /**
- * AdminMyTasksPage — Shows tasks assigned to the Admin (m1) in a Kanban layout.
+ * AdminMyTasksPage — Shows tasks assigned to the authenticated Admin in a Kanban layout.
  * Supports drag-and-drop between columns.
  */
 export default function AdminMyTasksPage() {
-  const { tasks, boards, moveTask, deleteTask, getMemberById } = useAdmin();
+  const { boards, moveTask, deleteTask, getMemberById, getMyTasks } = useAdmin();
 
-  // My tasks = assigned to m1 (Admin)
-  const myTasks = tasks.filter(t => t.assignee === 'm1');
+  const [assignedTasks, setAssignedTasks] = useState([]);
+  const [selectedTask,  setSelectedTask]  = useState(null);
+  const [taskToDelete,  setTaskToDelete]  = useState(null);
+  const [dragTaskId,    setDragTaskId]    = useState(null);
+  const [dragOverCol,   setDragOverCol]   = useState(null);
 
-  const [selectedTask, setSelectedTask] = useState(null);
-  const [taskToDelete, setTaskToDelete] = useState(null);
-  const [dragTaskId,   setDragTaskId]   = useState(null);
-  const [dragOverCol,  setDragOverCol]  = useState(null);
+  const fetchAssigned = React.useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await getMyTasks();
+      setAssignedTasks(data);
+    } catch (err) {
+      console.warn('Error fetching my tasks:', err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [getMyTasks]);
+
+  React.useEffect(() => {
+    fetchAssigned();
+  }, [fetchAssigned]);
+
+  const myTasks = assignedTasks;
 
   const getBoardName = (boardId) => {
     const board = boards.find(b => b.id === boardId);
@@ -63,9 +79,17 @@ export default function AdminMyTasksPage() {
     setDragOverCol(status);
   };
 
-  const handleDrop = (e, status) => {
+  const handleDrop = async (e, status) => {
     e.preventDefault();
-    if (dragTaskId) moveTask(dragTaskId, status);
+    if (dragTaskId) {
+      setAssignedTasks(prev => prev.map(t => t.id === dragTaskId ? { ...t, status } : t));
+      try {
+        await moveTask(dragTaskId, status);
+      } catch (err) {
+        console.error('Failed to move task:', err);
+        fetchAssigned();
+      }
+    }
     setDragTaskId(null);
     setDragOverCol(null);
   };
@@ -80,8 +104,11 @@ export default function AdminMyTasksPage() {
     setTaskToDelete(taskId);
   };
 
-  const confirmDeleteTask = () => {
-    if (taskToDelete) deleteTask(taskToDelete);
+  const confirmDeleteTask = async () => {
+    if (taskToDelete) {
+      setAssignedTasks(prev => prev.filter(t => t.id !== taskToDelete));
+      await deleteTask(taskToDelete);
+    }
     setTaskToDelete(null);
   };
 
@@ -178,7 +205,7 @@ export default function AdminMyTasksPage() {
       {/* Task Details */}
       {selectedTask && (
         <TaskDetails
-          task={tasks.find(t => t.id === selectedTask.id) || selectedTask}
+          task={assignedTasks.find(t => t.id === selectedTask.id) || selectedTask}
           onClose={() => setSelectedTask(null)}
           onDelete={handleDeleteTask}
           hideComments={true}

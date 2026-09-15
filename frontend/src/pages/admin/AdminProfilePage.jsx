@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAdmin } from '../../context/AdminContext';
 import './AdminProfilePage.css';
 
@@ -23,36 +23,58 @@ const IconSave = () => (
 export default function AdminProfilePage() {
   const { profile, updateProfile } = useAdmin();
 
-  const [isEditing, setIsEditing] = useState(false);
-  const [form,      setForm]      = useState({ name: profile.name, email: profile.email });
-  const [saved,     setSaved]     = useState(false);
-  const [errors,    setErrors]    = useState({});
+  const [isEditing,  setIsEditing]  = useState(false);
+  const [form,       setForm]       = useState({ name: profile?.name || '', email: profile?.email || '', bio: profile?.bio || '' });
+  const [saved,      setSaved]      = useState(false);
+  const [saving,     setSaving]     = useState(false);
+  const [errors,     setErrors]     = useState({});
 
-  const initials = profile.name ? profile.name.charAt(0).toUpperCase() : 'A';
+  useEffect(() => {
+    if (profile) {
+      setForm({
+        name: profile.name || '',
+        email: profile.email || '',
+        bio: profile.bio || '',
+      });
+    }
+  }, [profile]);
+
+  const initials = profile?.name ? profile.name.charAt(0).toUpperCase() : (profile?.email ? profile.email.charAt(0).toUpperCase() : 'A');
 
   const validate = () => {
     const errs = {};
-    if (!form.name.trim())  errs.name  = 'Full name is required.';
-    if (!form.email.trim()) errs.email = 'Email is required.';
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim()))
-      errs.email = 'Enter a valid email.';
+    if (!form.name.trim()) errs.name = 'Full name is required.';
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
 
   const handleEdit = () => {
-    setForm({ name: profile.name, email: profile.email });
+    setForm({
+      name: profile?.name || '',
+      email: profile?.email || '',
+      bio: profile?.bio || '',
+    });
     setErrors({});
     setSaved(false);
     setIsEditing(true);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!validate()) return;
-    updateProfile({ name: form.name.trim(), email: form.email.trim() });
-    setIsEditing(false);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+    setSaving(true);
+    try {
+      await updateProfile({
+        name: form.name.trim(),
+        bio: form.bio ? form.bio.trim() : '',
+      });
+      setIsEditing(false);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (err) {
+      setErrors({ form: err.message || 'Failed to update profile.' });
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleCancel = () => {
@@ -78,10 +100,11 @@ export default function AdminProfilePage() {
           </div>
 
           <div className="profile-info">
-            <h2 className="profile-name">{profile.name}</h2>
-            <p className="profile-email">{profile.email}</p>
-            <span className="profile-role-badge">
-              {profile.role}
+            <h2 className="profile-name">{profile?.name || 'Admin'}</h2>
+            <p className="profile-email">{profile?.email || 'admin@fizz.com'}</p>
+            {profile?.bio && <p className="profile-bio" style={{ marginTop: '8px', color: 'var(--text-muted)', fontSize: '0.9rem' }}>{profile.bio}</p>}
+            <span className="profile-role-badge" style={{ marginTop: '8px', display: 'inline-block' }}>
+              {profile?.role || 'Admin'}
             </span>
           </div>
 
@@ -105,10 +128,16 @@ export default function AdminProfilePage() {
           <div className="profile-edit-card">
             <h3 className="edit-form-title">Edit Profile</h3>
 
+            {errors.form && (
+              <div style={{ color: '#f87171', marginBottom: '12px', fontSize: '0.875rem' }}>
+                {errors.form}
+              </div>
+            )}
+
             <div className="edit-form-grid">
               {/* Full Name */}
               <div className="edit-form-field">
-                <label htmlFor="profile-name-input" className="edit-form-label">Full Name</label>
+                <label htmlFor="profile-name-input" className="edit-form-label">Full Name *</label>
                 <input
                   id="profile-name-input"
                   type="text"
@@ -121,26 +150,40 @@ export default function AdminProfilePage() {
                 {errors.name && <span className="edit-form-error">{errors.name}</span>}
               </div>
 
-              {/* Email */}
+              {/* Email (Read-only) */}
               <div className="edit-form-field">
-                <label htmlFor="profile-email-input" className="edit-form-label">Email</label>
+                <label htmlFor="profile-email-input" className="edit-form-label">Email (Account ID)</label>
                 <input
                   id="profile-email-input"
                   type="email"
-                  className={`edit-form-input ${errors.email ? 'input-err' : ''}`}
+                  className="edit-form-input"
                   value={form.email}
-                  onChange={(e) => { setForm(p => ({ ...p, email: e.target.value })); setErrors(p => ({ ...p, email: null })); }}
-                  placeholder="you@example.com"
+                  disabled
+                  readOnly
+                  title="Email cannot be changed as it is your account identifier"
+                  style={{ opacity: 0.6, cursor: 'not-allowed' }}
                 />
-                {errors.email && <span className="edit-form-error">{errors.email}</span>}
+              </div>
+
+              {/* Bio */}
+              <div className="edit-form-field" style={{ gridColumn: '1 / -1' }}>
+                <label htmlFor="profile-bio-input" className="edit-form-label">Bio</label>
+                <textarea
+                  id="profile-bio-input"
+                  className="edit-form-input"
+                  value={form.bio}
+                  onChange={(e) => setForm(p => ({ ...p, bio: e.target.value }))}
+                  placeholder="Write a short bio..."
+                  rows={3}
+                />
               </div>
             </div>
 
             <div className="edit-form-actions">
-              <button className="btn-outline-aqua" onClick={handleCancel} type="button">Cancel</button>
-              <button className="btn-primary-aqua" onClick={handleSave} type="button">
+              <button className="btn-outline-aqua" onClick={handleCancel} type="button" disabled={saving}>Cancel</button>
+              <button className="btn-primary-aqua" onClick={handleSave} type="button" disabled={saving}>
                 <IconSave />
-                Save Changes
+                {saving ? 'Saving...' : 'Save Changes'}
               </button>
             </div>
           </div>

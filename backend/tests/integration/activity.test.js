@@ -1,14 +1,22 @@
 const request = require("supertest");
 const app = require("../../src/app");
-const { memoryStore } = require("../../src/repositories");
+const { boardRepository } = require("../../src/repositories");
+const { boardService } = require("../../src/services");
 const { generateJwt } = require("../../src/utils/crypto");
 
 describe("Activity Log Integration Tests", () => {
   let token;
   let boardId;
 
+  const cleanupBoardByCode = async (code) => {
+    const existing = await boardRepository.findByCode(code);
+    if (existing) {
+      await boardService.deleteBoard(existing.id, existing.ownerId, "cleanup").catch(() => {});
+    }
+  };
+
   beforeEach(async () => {
-    memoryStore.clear();
+    await cleanupBoardByCode("ACT01");
 
     token = generateJwt({
       id: "usr_alice",
@@ -23,6 +31,13 @@ describe("Activity Log Integration Tests", () => {
       .send({ name: "Activity Board", code: "ACT01" });
 
     boardId = boardRes.body.data.id;
+  });
+
+  afterEach(async () => {
+    if (boardId) {
+      await boardService.deleteBoard(boardId, "usr_alice", "Alice").catch(() => {});
+    }
+    await cleanupBoardByCode("ACT01");
   });
 
   describe("GET /api/boards/:boardId/activity-logs", () => {

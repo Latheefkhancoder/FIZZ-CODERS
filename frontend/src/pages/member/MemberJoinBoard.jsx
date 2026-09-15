@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import logo from '../../assets/logo.png';
 import { useAdmin } from '../../context/AdminContext';
+import { boardService } from '../../services/board.service';
 import './MemberJoinBoard.css';
 
 const IconKey = () => (
@@ -26,7 +27,7 @@ const IconArrowRight = () => (
 
 export default function MemberJoinBoard() {
   const navigate = useNavigate();
-  const { boards, getBoardByCode } = useAdmin();
+  const { fetchBoards } = useAdmin();
 
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
@@ -41,7 +42,7 @@ export default function MemberJoinBoard() {
     if (error) setError('');
   };
 
-  const handleJoinSubmit = (e) => {
+  const handleJoinSubmit = async (e) => {
     e.preventDefault();
     const trimmed = code.trim().toUpperCase();
 
@@ -63,20 +64,18 @@ export default function MemberJoinBoard() {
     setIsSubmitting(true);
     setError('');
 
-    // Check against mock/context state
-    const foundBoard = getBoardByCode(trimmed) || boards.find((b) => b.code?.toUpperCase() === trimmed);
-
-    setTimeout(() => {
+    try {
+      const board = await boardService.joinBoard(trimmed);
+      setJoinedBoard(board);
+      sessionStorage.setItem('fizz_role', 'member');
+      localStorage.setItem('fizz_role', 'member');
+      sessionStorage.setItem('fizz_current_board_id', board.id);
+      fetchBoards();
+    } catch (err) {
+      setError(err.message || 'Invalid board code. Please check the code and try again.');
+    } finally {
       setIsSubmitting(false);
-      if (foundBoard) {
-        setJoinedBoard(foundBoard);
-        sessionStorage.setItem('fizz_role', 'member');
-        localStorage.setItem('fizz_role', 'member');
-        sessionStorage.setItem('fizz_current_board_id', foundBoard.id);
-      } else {
-        setError('Invalid board code. Please check the code and try again.');
-      }
-    }, 300);
+    }
   };
 
   const handleContinueToDashboard = () => {

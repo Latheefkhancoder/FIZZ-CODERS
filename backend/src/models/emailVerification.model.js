@@ -1,11 +1,15 @@
 /**
- * Email Verification Model
- * Decoupled in-memory storage for email verification codes pending Firebase/Firestore integration.
- * Starts empty with zero synthetic or seed data.
+ * Email Verification Model — Firestore-backed
+ * Stores OTP codes in the Firestore `emailVerificationCodes` collection.
+ * Data persists across server restarts.
  */
 
-const codes = new Map();
-let nextCodeId = 1;
+const { db } = require("../config/firebase");
+const crypto = require("crypto");
+
+const COLLECTION = "emailVerificationCodes";
+
+const newId = () => crypto.randomBytes(8).toString("hex");
 
 /**
  * Create a new email verification code record
@@ -16,7 +20,9 @@ let nextCodeId = 1;
  * @returns {Promise<object>}
  */
 const createCode = async ({ email, otpHash, expiresAt }) => {
-  const id = nextCodeId++;
+  if (!db) throw new Error("Firestore not configured. Add Firebase credentials to backend/.env");
+
+  const id = newId();
   const cleanEmail = email.toLowerCase().trim();
   const now = new Date().toISOString();
 
@@ -30,17 +36,9 @@ const createCode = async ({ email, otpHash, expiresAt }) => {
     attempts: 0,
   };
 
-  codes.set(id, record);
+  await db.collection(COLLECTION).doc(id).set(record);
 
-  return {
-    id: record.id,
-    email: record.email,
-    otp_hash: record.otp_hash,
-    expires_at: record.expires_at,
-    created_at: record.created_at,
-    verified_at: record.verified_at,
-    attempts: record.attempts,
-  };
+  return { ...record };
 };
 
 /**
@@ -50,28 +48,23 @@ const createCode = async ({ email, otpHash, expiresAt }) => {
  */
 const findLatestActiveCode = async (email) => {
   if (!email) return null;
+  if (!db) throw new Error("Firestore not configured. Add Firebase credentials to backend/.env");
+
   const cleanEmail = email.toLowerCase().trim();
 
-  let latest = null;
-  for (const record of codes.values()) {
-    if (record.email === cleanEmail && record.verified_at === null) {
-      if (!latest || record.id > latest.id) {
-        latest = record;
-      }
-    }
-  }
+  // Fetch all codes for this email, filter unverified client-side (avoids composite index)
+  const snapshot = await db.collection(COLLECTION)
+    .where("email", "==", cleanEmail)
+    .get();
 
-  if (!latest) return null;
+  if (snapshot.empty) return null;
 
-  return {
-    id: latest.id,
-    email: latest.email,
-    otp_hash: latest.otp_hash,
-    expires_at: latest.expires_at,
-    created_at: latest.created_at,
-    verified_at: latest.verified_at,
-    attempts: latest.attempts,
-  };
+  const unverified = snapshot.docs
+    .map((doc) => ({ ...doc.data(), id: doc.id }))
+    .filter((r) => r.verified_at === null)
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+  return unverified.length > 0 ? unverified[0] : null;
 };
 
 /**
@@ -81,86 +74,97 @@ const findLatestActiveCode = async (email) => {
  */
 const isEmailVerified = async (email) => {
   if (!email) return false;
+  if (!db) throw new Error("Firestore not configured. Add Firebase credentials to backend/.env");
+
   const cleanEmail = email.toLowerCase().trim();
 
-  for (const record of codes.values()) {
-    if (record.email === cleanEmail && record.verified_at !== null) {
-      return true;
-    }
-  }
-  return false;
+  // Fetch all codes for this email, check if any are verified client-side (avoids composite index)
+  const snapshot = await db.collection(COLLECTION)
+    .where("email", "==", cleanEmail)
+    .get();
+
+  return snapshot.docs.some((doc) => doc.data().verified_at !== null);
 };
 
 /**
  * Increment the failed attempt counter for a verification code
- * @param {number|string} id
+ * @param {string} id
  * @returns {Promise<object|null>}
  */
 const incrementAttempts = async (id) => {
-  const idStr = String(id);
-  for (const [codeId, record] of codes.entries()) {
-    if (String(codeId) === idStr) {
-      record.attempts += 1;
-      return {
-        id: record.id,
-        attempts: record.attempts,
-      };
-    }
-  }
-  return null;
+  if (!db) throw new Error("Firestore not configured. Add Firebase credentials to backend/.env");
+
+  const ref = db.collection(COLLECTION).doc(String(id));
+  const doc = await ref.get();
+  if (!doc.exists) return null;
+
+  const newAttempts = (doc.data().attempts || 0) + 1;
+  await ref.update({ attempts: newAttempts });
+
+  return { id, attempts: newAttempts };
 };
 
 /**
  * Mark a verification code as verified
- * @param {number|string} id
+ * @param {string} id
  * @returns {Promise<object|null>}
  */
 const markVerified = async (id) => {
-  const idStr = String(id);
-  for (const [codeId, record] of codes.entries()) {
-    if (String(codeId) === idStr) {
-      record.verified_at = new Date().toISOString();
-      return {
-        id: record.id,
-        email: record.email,
-        verified_at: record.verified_at,
-      };
-    }
-  }
-  return null;
+  if (!db) throw new Error("Firestore not configured. Add Firebase credentials to backend/.env");
+
+  const ref = db.collection(COLLECTION).doc(String(id));
+  const doc = await ref.get();
+  if (!doc.exists) return null;
+
+  const verified_at = new Date().toISOString();
+  await ref.update({ verified_at });
+
+  return { id, email: doc.data().email, verified_at };
 };
 
 /**
  * Invalidate all active (unverified) codes for an email address
+ * by setting their expires_at to now (making them expired)
  * @param {string} email
  * @returns {Promise<number>}
  */
 const invalidateActiveCodes = async (email) => {
   if (!email) return 0;
+  if (!db) throw new Error("Firestore not configured. Add Firebase credentials to backend/.env");
+
   const cleanEmail = email.toLowerCase().trim();
   const now = new Date().toISOString();
-  let count = 0;
 
-  for (const record of codes.values()) {
-    if (
-      record.email === cleanEmail &&
-      record.verified_at === null &&
-      new Date(record.expires_at) > new Date()
-    ) {
-      record.expires_at = now;
-      count++;
-    }
-  }
+  // Fetch all unverified codes for email, filter active ones client-side
+  const snapshot = await db.collection(COLLECTION)
+    .where("email", "==", cleanEmail)
+    .get();
 
-  return count;
+  if (snapshot.empty) return 0;
+
+  const toInvalidate = snapshot.docs.filter((doc) => {
+    const d = doc.data();
+    return d.verified_at === null && new Date(d.expires_at) > new Date();
+  });
+
+  if (toInvalidate.length === 0) return 0;
+
+  const batch = db.batch();
+  toInvalidate.forEach((doc) => batch.update(doc.ref, { expires_at: now }));
+  await batch.commit();
+
+  return toInvalidate.length;
 };
 
 /**
- * Reset in-memory storage (useful for tests)
+ * Clear all codes — only used in tests
  */
-const clear = () => {
-  codes.clear();
-  nextCodeId = 1;
+const clear = async () => {
+  if (!db) return;
+  const snapshot = await db.collection(COLLECTION).get();
+  const batch = db.batch();
+  snapshot.docs.forEach((doc) => batch.delete(doc.ref));
+  await batch.commit();
 };
 
 module.exports = {

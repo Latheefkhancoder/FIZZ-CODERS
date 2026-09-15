@@ -1,10 +1,10 @@
-const memoryStore = require("./memoryStore");
+const { db } = require("../config/firebase");
 
 /**
  * Board Repository
- * Manages board persistence with an in-memory development implementation.
- * Prepared for Firebase/Firestore replacement.
+ * Manages board persistence using Firebase Firestore.
  */
+
 class BoardRepository {
   /**
    * Create a new board
@@ -15,11 +15,12 @@ class BoardRepository {
    * @returns {Promise<object>}
    */
   async create({ name, code, ownerId }) {
-    const id = `board_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
     const now = new Date().toISOString();
 
+    const boardRef = db.collection("boards").doc();
+
     const board = {
-      id,
+      id: boardRef.id,
       name: name.trim(),
       code: code.trim().toUpperCase(),
       ownerId: String(ownerId),
@@ -27,7 +28,8 @@ class BoardRepository {
       updatedAt: now,
     };
 
-    memoryStore.boards.set(id, board);
+    await boardRef.set(board);
+
     return { ...board };
   }
 
@@ -38,8 +40,17 @@ class BoardRepository {
    */
   async findById(id) {
     if (!id) return null;
-    const board = memoryStore.boards.get(String(id));
-    return board ? { ...board } : null;
+
+    const boardDoc = await db.collection("boards").doc(String(id)).get();
+
+    if (!boardDoc.exists) {
+      return null;
+    }
+
+    return {
+      ...boardDoc.data(),
+      id: boardDoc.id,
+    };
   }
 
   /**
@@ -49,13 +60,25 @@ class BoardRepository {
    */
   async findByCode(code) {
     if (!code) return null;
+
     const normalized = code.trim().toUpperCase();
-    for (const board of memoryStore.boards.values()) {
-      if (board.code === normalized) {
-        return { ...board };
-      }
+
+    const snapshot = await db
+      .collection("boards")
+      .where("code", "==", normalized)
+      .limit(1)
+      .get();
+
+    if (snapshot.empty) {
+      return null;
     }
-    return null;
+
+    const doc = snapshot.docs[0];
+
+    return {
+      ...doc.data(),
+      id: doc.id,
+    };
   }
 
   /**
@@ -66,24 +89,42 @@ class BoardRepository {
    */
   async findUserBoards(userId, memberBoardIds = new Set()) {
     const userIdStr = String(userId);
+
+    const snapshot = await db.collection("boards").get();
+
     const results = [];
 
-    for (const board of memoryStore.boards.values()) {
-      if (board.ownerId === userIdStr || memberBoardIds.has(board.id)) {
-        results.push({ ...board });
+    snapshot.forEach((doc) => {
+      const board = {
+        ...doc.data(),
+        id: doc.id,
+      };
+
+      if (
+        board.ownerId === userIdStr ||
+        memberBoardIds.has(board.id)
+      ) {
+        results.push(board);
       }
-    }
+    });
 
     // Sort newest first
-    return results.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    return results.sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
   }
 
   /**
-   * Find all boards (admin or internal lookup)
+   * Find all boards
    * @returns {Promise<Array<object>>}
    */
   async findAll() {
-    return Array.from(memoryStore.boards.values()).map((b) => ({ ...b }));
+    const snapshot = await db.collection("boards").get();
+
+    return snapshot.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
   }
 
   /**
@@ -92,7 +133,18 @@ class BoardRepository {
    * @returns {Promise<boolean>}
    */
   async delete(id) {
-    return memoryStore.boards.delete(String(id));
+    if (!id) return false;
+
+    const boardRef = db.collection("boards").doc(String(id));
+    const boardDoc = await boardRef.get();
+
+    if (!boardDoc.exists) {
+      return false;
+    }
+
+    await boardRef.delete();
+
+    return true;
   }
 }
 

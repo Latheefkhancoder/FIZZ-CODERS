@@ -1,8 +1,8 @@
-const memoryStore = require("./memoryStore");
+const { db } = require("../config/firebase");
 
 /**
  * Task Comment Repository
- * Manages comments on tasks with in-memory persistence.
+ * Manages comments on tasks using Firebase Firestore.
  */
 class CommentRepository {
   /**
@@ -16,11 +16,11 @@ class CommentRepository {
    * @returns {Promise<object>}
    */
   async create({ taskId, boardId, author, authorId, text }) {
-    const id = `comment_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+    const commentRef = db.collection("comments").doc();
     const now = new Date().toISOString();
 
     const comment = {
-      id,
+      id: commentRef.id,
       taskId: String(taskId),
       boardId: String(boardId),
       author: author || "User",
@@ -30,15 +30,7 @@ class CommentRepository {
       createdAt: now,
     };
 
-    memoryStore.comments.set(id, comment);
-
-    // Also push to task's internal comments array if task exists
-    const task = memoryStore.tasks.get(String(taskId));
-    if (task) {
-      if (!task.comments) task.comments = [];
-      task.comments.push({ ...comment });
-    }
-
+    await commentRef.set(comment);
     return { ...comment };
   }
 
@@ -48,14 +40,16 @@ class CommentRepository {
    * @returns {Promise<Array<object>>}
    */
   async findByTaskId(taskId) {
-    const taskIdStr = String(taskId);
-    const results = [];
+    if (!taskId) return [];
 
-    for (const comment of memoryStore.comments.values()) {
-      if (comment.taskId === taskIdStr) {
-        results.push({ ...comment });
-      }
-    }
+    const snapshot = await db.collection("comments")
+      .where("taskId", "==", String(taskId))
+      .get();
+
+    const results = snapshot.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
 
     return results.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
   }
@@ -66,16 +60,25 @@ class CommentRepository {
    * @returns {Promise<number>}
    */
   async deleteByTaskId(taskId) {
-    const taskIdStr = String(taskId);
-    let count = 0;
+    if (!taskId) return 0;
 
-    for (const [id, comment] of memoryStore.comments.entries()) {
-      if (comment.taskId === taskIdStr) {
-        memoryStore.comments.delete(id);
-        count++;
-      }
+    const snapshot = await db.collection("comments")
+      .where("taskId", "==", String(taskId))
+      .get();
+
+    if (snapshot.empty) return 0;
+
+    const docs = snapshot.docs;
+    const batchSize = 400;
+
+    for (let i = 0; i < docs.length; i += batchSize) {
+      const batch = db.batch();
+      const chunk = docs.slice(i, i + batchSize);
+      chunk.forEach((d) => batch.delete(d.ref));
+      await batch.commit();
     }
-    return count;
+
+    return docs.length;
   }
 
   /**
@@ -84,16 +87,25 @@ class CommentRepository {
    * @returns {Promise<number>}
    */
   async deleteByBoardId(boardId) {
-    const boardIdStr = String(boardId);
-    let count = 0;
+    if (!boardId) return 0;
 
-    for (const [id, comment] of memoryStore.comments.entries()) {
-      if (comment.boardId === boardIdStr) {
-        memoryStore.comments.delete(id);
-        count++;
-      }
+    const snapshot = await db.collection("comments")
+      .where("boardId", "==", String(boardId))
+      .get();
+
+    if (snapshot.empty) return 0;
+
+    const docs = snapshot.docs;
+    const batchSize = 400;
+
+    for (let i = 0; i < docs.length; i += batchSize) {
+      const batch = db.batch();
+      const chunk = docs.slice(i, i + batchSize);
+      chunk.forEach((d) => batch.delete(d.ref));
+      await batch.commit();
     }
-    return count;
+
+    return docs.length;
   }
 }
 

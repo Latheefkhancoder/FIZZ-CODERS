@@ -143,7 +143,9 @@ export default function CreateTaskModal({ isOpen, boardId, onClose, onSubmit }) 
               >
                 <option value="">Select member...</option>
                 {members.map(m => (
-                  <option key={m.id} value={m.id}>{m.name}</option>
+                  <option key={m.id || m.userId} value={m.userId || m.id}>
+                    {m.name || m.user?.name || m.email || 'Member'}
+                  </option>
                 ))}
               </select>
               {errors.assignee && <span className="modal-field-error">{errors.assignee}</span>}

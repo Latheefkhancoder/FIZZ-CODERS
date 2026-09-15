@@ -24,10 +24,12 @@ export default function TaskComments({ task }) {
   const [text, setText] = useState('');
   const bottomRef = useRef(null);
 
+  const commentsList = task?.comments || [];
+
   // Scroll to bottom when comments load/change
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [task.comments]);
+  }, [commentsList]);
 
   const handleSend = (e) => {
     e.preventDefault();
@@ -44,30 +46,33 @@ export default function TaskComments({ task }) {
     }
   };
 
+  const userInitial = profile?.name ? profile.name.charAt(0).toUpperCase() : 'A';
+
   return (
     <div className="task-comments">
       <div className="comments-header">
         <span className="comments-title">Comments</span>
-        <span className="comments-count">{task.comments.length}</span>
+        <span className="comments-count">{commentsList.length}</span>
       </div>
 
       <div className="comments-list">
-        {task.comments.length === 0 ? (
+        {commentsList.length === 0 ? (
           <div className="comments-empty">
             <p>No comments yet. Start the conversation!</p>
           </div>
         ) : (
-          task.comments.map((c) => {
-            const isOwn = c.author === profile.name;
+          commentsList.map((c) => {
+            const authorName = c.author || c.authorName || 'User';
+            const isOwn = authorName === profile?.name;
             return (
               <div key={c.id} className={`comment-item ${isOwn ? 'comment-own' : ''}`}>
-                <span className="comment-avatar">{c.author.charAt(0).toUpperCase()}</span>
+                <span className="comment-avatar">{authorName.charAt(0).toUpperCase()}</span>
                 <div className="comment-body">
                   <div className="comment-meta">
-                    <span className="comment-author">{c.author}</span>
-                    <span className="comment-time">{formatCommentTime(c.timestamp)}</span>
+                    <span className="comment-author">{authorName}</span>
+                    <span className="comment-time">{formatCommentTime(c.timestamp || c.createdAt)}</span>
                   </div>
-                  <p className="comment-text">{c.text}</p>
+                  <p className="comment-text">{c.text || c.content}</p>
                 </div>
               </div>
             );
@@ -78,7 +83,7 @@ export default function TaskComments({ task }) {
 
       {/* Input */}
       <form className="comment-input-row" onSubmit={handleSend}>
-        <span className="comment-input-avatar">{profile.name.charAt(0).toUpperCase()}</span>
+        <span className="comment-input-avatar">{userInitial}</span>
         <textarea
           className="comment-textarea"
           value={text}

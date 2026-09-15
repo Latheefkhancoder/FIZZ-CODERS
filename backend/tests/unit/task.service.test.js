@@ -1,11 +1,19 @@
 const { taskService, boardService } = require("../../src/services");
-const { memoryStore, memberRepository } = require("../../src/repositories");
+const { boardRepository, memberRepository } = require("../../src/repositories");
 
 describe("Task Service Unit Tests", () => {
   let board;
 
+  const cleanupBoardByCode = async (code) => {
+    const existing = await boardRepository.findByCode(code);
+    if (existing) {
+      await boardService.deleteBoard(existing.id, existing.ownerId, "cleanup").catch(() => {});
+    }
+  };
+
   beforeEach(async () => {
-    memoryStore.clear();
+    await cleanupBoardByCode("SPNT1");
+
     board = await boardService.createBoard({
       name: "Sprint Board",
       code: "SPNT1",
@@ -22,6 +30,13 @@ describe("Task Service Unit Tests", () => {
       email: "member@fizz.com",
       role: "Member",
     });
+  });
+
+  afterEach(async () => {
+    if (board && board.id) {
+      await boardService.deleteBoard(board.id, "user_owner", "Owner").catch(() => {});
+    }
+    await cleanupBoardByCode("SPNT1");
   });
 
   describe("createTask", () => {

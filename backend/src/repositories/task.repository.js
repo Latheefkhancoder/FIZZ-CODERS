@@ -1,8 +1,8 @@
-const memoryStore = require("./memoryStore");
+const { db } = require("../config/firebase");
 
 /**
  * Task Repository
- * Manages task persistence with in-memory development implementation.
+ * Manages task persistence using Firebase Firestore.
  */
 class TaskRepository {
   /**
@@ -21,11 +21,11 @@ class TaskRepository {
     assignee = null,
     dueDate = null,
   }) {
-    const id = `task_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+    const taskRef = db.collection("tasks").doc();
     const now = new Date().toISOString();
 
     const task = {
-      id,
+      id: taskRef.id,
       boardId: String(boardId),
       title: title.trim(),
       description: description ? description.trim() : "",
@@ -40,7 +40,7 @@ class TaskRepository {
       comments: [],
     };
 
-    memoryStore.tasks.set(id, task);
+    await taskRef.set(task);
     return { ...task };
   }
 
@@ -51,8 +51,16 @@ class TaskRepository {
    */
   async findById(id) {
     if (!id) return null;
-    const task = memoryStore.tasks.get(String(id));
-    return task ? { ...task } : null;
+
+    const doc = await db.collection("tasks").doc(String(id)).get();
+    if (!doc.exists) {
+      return null;
+    }
+
+    return {
+      ...doc.data(),
+      id: doc.id,
+    };
   }
 
   /**
@@ -65,14 +73,16 @@ class TaskRepository {
    * @returns {Promise<Array<object>>}
    */
   async findByBoardId(boardId, filters = {}) {
-    const boardIdStr = String(boardId);
-    let results = [];
+    if (!boardId) return [];
 
-    for (const task of memoryStore.tasks.values()) {
-      if (task.boardId === boardIdStr) {
-        results.push({ ...task });
-      }
-    }
+    const snapshot = await db.collection("tasks")
+      .where("boardId", "==", String(boardId))
+      .get();
+
+    let results = snapshot.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
 
     if (filters.status) {
       const normalizedStatus = filters.status.toUpperCase().replace(/\s+/g, "_");
@@ -88,8 +98,8 @@ class TaskRepository {
       const term = filters.search.toLowerCase();
       results = results.filter(
         (t) =>
-          t.title.toLowerCase().includes(term) ||
-          t.description.toLowerCase().includes(term)
+          (t.title && t.title.toLowerCase().includes(term)) ||
+          (t.description && t.description.toLowerCase().includes(term))
       );
     }
 
@@ -103,15 +113,19 @@ class TaskRepository {
    * @returns {Promise<Array<object>>}
    */
   async findByAssigneeId(userId, accessibleBoardIds = null) {
-    const userIdStr = String(userId);
-    const results = [];
+    if (!userId) return [];
 
-    for (const task of memoryStore.tasks.values()) {
-      if (task.assignee === userIdStr) {
-        if (!accessibleBoardIds || accessibleBoardIds.has(task.boardId)) {
-          results.push({ ...task });
-        }
-      }
+    const snapshot = await db.collection("tasks")
+      .where("assignee", "==", String(userId))
+      .get();
+
+    let results = snapshot.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
+
+    if (accessibleBoardIds) {
+      results = results.filter((t) => accessibleBoardIds.has(t.boardId));
     }
 
     return results.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
@@ -124,10 +138,15 @@ class TaskRepository {
    * @returns {Promise<object|null>}
    */
   async update(id, updates) {
-    const idStr = String(id);
-    const existing = memoryStore.tasks.get(idStr);
-    if (!existing) return null;
+    if (!id) return null;
 
+    const taskRef = db.collection("tasks").doc(String(id));
+    const doc = await taskRef.get();
+    if (!doc.exists) {
+      return null;
+    }
+
+    const existing = { ...doc.data(), id: doc.id };
     const updated = {
       ...existing,
       ...updates,
@@ -146,7 +165,7 @@ class TaskRepository {
       updated.status = updates.status.toUpperCase().replace(/\s+/g, "_");
     }
 
-    memoryStore.tasks.set(idStr, updated);
+    await taskRef.set(updated);
     return { ...updated };
   }
 
@@ -156,7 +175,16 @@ class TaskRepository {
    * @returns {Promise<boolean>}
    */
   async delete(id) {
-    return memoryStore.tasks.delete(String(id));
+    if (!id) return false;
+
+    const taskRef = db.collection("tasks").doc(String(id));
+    const doc = await taskRef.get();
+    if (!doc.exists) {
+      return false;
+    }
+
+    await taskRef.delete();
+    return true;
   }
 
   /**
@@ -165,16 +193,25 @@ class TaskRepository {
    * @returns {Promise<number>}
    */
   async deleteByBoardId(boardId) {
-    const boardIdStr = String(boardId);
-    let count = 0;
+    if (!boardId) return 0;
 
-    for (const [id, task] of memoryStore.tasks.entries()) {
-      if (task.boardId === boardIdStr) {
-        memoryStore.tasks.delete(id);
-        count++;
-      }
+    const snapshot = await db.collection("tasks")
+      .where("boardId", "==", String(boardId))
+      .get();
+
+    if (snapshot.empty) return 0;
+
+    const docs = snapshot.docs;
+    const batchSize = 400;
+
+    for (let i = 0; i < docs.length; i += batchSize) {
+      const batch = db.batch();
+      const chunk = docs.slice(i, i + batchSize);
+      chunk.forEach((d) => batch.delete(d.ref));
+      await batch.commit();
     }
-    return count;
+
+    return docs.length;
   }
 }
 

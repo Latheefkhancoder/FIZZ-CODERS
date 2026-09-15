@@ -18,10 +18,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@google-cloud/firestore": "^9.1.0",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "firebase-admin": "^14.4.0",
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.3",
     "nodemailer": "^10.0.1"
@@ -39,6 +41,7 @@
     "testMatch": [
       "**/tests/**/*.test.js"
     ],
-    "verbose": true
+    "verbose": true,
+    "testTimeout": 15000
   }
 }

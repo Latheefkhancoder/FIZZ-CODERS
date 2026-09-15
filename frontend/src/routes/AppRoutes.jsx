@@ -34,7 +34,11 @@ import MemberProfilePage      from '../pages/member/MemberProfilePage';
  */
 const ProtectedRoute = ({ children, allowedRole }) => {
   const role = sessionStorage.getItem('fizz_role') || localStorage.getItem('fizz_role');
-  const token = sessionStorage.getItem('auth_token') || localStorage.getItem('auth_token');
+  const token =
+    sessionStorage.getItem('fizz_token') ||
+    localStorage.getItem('fizz_token') ||
+    sessionStorage.getItem('auth_token') ||
+    localStorage.getItem('auth_token');
 
   if (!token && !role) {
     return <Navigate to="/login" replace />;

@@ -1,9 +1,36 @@
 const { boardService } = require("../../src/services");
-const { memoryStore } = require("../../src/repositories");
+const {
+  boardRepository,
+  memberRepository,
+  activityRepository,
+} = require("../../src/repositories");
 
 describe("Board Service Unit Tests", () => {
-  beforeEach(() => {
-    memoryStore.clear();
+  const TEST_CODES = ["A7K2P", "B3M9Q", "C5R8T", "D8W4Z", "X9Y8Z"];
+  const createdBoardIds = [];
+
+  const cleanupBoardByCode = async (code) => {
+    const existing = await boardRepository.findByCode(code);
+    if (existing) {
+      await boardService.deleteBoard(existing.id, existing.ownerId, "cleanup").catch(() => {});
+    }
+  };
+
+  beforeEach(async () => {
+    for (const code of TEST_CODES) {
+      await cleanupBoardByCode(code);
+    }
+  });
+
+  afterEach(async () => {
+    for (const id of createdBoardIds) {
+      await boardService.deleteBoard(id, "cleanup", "cleanup").catch(() => {});
+    }
+    createdBoardIds.length = 0;
+
+    for (const code of TEST_CODES) {
+      await cleanupBoardByCode(code);
+    }
   });
 
   describe("createBoard", () => {
@@ -15,33 +42,35 @@ describe("Board Service Unit Tests", () => {
         userName: "Alice",
         userEmail: "alice@example.com",
       });
+      createdBoardIds.push(board.id);
 
       expect(board).toBeDefined();
       expect(board.name).toBe("Test Board");
       expect(board.code).toBe("A7K2P");
       expect(board.ownerId).toBe("user_1");
 
-      // Verify owner is added as Admin member
-      const members = Array.from(memoryStore.members.values());
+      // Verify owner is added as Admin member via memberRepository
+      const members = await memberRepository.findByBoardId(board.id);
       expect(members.length).toBe(1);
       expect(members[0].boardId).toBe(board.id);
       expect(members[0].userId).toBe("user_1");
       expect(members[0].role).toBe("Admin");
 
-      // Verify activity log was created
-      const logs = Array.from(memoryStore.activityLogs.values());
+      // Verify activity log was created via activityRepository
+      const logs = await activityRepository.findByBoardId(board.id);
       expect(logs.length).toBe(1);
       expect(logs[0].action).toBe("BOARD_CREATED");
     });
 
     it("should reject duplicate board codes with 409", async () => {
-      await boardService.createBoard({
+      const firstBoard = await boardService.createBoard({
         name: "First Board",
         code: "A7K2P",
         userId: "user_1",
         userName: "Alice",
         userEmail: "alice@example.com",
       });
+      createdBoardIds.push(firstBoard.id);
 
       await expect(
         boardService.createBoard({
@@ -64,6 +93,7 @@ describe("Board Service Unit Tests", () => {
         userName: "Alice",
         userEmail: "alice@example.com",
       });
+      createdBoardIds.push(board.id);
 
       const joinedBoard = await boardService.joinBoard({
         code: "b3m9q",
@@ -73,7 +103,7 @@ describe("Board Service Unit Tests", () => {
       });
 
       expect(joinedBoard.id).toBe(board.id);
-      const members = Array.from(memoryStore.members.values());
+      const members = await memberRepository.findByBoardId(board.id);
       expect(members.length).toBe(2);
       const bobMember = members.find((m) => m.userId === "user_2");
       expect(bobMember).toBeDefined();
@@ -81,13 +111,14 @@ describe("Board Service Unit Tests", () => {
     });
 
     it("should reject joining if user is already owner", async () => {
-      await boardService.createBoard({
+      const board = await boardService.createBoard({
         name: "Owner Board",
         code: "C5R8T",
         userId: "user_1",
         userName: "Alice",
         userEmail: "alice@example.com",
       });
+      createdBoardIds.push(board.id);
 
       await expect(
         boardService.joinBoard({
@@ -107,6 +138,7 @@ describe("Board Service Unit Tests", () => {
         userName: "Alice",
         userEmail: "alice@example.com",
       });
+      createdBoardIds.push(board.id);
 
       await boardService.joinBoard({
         code: "D8W4Z",
@@ -138,8 +170,9 @@ describe("Board Service Unit Tests", () => {
 
       await boardService.deleteBoard(board.id, "user_1", "Alice");
 
-      expect(memoryStore.boards.has(board.id)).toBe(false);
-      expect(Array.from(memoryStore.members.values()).filter((m) => m.boardId === board.id).length).toBe(0);
+      expect(await boardRepository.findById(board.id)).toBeNull();
+      const remainingMembers = await memberRepository.findByBoardId(board.id);
+      expect(remainingMembers.length).toBe(0);
     });
   });
 });
